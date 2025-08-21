@@ -29,23 +29,16 @@ Este projeto foi desenvolvido como parte da disciplina de **Requisitos, projeto 
 - 📌 **Notificações automáticas** para prazos e novas aulas.
 - 📌 **Relatórios e estatísticas** para instrutores e administração.
 
----
 
 ## 🛠 Tecnologias Utilizadas
 ### Backend
-- **Java 17+**
-- **Spring Boot** (Web, Data JPA, Security)
-- **Hibernate**
-- **Lombok**
-- **JUnit & Cucumber** (testes BDD)
-- **Maven**
-
 ### Frontend
-- **Angular 16+** ou **Vaadin**
-- **HTML5 / CSS3 / TypeScript**
-- **Bootstrap / Material UI**
-
 ### Banco de Dados
-- **PostgreSQL** (padrão) ou MySQL
-- **Docker Compose** para containerização
+
+## 📂 Documentação do Projeto
+
+- [Descrição do Domínio](docs/descricao_dominio.md)
+
+
+
 

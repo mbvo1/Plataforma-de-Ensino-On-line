@@ -14,7 +14,7 @@ Este projeto foi desenvolvido como parte da disciplina **Requisitos, Projeto de 
 
 ---
 
-## 3. Conceitos Centrais (Linguagem Onipresente)
+## 3. Conceitos Centrais
 - **Curso** – Unidade de ensino composta por módulos, aulas e avaliações.  
 - **Módulo** – Subdivisão de um curso, agrupando aulas relacionadas.  
 - **Aula** – Conteúdo disponibilizado pelo instrutor (vídeo, PDF, material interativo).  

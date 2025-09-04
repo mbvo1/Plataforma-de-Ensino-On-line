@@ -1,4 +1,4 @@
-Descrição do Domínio: Plataforma de Ensino Online
+# Descrição do Domínio: Plataforma de Ensino Online
 1. Introdução
 A Plataforma de Ensino Online tem como objetivo oferecer uma experiência completa de educação digital, permitindo que alunos se inscrevam em cursos, acompanhem seu progresso e recebam certificados. O sistema também possibilita que instrutores criem e gerenciem conteúdos de forma organizada, enquanto a administração supervisiona usuários, pagamentos e relatórios.
 

@@ -19,23 +19,23 @@ Este projeto foi desenvolvido como parte da disciplina de **Requisitos, projeto 
 ---
 
 ## Funcionalidades Principais
-- 📌 **Cadastro e autenticação de usuários** (Aluno, Instrutor, Admin).
-- 📌 **Criação e edição de cursos** com módulos e pré-requisitos.
-- 📌 **Inscrição e pagamento** com regras de cupons e parcelamento.
-- 📌 **Controle de progresso** e desbloqueio de módulos.
-- 📌 **Avaliações online** com correção automática/manual.
-- 📌 **Emissão de certificados** com código de validação.
-- 📌 **Fórum de dúvidas** e comentários por módulo.
-- 📌 **Notificações automáticas** para prazos e novas aulas.
-- 📌 **Relatórios e estatísticas** para instrutores e administração.
+- **Cadastro e autenticação de usuários** (Aluno, Instrutor, Admin).
+- **Criação e edição de cursos** com módulos e pré-requisitos.
+- **Inscrição e pagamento** com regras de cupons e parcelamento.
+- **Controle de progresso** e desbloqueio de módulos.
+- **Avaliações online** com correção automática/manual.
+- **Emissão de certificados** com código de validação.
+- **Fórum de dúvidas** e comentários por módulo.
+- **Notificações automáticas** para prazos e novas aulas.
+- **Relatórios e estatísticas** para instrutores e administração.
 
 
-## 🛠 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 ### Backend
 ### Frontend
 ### Banco de Dados
 
-## 📂 Documentação do Projeto
+## Documentação do Projeto
 
 - [Descrição do Domínio](docs/descricao_dominio.md)
 

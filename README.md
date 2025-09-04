@@ -1,4 +1,4 @@
-# 🎓 Plataforma de Ensino Online
+#  Plataforma de Ensino Online
 
 ## Descrição do Projeto
 A **Plataforma de Ensino Online** é um sistema web desenvolvido em **Java com Spring Boot** e **Angular** (ou Vaadin) para oferecer uma experiência completa de educação digital.  

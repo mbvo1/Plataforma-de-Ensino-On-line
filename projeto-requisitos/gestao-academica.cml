@@ -1,0 +1,209 @@
+Domain GestaoDeEnsinoOnline {
+    Subdomain GestaoAcademicaFormal
+    Subdomain AmbienteDeAprendizagem
+    Subdomain GerenciamentoDeIdentidade
+    Subdomain ComunicacaoEOrganizacao
+}
+
+
+BoundedContext GESTAO_ACADEMICA implements GestaoAcademicaFormal, ComunicacaoEOrganizacao {
+    
+    Aggregate Disciplina {
+        aggregateRoot Entity Disciplina {
+            - DisciplinaId id
+            - String codigoDisciplina
+            - String nome
+            - String descricao
+            - List<DisciplinaId> preRequisitosIds 
+        }
+    }
+    
+    Aggregate Sala {
+        aggregateRoot Entity Sala {
+            - SalaId id
+            - DisciplinaId disciplinaId
+            - PeriodoLetivoId periodoLetivoId
+            - String identificador
+            - ProfessorId professorResponsavelId
+            - String horario
+            - int limiteDeVagas
+            - List<Matricula> matriculas
+        }
+        
+        Entity Matricula {
+            - MatriculaId id
+            - AlunoId alunoId
+            - Date dataMatricula
+            - MatriculaStatus status
+            - Map<String, Nota> avaliacoes
+            - int totalFaltas
+            - SituacaoFinal situacao
+        }
+        
+        ValueObject Nota { - double valor }
+        enum MatriculaStatus { ATIVA, CANCELADA }
+        enum SituacaoFinal { APROVADO, REPROVADO, CURSANDO }
+    }
+    
+    Aggregate PeriodoLetivo {
+        aggregateRoot Entity PeriodoLetivo {
+            - PeriodoLetivoId id
+            - String identificador
+            - Date dataInicio
+            - Date dataFim
+            - Date dataInicioMatricula
+            - Date dataFimMatricula
+            - PeriodoStatus status
+        }
+        enum PeriodoStatus { ABERTO, ENCERRADO, MATRICULAS_ABERTAS }
+    }
+    
+    Service GestaoMatriculaService {
+        def void realizarMatricula(AlunoId alunoId, SalaId salaId)
+        def boolean verificarPreRequisitos(AlunoId alunoId, DisciplinaId disciplinaId)
+    }
+    
+    Aggregate Topico {
+        aggregateRoot Entity Topico {
+            - TopicoId id
+            - DisciplinaId disciplinaId
+            - String titulo
+            - String conteudo
+            - UsuarioId autorId
+            - List<Resposta> respostas
+        }
+        
+        Entity Resposta {
+            - RespostaId id
+            - String conteudo
+            - UsuarioId autorId
+            - boolean verificadaPeloProfessor
+        }
+    }
+
+
+    ValueObject DisciplinaId { long id }
+    ValueObject SalaId { long id }
+    ValueObject PeriodoLetivoId { long id }
+    ValueObject MatriculaId { long id }
+    ValueObject TopicoId { long id }
+    ValueObject RespostaId { long id }
+    ValueObject ProfessorId { long id }
+    ValueObject AlunoId { long id }
+    ValueObject UsuarioId { long id }
+}
+
+
+BoundedContext AMBIENTE_COLABORATIVO implements AmbienteDeAprendizagem {
+  
+    Aggregate Turma {
+        aggregateRoot Entity Turma {
+            - TurmaId id
+            - String titulo
+            - CodigoAcesso codigoAcesso
+            - ProfessorId professorCriadorId
+            - List<AlunoId> alunosParticipantes
+            - List<Atividade> atividades
+        }
+
+
+        Entity Atividade {
+            - AtividadeId id
+            - String titulo
+            - String descricao
+            - Date dataDeEntrega
+            - List<Envio> envios
+        }
+        
+        Entity Envio {
+            - EnvioId id
+            - AlunoId alunoId
+            - Date dataEnvio
+            - EnvioStatus status
+            - Nota nota
+            - String feedbackProfessor
+        }
+
+
+        ValueObject CodigoAcesso { - String codigo }
+        ValueObject Nota { - double valor }
+        enum EnvioStatus { ENVIADO, ATRASADO, CORRIGIDO }
+    }
+
+
+    ValueObject TurmaId { long id }
+    ValueObject AtividadeId { long id }
+    ValueObject EnvioId { long id }
+    ValueObject ProfessorId { long id }
+    ValueObject AlunoId { long id }
+}
+
+
+BoundedContext IDENTIDADE_E_ACESSO implements GerenciamentoDeIdentidade {
+    Aggregate Usuario {
+        aggregateRoot Entity Usuario {
+            - UsuarioId id
+            - String nome
+            - String email
+            - Perfil perfil
+            - UsuarioStatus status
+        }
+        enum Perfil { ALUNO, PROFESSOR, ADMINISTRADOR }
+        enum UsuarioStatus { ATIVO, INATIVO }
+    }
+
+
+    ValueObject UsuarioId { long id }
+}
+
+
+BoundedContext COMUNICACAO_GERAL implements ComunicacaoEOrganizacao {
+    Aggregate Aviso {
+        aggregateRoot Entity Aviso {
+            - AvisoId id
+            - String titulo
+            - String conteudo
+            - UsuarioId autorId
+            - PublicoAlvo publicoAlvo
+        }
+        
+        ValueObject PublicoAlvo {
+            - AlvoType tipo
+            - List<SalaId> salasIds
+            - List<TurmaId> turmasIds
+        }
+        enum AlvoType { GERAL, ALUNOS, PROFESSORES, SALA_ESPECIFICA, TURMA_ESPECIFICA }
+    }
+
+
+    Aggregate Calendario {
+        aggregateRoot Entity Evento {
+            - EventoId id
+            - String titulo
+            - Date data
+            - EventoTipo tipo
+            - UsuarioId responsavelId
+        }
+        enum EventoTipo { PROVA, ENTREGA_ATIVIDADE, FERIADO, PERIODO_MATRICULA }
+    }
+
+
+    ValueObject AvisoId { long id }
+    ValueObject EventoId { long id }
+    ValueObject UsuarioId { long id }
+    ValueObject SalaId { long id }
+    ValueObject TurmaId { long id }
+}
+
+
+ContextMap {
+    GESTAO_ACADEMICA [D, CF] -> [U, OHS] IDENTIDADE_E_ACESSO
+    AMBIENTE_COLABORATIVO [D, CF] -> [U, OHS] IDENTIDADE_E_ACESSO
+    COMUNICACAO_GERAL [D, CF] -> [U, OHS] IDENTIDADE_E_ACESSO
+    
+    AMBIENTE_COLABORATIVO [D, ACL] -> [U, PL] GESTAO_ACADEMICA
+
+
+    COMUNICACAO_GERAL [D, CF] -> [U, OHS] GESTAO_ACADEMICA
+    COMUNICACAO_GERAL [D, CF] -> [U, OHS] AMBIENTE_COLABORATIVO
+}

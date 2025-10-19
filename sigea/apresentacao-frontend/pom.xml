@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.lfeipearruda1.gestao</groupId>
+        <artifactId>gestao-ensino-online-pai</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../gestao-ensino-online-pai</relativePath>
+    </parent>
+
+    <artifactId>apresentacao-frontend</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Gestão Ensino Online - Frontend</name>
+    <description>Módulo de apresentação front-end do projeto de Gestão de Ensino Online</description>
+</project>

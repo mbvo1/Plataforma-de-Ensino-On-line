@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.lfeipearruda1.gestao</groupId>
+        <groupId>com.sigea.gestao</groupId>
         <artifactId>gestao-ensino-online-pai</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../gestao-ensino-online-pai</relativePath>

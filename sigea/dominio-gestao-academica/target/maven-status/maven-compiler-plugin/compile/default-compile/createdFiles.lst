@@ -1,0 +1,7 @@
+dev\com\sigea\dominio\gestaoacademica\disciplina\DisciplinaId.class
+dev\com\sigea\dominio\gestaoacademica\disciplina\DisciplinaRepository.class
+dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivo.class
+dev\com\sigea\dominio\gestaoacademica\disciplina\Disciplina.class
+dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoStatus.class
+dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivoRepository.class
+dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivoId.class

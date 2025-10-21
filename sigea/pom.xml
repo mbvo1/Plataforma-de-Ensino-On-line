@@ -16,14 +16,8 @@
 
     <modules>
         <module>sigea-pai</module>
-        <module>dominio-compartilhado</module>
         <module>dominio-identidade-acesso</module>
         <module>dominio-gestao-academica</module>
-        <module>dominio-ambiente-colaborativo</module>
-        <module>dominio-comunicacao-geral</module>
-        <module>aplicacao</module>
-        <module>apresentacao-backend</module>
-        <module>infraestrutura</module>
     </modules>
 
 </project>

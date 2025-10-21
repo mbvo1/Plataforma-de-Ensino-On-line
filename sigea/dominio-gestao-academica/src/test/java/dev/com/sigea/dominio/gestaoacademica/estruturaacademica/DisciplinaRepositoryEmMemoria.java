@@ -17,6 +17,8 @@ public class DisciplinaRepositoryEmMemoria implements DisciplinaRepository {
     @Override
     public Optional<Disciplina> buscarPorNome(String nome) { return Optional.ofNullable(disciplinasPorNome.get(nome)); }
     @Override
-    public DisciplinaId proximoId() { return new DisciplinaId(sequence.getAndIncrement()); }
+    public DisciplinaId proximoId() {
+        return new DisciplinaId(String.valueOf(sequence.getAndIncrement()));
+    }
     public int totalDeDisciplinas() { return disciplinasPorNome.size(); }
 }

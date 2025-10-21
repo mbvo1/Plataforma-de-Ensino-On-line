@@ -1,3 +1,10 @@
 package dev.com.sigea.dominio.gestaoacademica.disciplina;
+
 import java.io.Serializable;
-public record DisciplinaId(Long value) implements Serializable {}
+import java.util.Objects;
+
+public record DisciplinaId(String valor) implements Serializable {
+    public DisciplinaId {
+        Objects.requireNonNull(valor, "O valor do ID da disciplina não pode ser nulo.");
+    }
+}

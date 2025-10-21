@@ -16,6 +16,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>dev.com.sigea</groupId>
+            <artifactId>dominio-identidade-acesso</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
             <version>7.18.0</version>

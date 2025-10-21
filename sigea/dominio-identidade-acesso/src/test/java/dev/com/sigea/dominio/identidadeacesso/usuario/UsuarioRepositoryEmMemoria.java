@@ -27,7 +27,7 @@ public class UsuarioRepositoryEmMemoria implements UsuarioRepository {
     
     @Override
     public UsuarioId proximoId() {
-        return new UsuarioId(sequence.getAndIncrement());
+        return new UsuarioId(String.valueOf(sequence.getAndIncrement())); 
     }
     
     public int totalDeUsuarios() {

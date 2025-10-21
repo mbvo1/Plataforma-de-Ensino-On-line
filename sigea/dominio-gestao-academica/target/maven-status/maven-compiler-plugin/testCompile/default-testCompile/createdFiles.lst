@@ -1,4 +1,6 @@
 dev\com\sigea\dominio\gestaoacademica\RunCucumberTest.class
-dev\com\sigea\dominio\gestaoacademica\estruturaacademica\ControlarEstruturaAcademicaFeature.class
 dev\com\sigea\dominio\gestaoacademica\estruturaacademica\DisciplinaRepositoryEmMemoria.class
+dev\com\sigea\dominio\gestaoacademica\estruturaacademica\ControlarEstruturaAcademicaFeature.class
+dev\com\sigea\dominio\gestaoacademica\sala\RealizarMatriculaFeature.class
 dev\com\sigea\dominio\gestaoacademica\estruturaacademica\PeriodoLetivoRepositoryEmMemoria.class
+dev\com\sigea\dominio\gestaoacademica\sala\SalaRepositoryEmMemoria.class

@@ -5,3 +5,9 @@ C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dom
 C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivoId.java
 C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivoRepository.java
 C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoStatus.java
+C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\sala\Matricula.java
+C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\sala\MatriculaId.java
+C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\sala\MatriculaStatus.java
+C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\sala\Sala.java
+C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\sala\SalaId.java
+C:\Users\felip\Desktop\trabalhoRequisitos\Plataforma-de-Ensino-On-line\sigea\dominio-gestao-academica\src\main\java\dev\com\sigea\dominio\gestaoacademica\sala\SalaRepository.java

@@ -1,8 +1,8 @@
 package dev.com.sigea.dominio.comunicacaogeral.aviso;
 
-import dev.com.sigea.dominio.comunicacao.aviso.Aviso;
-import dev.com.sigea.dominio.comunicacao.aviso.AvisoId;
-import dev.com.sigea.dominio.comunicacao.aviso.AvisoRepository;
+import dev.com.sigea.dominio.comunicacaogeral.aviso.Aviso;
+import dev.com.sigea.dominio.comunicacaogeral.aviso.AvisoId;
+import dev.com.sigea.dominio.comunicacaogeral.aviso.AvisoRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

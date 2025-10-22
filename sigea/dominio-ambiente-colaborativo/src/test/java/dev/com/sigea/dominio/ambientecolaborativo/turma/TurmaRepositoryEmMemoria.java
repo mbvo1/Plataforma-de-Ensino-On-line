@@ -20,6 +20,13 @@ public class TurmaRepositoryEmMemoria implements TurmaRepository {
     }
 
     @Override
+    public Optional<Turma> buscarPorCodigoDeAcesso(CodigoAcesso codigo) {
+        return turmas.values().stream()
+            .filter(turma -> turma.getCodigoAcesso().equals(codigo))
+            .findFirst();
+    }
+
+    @Override
     public TurmaId proximoId() {
         return new TurmaId(UUID.randomUUID().toString());
     }

@@ -1,4 +1,4 @@
-package dev.com.sigea.dominio.comunicacao.aviso;
+package dev.com.sigea.dominio.comunicacaogeral.aviso;
 
 import java.util.Optional;
 

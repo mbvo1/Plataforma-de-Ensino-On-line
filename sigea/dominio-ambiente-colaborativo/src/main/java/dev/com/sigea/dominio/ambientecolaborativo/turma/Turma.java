@@ -14,6 +14,7 @@ public class Turma {
     private final UsuarioId professorCriadorId;
     private final List<UsuarioId> alunosParticipantes = new ArrayList<>();
     private final List<Material> materiais = new ArrayList<>();
+    private final List<Atividade> atividades = new ArrayList<>();
 
     public Turma(TurmaId id, UsuarioId professorCriadorId, String titulo) {
         this.id = Objects.requireNonNull(id);
@@ -41,5 +42,34 @@ public class Turma {
 
     public List<Material> getMateriais() {
         return List.copyOf(materiais);
+    }
+
+    public void ingressar(UsuarioId alunoId) {
+        Objects.requireNonNull(alunoId);
+        if (alunosParticipantes.contains(alunoId)) {
+            throw new IllegalArgumentException("Aluno já está participando desta turma.");
+        }
+        alunosParticipantes.add(alunoId);
+    }
+
+    public Envio enviarAtividade(AtividadeId atividadeId, UsuarioId alunoId, List<Anexo> anexos) {
+        Objects.requireNonNull(atividadeId);
+        Objects.requireNonNull(alunoId);
+        Objects.requireNonNull(anexos);
+
+        if (!alunosParticipantes.contains(alunoId)) {
+            throw new IllegalArgumentException("Aluno não está participando desta turma.");
+        }
+
+        var atividade = atividades.stream()
+            .filter(a -> a.getId().equals(atividadeId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Atividade não encontrada nesta turma."));
+
+        return atividade.receberEnvio(alunoId, anexos);
+    }
+
+    public List<Atividade> getAtividades() {
+        return List.copyOf(atividades);
     }
 }

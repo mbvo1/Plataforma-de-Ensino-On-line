@@ -1,7 +1,13 @@
+dev\com\sigea\dominio\ambientecolaborativo\turma\EnvioId.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\AtividadeId.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\IngressoService.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\Material.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\CodigoAcesso.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\Anexo.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\TurmaId.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\Turma.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\MaterialId.class
-dev\com\sigea\dominio\ambientecolaborativo\turma\Material.class
-dev\com\sigea\dominio\ambientecolaborativo\turma\CodigoAcesso.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\Atividade.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\TurmaRepository.class
-dev\com\sigea\dominio\ambientecolaborativo\turma\Anexo.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\Envio.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\EnvioStatus.class

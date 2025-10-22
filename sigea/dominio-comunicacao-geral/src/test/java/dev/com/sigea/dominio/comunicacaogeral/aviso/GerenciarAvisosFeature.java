@@ -1,7 +1,7 @@
 package dev.com.sigea.dominio.comunicacaogeral.aviso;
 
 import dev.com.sigea.dominio.ambientecolaborativo.turma.*;
-import dev.com.sigea.dominio.comunicacao.aviso.*;
+import dev.com.sigea.dominio.comunicacaogeral.aviso.*;
 import dev.com.sigea.dominio.identidadeacesso.usuario.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.pt.*;

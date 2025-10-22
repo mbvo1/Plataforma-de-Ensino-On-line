@@ -1,38 +1,48 @@
-#  Plataforma de Ensino Online
+# SIGEA - Plataforma de Ensino On-line
 
-## Descrição do Projeto
-A **Plataforma de Ensino Online** é um sistema web desenvolvido em **Java com Spring Boot** e **Angular** (ou Vaadin) para oferecer uma experiência completa de educação digital.  
-O sistema permite que **alunos** se inscrevam em cursos, acompanhem o progresso e recebam certificados, enquanto **instrutores** podem criar e gerenciar conteúdo. A **administração** pode controlar usuários, pagamentos e relatórios.
+## 🚀 Sobre o Projeto
 
-Este projeto foi desenvolvido como parte da disciplina de **Requisitos, projeto de software e validação** , seguindo **DDD (Domain-Driven Design)**, **Arquitetura Limpa** e padrões de projeto.
+SIGEA é uma plataforma educacional integrada para a gestão de instituições de ensino, projetada para otimizar tanto os aspectos acadêmicos formais quanto os ambientes colaborativos de aprendizado. O sistema oferece ferramentas para a gestão completa de usuários (administradores, professores e alunos), organização da estrutura acadêmica (disciplinas e períodos letivos), controle de matrículas e a publicação centralizada de materiais, atividades e comunicados.
 
----
-
-##  Objetivos
-- Aplicar os conceitos de **Domain-Driven Design** (DDD) nos níveis estratégico, tático e operacional.
-- Utilizar **padrões de projeto** como Strategy, Observer, Iterator, Proxy e Template Method.
-- Implementar funcionalidades **não triviais** com regras de negócio de média/alta complexidade.
-- Garantir persistência com **JPA/Hibernate** e banco de dados relacional.
-- Criar **interface web** responsiva e intuitiva.
-- Implementar **testes BDD** com Cucumber.
+O objetivo principal é fornecer à comunidade acadêmica — administradores, professores e alunos — um ambiente digital unificado e robusto que aprimore a experiência de ensino e aprendizagem. A plataforma permite o planejamento de atividades, a distribuição de conteúdo didático e o monitoramento completo do progresso dos alunos, incluindo notas, participação em fóruns e entrega de trabalhos.
 
 ---
 
-## Funcionalidades Principais
-- **Cadastro e autenticação de usuários** (Aluno, Instrutor, Admin).
-- **Criação e edição de cursos** com módulos e pré-requisitos.
-- **Inscrição e pagamento** com regras de cupons e parcelamento.
-- **Controle de progresso** e desbloqueio de módulos.
-- **Avaliações online** com correção automática/manual.
-- **Emissão de certificados** com código de validação.
-- **Fórum de dúvidas** e comentários por módulo.
-- **Notificações automáticas** para prazos e novas aulas.
-- **Relatórios e estatísticas** para instrutores e administração.
+## 🏛️ Arquitetura e Tecnologias
+
+## ⚙️ Como Rodar o Projeto
+
+### Pré-requisitos
+
+* **JDK 17** (ou superior)
+* **Apache Maven** 3.8 (ou superior)
+
+### Comandos
+
+Para compilar o projeto e executar todos os testes automatizados, navegue até a pasta raiz (`sigea/`) e execute o seguinte comando:
+
+mvn clean install
+
+Para apenas executar os testes (sem recompilar tudo), utilize:
+
+mvn test
+
+Ao final da execução, o build deve ser concluído com **`BUILD SUCCESS`**, indicando que todas as 18 especificações de teste passaram.
 
 ---
 
-- [Figma](https://www.figma.com/design/mshXnITEmNfVZrYsQT8gV6/Untitled?node-id=0-1&p=f&t=C1KQSf8LGKrchoLk-0)
+## 👥 Integrantes
 
-- [Slides](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+* Felipe Bandeira
+* Luis Felipe Arruda
+* Marcelo Bresani
+* Marcelo Henrique
 
-- [Descrição do Domínio](docs/descricao_dominio.md)
+---
+
+## 🔗 Links Gerais
+
+* **[Apresentação](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)** *
+* **[Protótipo]([https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://www.figma.com/design/mshXnITEmNfVZrYsQT8gV6/Untitled?node-id=0-1&p=f&t=C1KQSf8LGKrchoLk-0))** *
+* **[Mapa de Histórias do Usuário]([https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://miro.com/app/board/uXjVJ7Q1pVU=))** *
+* **[Descrição do Domínio]([https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://docs.google.com/document/d/19dmEHKq8BIhEIaaKKtwoF_yDFlVeOprotMjORMVZwSE/edit?tab=t.0))** *

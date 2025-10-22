@@ -31,9 +31,9 @@ Este projeto foi desenvolvido como parte da disciplina de **Requisitos, projeto 
 
 ---
 
-FIGMA: https://www.figma.com/design/mshXnITEmNfVZrYsQT8gV6/Untitled?node-id=0-1&p=f&t=C1KQSf8LGKrchoLk-0
-Slides: https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+- [Figma](https://www.figma.com/design/mshXnITEmNfVZrYsQT8gV6/Untitled?node-id=0-1&p=f&t=C1KQSf8LGKrchoLk-0)
 
+- [Slides](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 - [Descrição do Domínio](docs/descricao_dominio.md)
 

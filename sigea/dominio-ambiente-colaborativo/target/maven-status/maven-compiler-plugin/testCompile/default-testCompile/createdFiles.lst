@@ -1,2 +1,3 @@
 dev\com\sigea\dominio\ambientecolaborativo\turma\GerenciarConteudoFeature.class
+dev\com\sigea\dominio\ambientecolaborativo\RunCucumberTest.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\TurmaRepositoryEmMemoria.class

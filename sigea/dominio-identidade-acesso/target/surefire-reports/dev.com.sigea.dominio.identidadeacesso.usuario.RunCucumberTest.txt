@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: dev.com.sigea.dominio.identidadeacesso.usuario.RunCucumberTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.180 s -- in dev.com.sigea.dominio.identidadeacesso.usuario.RunCucumberTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.186 s -- in dev.com.sigea.dominio.identidadeacesso.usuario.RunCucumberTest

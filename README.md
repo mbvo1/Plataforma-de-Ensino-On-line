@@ -41,6 +41,6 @@ Ao final da execução, o build deve ser concluído com **`BUILD SUCCESS`**, ind
 ## 🔗 Links Gerais
 
 * **[Apresentação](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)**
-* **[Protótipo]([https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://www.figma.com/design/mshXnITEmNfVZrYsQT8gV6/Untitled?node-id=0-1&p=f&t=C1KQSf8LGKrchoLk-0))** 
-* **[Mapa de Histórias do Usuário]([https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://miro.com/app/board/uXjVJ7Q1pVU=))** 
-* **[Descrição do Domínio]([https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://docs.google.com/document/d/19dmEHKq8BIhEIaaKKtwoF_yDFlVeOprotMjORMVZwSE/edit?tab=t.0))** 
+* **[Protótipo](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://www.figma.com/design/mshXnITEmNfVZrYsQT8gV6/Untitled?node-id=0-1&p=f&t=C1KQSf8LGKrchoLk-0))** 
+* **[Mapa de Histórias do Usuário](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://miro.com/app/board/uXjVJ7Q1pVU=))** 
+* **[Descrição do Domínio](https://www.canva.com/design/DAG2U5n0a3I/-9maNTx9KBascFk08bwTjw/edit?utm_content=DAG2U5n0a3I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton](https://docs.google.com/document/d/19dmEHKq8BIhEIaaKKtwoF_yDFlVeOprotMjORMVZwSE/edit?tab=t.0))** 

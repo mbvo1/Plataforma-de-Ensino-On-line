@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-// Implementação do Adaptador de persistência para testes em memória
 public class UsuarioRepositoryEmMemoria implements UsuarioRepository {
 
     private final Map<String, Usuario> usuariosPorEmail = new HashMap<>();

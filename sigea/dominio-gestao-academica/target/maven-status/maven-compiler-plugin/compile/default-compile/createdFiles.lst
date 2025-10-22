@@ -11,3 +11,4 @@ dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivo.class
 dev\com\sigea\dominio\gestaoacademica\sala\MatriculaStatus.class
 dev\com\sigea\dominio\gestaoacademica\sala\Sala.class
 dev\com\sigea\dominio\gestaoacademica\sala\SalaId.class
+dev\com\sigea\dominio\gestaoacademica\sala\Nota.class

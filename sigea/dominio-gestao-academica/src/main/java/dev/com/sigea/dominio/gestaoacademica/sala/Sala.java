@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Optional;
 
 public class Sala {
 
@@ -31,6 +32,19 @@ public class Sala {
         Matricula novaMatricula = new Matricula(new MatriculaId(UUID.randomUUID().toString()), alunoId);
         this.matriculas.add(novaMatricula);
         return novaMatricula;
+    }
+
+    public void lancarNota(UsuarioId alunoId, String avaliacao, Nota nota) {
+        Matricula matricula = buscarMatriculaDoAluno(alunoId)
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado nesta sala."));
+        
+        matricula.registrarNota(avaliacao, nota);
+    }
+
+    private Optional<Matricula> buscarMatriculaDoAluno(UsuarioId alunoId) {
+        return matriculas.stream()
+                .filter(m -> m.getAlunoId().equals(alunoId))
+                .findFirst();
     }
 
     public SalaId getId() {

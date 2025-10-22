@@ -24,8 +24,6 @@ public class GerenciarUsuariosFeature {
     @Dado("que eu sou um administrador logado no sistema")
     public void que_eu_sou_um_administrador_logado_no_sistema() {
         setup();
-        // Em um cenário real, aqui haveria uma simulação de login
-        // Para este teste de domínio, apenas inicializamos o ambiente
     }
 
     @Quando("eu preencho o formulário de cadastro com o nome {string}, o e-mail {string} e o perfil {string}")
@@ -54,7 +52,6 @@ public class GerenciarUsuariosFeature {
         assertTrue(usuarioRepository.buscarPorEmail(email).isPresent(), "O usuário com o e-mail " + email + " não foi encontrado.");
     }
 
-    // Cenário de Falha
     @Dado("que já existe um usuário com o e-mail {string}")
     public void que_ja_existe_um_usuario_com_o_email(String emailExistente) {
         Usuario usuarioPreexistente = new Usuario(

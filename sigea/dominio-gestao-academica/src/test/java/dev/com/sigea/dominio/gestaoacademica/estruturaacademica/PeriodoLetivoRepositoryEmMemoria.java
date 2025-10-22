@@ -1,7 +1,9 @@
 package dev.com.sigea.dominio.gestaoacademica.estruturaacademica;
+
 import dev.com.sigea.dominio.gestaoacademica.periodoletivo.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+
 public class PeriodoLetivoRepositoryEmMemoria implements PeriodoLetivoRepository {
     private final Map<PeriodoLetivoId, PeriodoLetivo> periodos = new HashMap<>();
     private final AtomicLong sequence = new AtomicLong(1);
@@ -24,6 +26,11 @@ public class PeriodoLetivoRepositoryEmMemoria implements PeriodoLetivoRepository
     }
 
     @Override
-    public PeriodoLetivoId proximoId() { return new PeriodoLetivoId(sequence.getAndIncrement()); }
-    public int totalDePeriodos() { return periodos.size(); }
+    public PeriodoLetivoId proximoId() {
+        return new PeriodoLetivoId(String.valueOf(sequence.getAndIncrement()));
+    }
+
+    public int totalDePeriodos() {
+        return periodos.size();
+    }
 }

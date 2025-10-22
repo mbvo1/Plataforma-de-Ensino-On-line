@@ -19,6 +19,7 @@
         <module>dominio-identidade-acesso</module>
         <module>dominio-gestao-academica</module>
         <module>dominio-ambiente-colaborativo</module>
+        <module>dominio-comunicacao-geral</module>
     </modules>
 
 </project>

@@ -1,0 +1,4 @@
+dev\com\sigea\dominio\comunicacao\aviso\Aviso.class
+dev\com\sigea\dominio\comunicacao\aviso\AvisoId.class
+dev\com\sigea\dominio\comunicacao\aviso\PublicadorDeAvisoService.class
+dev\com\sigea\dominio\comunicacao\aviso\AvisoRepository.class

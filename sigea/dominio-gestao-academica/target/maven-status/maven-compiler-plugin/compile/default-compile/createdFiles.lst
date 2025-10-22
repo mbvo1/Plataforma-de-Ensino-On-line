@@ -1,13 +1,17 @@
 dev\com\sigea\dominio\gestaoacademica\disciplina\Disciplina.class
+dev\com\sigea\dominio\gestaoacademica\forum\Topico.class
+dev\com\sigea\dominio\gestaoacademica\forum\TopicoId.class
 dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoStatus.class
 dev\com\sigea\dominio\gestaoacademica\sala\Matricula.class
 dev\com\sigea\dominio\gestaoacademica\sala\MatriculaId.class
 dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivoRepository.class
 dev\com\sigea\dominio\gestaoacademica\sala\SalaRepository.class
 dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivoId.class
+dev\com\sigea\dominio\gestaoacademica\forum\ForumService.class
 dev\com\sigea\dominio\gestaoacademica\disciplina\DisciplinaId.class
 dev\com\sigea\dominio\gestaoacademica\disciplina\DisciplinaRepository.class
 dev\com\sigea\dominio\gestaoacademica\periodoletivo\PeriodoLetivo.class
+dev\com\sigea\dominio\gestaoacademica\forum\TopicoRepository.class
 dev\com\sigea\dominio\gestaoacademica\sala\MatriculaStatus.class
 dev\com\sigea\dominio\gestaoacademica\sala\Sala.class
 dev\com\sigea\dominio\gestaoacademica\sala\SalaId.class

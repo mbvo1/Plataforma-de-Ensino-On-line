@@ -22,6 +22,11 @@ public class Sala {
         this.limiteDeVagas = limiteDeVagas;
     }
 
+    public boolean isAlunoMatriculado(UsuarioId alunoId) {
+        return matriculas.stream()
+                .anyMatch(m -> m.getAlunoId().equals(alunoId));
+    }
+    
     public Matricula matricular(UsuarioId alunoId) {
         if (getVagasRestantes() <= 0) {
             throw new IllegalStateException("Não há vagas disponíveis para esta sala.");

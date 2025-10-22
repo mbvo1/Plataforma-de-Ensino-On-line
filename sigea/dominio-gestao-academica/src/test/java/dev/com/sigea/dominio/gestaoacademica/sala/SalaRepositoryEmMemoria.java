@@ -1,6 +1,8 @@
 package dev.com.sigea.dominio.gestaoacademica.sala;
 
+import java.util.ArrayList; 
 import java.util.HashMap;
+import java.util.List; 
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,5 +24,10 @@ public class SalaRepositoryEmMemoria implements SalaRepository {
     @Override
     public SalaId proximoId() {
         return new SalaId(UUID.randomUUID().toString());
+    }
+
+    @Override
+    public List<Sala> listarTodas() {
+        return new ArrayList<>(salas.values());
     }
 }

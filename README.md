@@ -30,13 +30,6 @@ Este projeto foi desenvolvido como parte da disciplina de **Requisitos, projeto 
 - **Relatórios e estatísticas** para instrutores e administração.
 
 
-## Tecnologias Utilizadas
-### Backend
-### Frontend
-### Banco de Dados
-
-## Documentação do Projeto
-
 - [Descrição do Domínio](docs/descricao_dominio.md)
 
 

@@ -8,8 +8,6 @@ O objetivo principal é fornecer à comunidade acadêmica — administradores, p
 
 ---
 
-## 🏛️ Arquitetura e Tecnologias
-
 ## ⚙️ Como Rodar o Projeto
 
 ### Pré-requisitos

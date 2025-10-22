@@ -13,12 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GerenciarConteudoFeature {
 
     private TurmaRepository turmaRepository;
+    private TurmaService turmaService;
     private Turma turma;
     private Exception excecaoCapturada;
 
     @Before
     public void setup() {
         turmaRepository = new TurmaRepositoryEmMemoria();
+        turmaService = new TurmaService(turmaRepository);
         excecaoCapturada = null;
     }
 
@@ -33,8 +35,7 @@ public class GerenciarConteudoFeature {
     @Quando("o professor {string} publica na turma um novo material com título {string}, descrição {string} e anexa o arquivo {string}")
     public void o_professor_publica_na_turma_um_novo_material(String idProfessor, String titulo, String descricao, String nomeAnexo) {
         Anexo anexo = new Anexo(nomeAnexo);
-        turma.publicarMaterial(new UsuarioId(idProfessor), titulo, descricao, List.of(anexo));
-        turmaRepository.salvar(turma);
+        turmaService.publicarMaterialNaTurma(new UsuarioId(idProfessor), turma.getId(), titulo, descricao, List.of(anexo));
     }
 
     @Então("a turma {string} deve conter um material com o título {string}")
@@ -61,7 +62,7 @@ public class GerenciarConteudoFeature {
     @Quando("o professor {string} tenta publicar um material na turma do professor {string}")
     public void o_professor_tenta_publicar_um_material_na_turma_do_professor(String idProfessorInvasor, String idProfessorDono) {
         try {
-            turma.publicarMaterial(new UsuarioId(idProfessorInvasor), "Material Invasor", "Desc", List.of());
+            turmaService.publicarMaterialNaTurma(new UsuarioId(idProfessorInvasor), turma.getId(), "Material Invasor", "Desc", List.of());
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }

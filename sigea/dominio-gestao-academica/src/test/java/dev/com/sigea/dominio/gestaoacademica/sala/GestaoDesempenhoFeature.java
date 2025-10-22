@@ -13,11 +13,13 @@ public class GestaoDesempenhoFeature {
 
     private Sala sala;
     private SalaRepository salaRepository;
+    private LancamentoDeNotaService lancamentoDeNotaService;
     private Exception excecaoCapturada;
 
     @Before
     public void setup() {
         this.salaRepository = new SalaRepositoryEmMemoria();
+        this.lancamentoDeNotaService = new LancamentoDeNotaService(salaRepository);
         this.excecaoCapturada = null;
     }
 
@@ -32,8 +34,7 @@ public class GestaoDesempenhoFeature {
     @Quando("o professor lança a nota {double} na avaliação {string} para o aluno {string}")
     public void o_professor_lanca_a_nota_na_avaliacao_para_o_aluno(Double valorNota, String avaliacao, String idAluno) {
         try {
-            sala.lancarNota(new UsuarioId(idAluno), avaliacao, new Nota(valorNota));
-            salaRepository.salvar(sala);
+            lancamentoDeNotaService.lancarNota(new UsuarioId(idAluno), sala.getId(), avaliacao, new Nota(valorNota));
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }
@@ -54,8 +55,7 @@ public class GestaoDesempenhoFeature {
     @Quando("o professor tenta lançar a nota {double} na avaliação {string} para o aluno {string}")
     public void o_professor_tenta_lancar_a_nota_na_avaliacao_para_o_aluno(Double valorNota, String avaliacao, String idAluno) {
         try {
-            sala.lancarNota(new UsuarioId(idAluno), avaliacao, new Nota(valorNota));
-            salaRepository.salvar(sala);
+            lancamentoDeNotaService.lancarNota(new UsuarioId(idAluno), sala.getId(), avaliacao, new Nota(valorNota));
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }

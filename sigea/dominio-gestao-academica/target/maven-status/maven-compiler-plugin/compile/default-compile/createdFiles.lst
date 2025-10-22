@@ -1,3 +1,4 @@
+dev\com\sigea\dominio\gestaoacademica\sala\MatriculaService.class
 dev\com\sigea\dominio\gestaoacademica\disciplina\Disciplina.class
 dev\com\sigea\dominio\gestaoacademica\forum\Topico.class
 dev\com\sigea\dominio\gestaoacademica\forum\TopicoId.class
@@ -15,4 +16,5 @@ dev\com\sigea\dominio\gestaoacademica\forum\TopicoRepository.class
 dev\com\sigea\dominio\gestaoacademica\sala\MatriculaStatus.class
 dev\com\sigea\dominio\gestaoacademica\sala\Sala.class
 dev\com\sigea\dominio\gestaoacademica\sala\SalaId.class
+dev\com\sigea\dominio\gestaoacademica\sala\LancamentoDeNotaService.class
 dev\com\sigea\dominio\gestaoacademica\sala\Nota.class

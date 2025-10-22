@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GerenciarUsuariosFeature {
 
     private UsuarioRepositoryEmMemoria usuarioRepository;
+    private UsuarioService usuarioService;
     private String nome;
     private String email;
     private Perfil perfil;
@@ -17,6 +18,7 @@ public class GerenciarUsuariosFeature {
 
     private void setup() {
         usuarioRepository = new UsuarioRepositoryEmMemoria();
+        usuarioService = new UsuarioService(usuarioRepository);
         mensagemDeErro = null;
         totalUsuariosAntesDaOperacao = 0;
     }
@@ -35,8 +37,7 @@ public class GerenciarUsuariosFeature {
 
     @Quando("eu clico em {string}")
     public void eu_clico_em(String botao) {
-        Usuario novoUsuario = new Usuario(usuarioRepository.proximoId(), this.nome, this.email, this.perfil);
-        usuarioRepository.salvar(novoUsuario);
+        usuarioService.cadastrarNovoUsuario(this.nome, this.email, this.perfil);
     }
 
     @Entao("um novo usuário com o perfil {string} e status {string} deve ser criado")
@@ -54,21 +55,14 @@ public class GerenciarUsuariosFeature {
 
     @Dado("que já existe um usuário com o e-mail {string}")
     public void que_ja_existe_um_usuario_com_o_email(String emailExistente) {
-        Usuario usuarioPreexistente = new Usuario(
-            usuarioRepository.proximoId(),
-            "Professor Existente",
-            emailExistente,
-            Perfil.PROFESSOR
-        );
-        usuarioRepository.salvar(usuarioPreexistente);
+        usuarioService.cadastrarNovoUsuario("Professor Existente", emailExistente, Perfil.PROFESSOR);
     }
 
     @Quando("eu tento criar um novo professor com o nome {string} e o e-mail {string}")
     public void eu_tento_criar_um_novo_professor_com_o_nome_e_o_email(String nome, String email) {
         this.totalUsuariosAntesDaOperacao = usuarioRepository.totalDeUsuarios();
         try {
-            Usuario novoUsuario = new Usuario(usuarioRepository.proximoId(), nome, email, Perfil.PROFESSOR);
-            usuarioRepository.salvar(novoUsuario);
+            usuarioService.cadastrarNovoUsuario(nome, email, Perfil.PROFESSOR);
         } catch (IllegalStateException e) {
             this.mensagemDeErro = e.getMessage();
         }

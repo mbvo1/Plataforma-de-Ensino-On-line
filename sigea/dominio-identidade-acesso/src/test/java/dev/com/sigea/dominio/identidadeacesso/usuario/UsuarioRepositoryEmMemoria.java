@@ -12,10 +12,6 @@ public class UsuarioRepositoryEmMemoria implements UsuarioRepository {
 
     @Override
     public void salvar(Usuario usuario) {
-        if (buscarPorEmail(usuario.getEmail()).isPresent() && 
-            !buscarPorEmail(usuario.getEmail()).get().getId().equals(usuario.getId())) {
-            throw new IllegalStateException("Este e-mail já está em uso");
-        }
         usuariosPorEmail.put(usuario.getEmail(), usuario);
     }
 

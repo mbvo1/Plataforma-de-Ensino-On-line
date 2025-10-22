@@ -72,4 +72,9 @@ public class Turma {
     public List<Atividade> getAtividades() {
         return List.copyOf(atividades);
     }
+
+    public void adicionarAtividade(Atividade atividade) {
+        Objects.requireNonNull(atividade);
+        this.atividades.add(atividade);
+    }
 }

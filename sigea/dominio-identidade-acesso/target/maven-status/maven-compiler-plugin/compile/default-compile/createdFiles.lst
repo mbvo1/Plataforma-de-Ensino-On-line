@@ -1,5 +1,6 @@
 dev\com\sigea\dominio\identidadeacesso\usuario\Perfil.class
 dev\com\sigea\dominio\identidadeacesso\usuario\Usuario.class
 dev\com\sigea\dominio\identidadeacesso\usuario\UsuarioId.class
+dev\com\sigea\dominio\identidadeacesso\usuario\UsuarioService.class
 dev\com\sigea\dominio\identidadeacesso\usuario\UsuarioStatus.class
 dev\com\sigea\dominio\identidadeacesso\usuario\UsuarioRepository.class

@@ -1,4 +1,5 @@
 dev\com\sigea\dominio\ambientecolaborativo\turma\EnvioId.class
+dev\com\sigea\dominio\ambientecolaborativo\turma\TurmaService.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\AtividadeId.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\IngressoService.class
 dev\com\sigea\dominio\ambientecolaborativo\turma\Material.class

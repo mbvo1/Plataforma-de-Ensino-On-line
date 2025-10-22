@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RealizarMatriculaFeature {
 
     private SalaRepository salaRepository;
+    private MatriculaService matriculaService;
     private Sala sala;
     private UsuarioId alunoId;
     private Exception excecaoCapturada;
@@ -19,6 +20,7 @@ public class RealizarMatriculaFeature {
     @Dado("uma sala da disciplina {string} com {int} vaga(s)")
     public void uma_sala_da_disciplina_com_vagas(String nomeDisciplina, int vagas) {
         this.salaRepository = new SalaRepositoryEmMemoria();
+        this.matriculaService = new MatriculaService(salaRepository);
         var disciplinaId = new DisciplinaId("DISC-" + nomeDisciplina.hashCode());
         this.sala = new Sala(salaRepository.proximoId(), disciplinaId, vagas);
         this.salaRepository.salvar(sala);
@@ -32,8 +34,7 @@ public class RealizarMatriculaFeature {
     @Quando("o aluno {string} se matricula na sala")
     public void o_aluno_se_matricula_na_sala(String id) {
         try {
-            this.sala.matricular(new UsuarioId(id));
-            this.salaRepository.salvar(sala); 
+            matriculaService.realizarMatricula(new UsuarioId(id), sala.getId());
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }

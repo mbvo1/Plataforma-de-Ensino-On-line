@@ -10,13 +10,6 @@ public class PeriodoLetivoRepositoryEmMemoria implements PeriodoLetivoRepository
 
     @Override
     public void salvar(PeriodoLetivo novoPeriodo) {
-        for (PeriodoLetivo existente : periodos.values()) {
-            if (existente.getId().equals(novoPeriodo.getId())) continue;
-            boolean sobrepoe = !novoPeriodo.getDataInicio().after(existente.getDataFim()) && !novoPeriodo.getDataFim().before(existente.getDataInicio());
-            if (sobrepoe) {
-                throw new IllegalStateException("Já existe um período letivo ativo nas datas especificadas");
-            }
-        }
         periodos.put(novoPeriodo.getId(), novoPeriodo);
     }
 
@@ -28,6 +21,11 @@ public class PeriodoLetivoRepositoryEmMemoria implements PeriodoLetivoRepository
     @Override
     public PeriodoLetivoId proximoId() {
         return new PeriodoLetivoId(String.valueOf(sequence.getAndIncrement()));
+    }
+
+    @Override
+    public List<PeriodoLetivo> listarTodas() {
+        return new ArrayList<>(periodos.values());
     }
 
     public int totalDePeriodos() {

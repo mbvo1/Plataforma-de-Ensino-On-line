@@ -8,17 +8,25 @@ public class DisciplinaRepositoryEmMemoria implements DisciplinaRepository {
 
     @Override
     public void salvar(Disciplina disciplina) {
-        if (buscarPorNome(disciplina.getNome()).isPresent() && !buscarPorNome(disciplina.getNome()).get().getId().equals(disciplina.getId())) {
-            throw new IllegalStateException("Já existe uma disciplina com este nome");
-        }
         disciplinasPorNome.put(disciplina.getNome(), disciplina);
     }
 
     @Override
-    public Optional<Disciplina> buscarPorNome(String nome) { return Optional.ofNullable(disciplinasPorNome.get(nome)); }
+    public Optional<Disciplina> buscarPorNome(String nome) { 
+        return Optional.ofNullable(disciplinasPorNome.get(nome)); 
+    }
+    
     @Override
     public DisciplinaId proximoId() {
         return new DisciplinaId(String.valueOf(sequence.getAndIncrement()));
     }
-    public int totalDeDisciplinas() { return disciplinasPorNome.size(); }
+    
+    @Override
+    public List<Disciplina> listarTodas() {
+        return new ArrayList<>(disciplinasPorNome.values());
+    }
+    
+    public int totalDeDisciplinas() { 
+        return disciplinasPorNome.size(); 
+    }
 }

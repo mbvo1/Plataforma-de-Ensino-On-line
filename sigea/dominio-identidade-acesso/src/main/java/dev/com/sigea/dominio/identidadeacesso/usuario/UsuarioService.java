@@ -9,16 +9,12 @@ public class UsuarioService {
     }
 
     public Usuario cadastrarNovoUsuario(String nome, String email, Perfil perfil) {
-        // Verificar se o e-mail já existe
         if (usuarioRepository.buscarPorEmail(email).isPresent()) {
             throw new IllegalStateException("Este e-mail já está em uso");
         }
 
-        // Criar novo usuário
         UsuarioId novoId = usuarioRepository.proximoId();
         Usuario novoUsuario = new Usuario(novoId, nome, email, perfil);
-
-        // Salvar o usuário
         usuarioRepository.salvar(novoUsuario);
 
         return novoUsuario;

@@ -1,9 +1,5 @@
 package dev.com.sigea.dominio.gestaoacademica.estruturaacademica;
 
-import dev.com.sigea.dominio.gestaoacademica.disciplina.Disciplina;
-import dev.com.sigea.dominio.gestaoacademica.disciplina.DisciplinaRepository;
-import dev.com.sigea.dominio.gestaoacademica.periodoletivo.PeriodoLetivo;
-import dev.com.sigea.dominio.gestaoacademica.periodoletivo.PeriodoLetivoRepository;
 import dev.com.sigea.dominio.gestaoacademica.periodoletivo.PeriodoStatus;
 import io.cucumber.java.Before;
 import io.cucumber.java.pt.Dado;
@@ -19,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControlarEstruturaAcademicaFeature {
     private PeriodoLetivoRepositoryEmMemoria periodoLetivoRepository;
     private DisciplinaRepositoryEmMemoria disciplinaRepository;
+    private EstruturaAcademicaService estruturaAcademicaService;
     private String mensagemDeErro;
     private int totalPeriodosAntes, totalDisciplinasAntes;
     private Date paraData(String dataStr) {
@@ -33,6 +30,7 @@ public class ControlarEstruturaAcademicaFeature {
     public void setup() {
         periodoLetivoRepository = new PeriodoLetivoRepositoryEmMemoria();
         disciplinaRepository = new DisciplinaRepositoryEmMemoria();
+        estruturaAcademicaService = new EstruturaAcademicaService(periodoLetivoRepository, disciplinaRepository);
         mensagemDeErro = null;
     }
 
@@ -42,27 +40,26 @@ public class ControlarEstruturaAcademicaFeature {
 
     @Quando("eu defino as datas de início como {string} e fim como {string} para o novo período letivo {string}")
     public void eu_defino_as_datas_de_início_e_fim(String inicioStr, String fimStr, String id) {
-        var novoPeriodo = new PeriodoLetivo(periodoLetivoRepository.proximoId(), id, paraData(inicioStr), paraData(fimStr));
-        periodoLetivoRepository.salvar(novoPeriodo);
+        estruturaAcademicaService.criarPeriodoLetivo(id, paraData(inicioStr), paraData(fimStr));
     }
 
     @Então("um novo período letivo {string} com status {string} deve existir no sistema")
     public void um_novo_período_letivo_com_status_deve_existir(String id, String status) {
-        var salvo = periodoLetivoRepository.buscarPorIdentificador(id).orElse(null);
+        var salvo = estruturaAcademicaService.buscarPeriodoPorIdentificador(id).orElse(null);
         assertNotNull(salvo);
         assertEquals(PeriodoStatus.valueOf(status), salvo.getStatus());
     }
 
     @Dado("que já existe um período letivo com datas de {string} a {string}")
     public void que_ja_existe_um_periodo_letivo_com_datas_de_a(String inicio, String fim) {
-        periodoLetivoRepository.salvar(new PeriodoLetivo(periodoLetivoRepository.proximoId(), "Periodo Existente", paraData(inicio), paraData(fim)));
+        estruturaAcademicaService.criarPeriodoLetivo("Periodo Existente", paraData(inicio), paraData(fim));
     }
 
     @Quando("eu tento criar um novo período letivo com início em {string} e fim em {string}")
     public void eu_tento_criar_um_novo_periodo_letivo_com_inicio_em_e_fim_em(String inicio, String fim) {
         totalPeriodosAntes = periodoLetivoRepository.totalDePeriodos();
         try {
-            periodoLetivoRepository.salvar(new PeriodoLetivo(periodoLetivoRepository.proximoId(), "Periodo Conflitante", paraData(inicio), paraData(fim)));
+            estruturaAcademicaService.criarPeriodoLetivo("Periodo Conflitante", paraData(inicio), paraData(fim));
         } catch (IllegalStateException e) {
             this.mensagemDeErro = e.getMessage();
         }
@@ -80,24 +77,24 @@ public class ControlarEstruturaAcademicaFeature {
 
     @Quando("eu crio uma nova disciplina com o nome {string}")
     public void eu_crio_uma_nova_disciplina_com_o_nome(String nome) {
-        disciplinaRepository.salvar(new Disciplina(disciplinaRepository.proximoId(), nome));
+        estruturaAcademicaService.criarDisciplina(nome);
     }
 
     @Então("a disciplina {string} deve ser criada com sucesso")
     public void a_disciplina_deve_ser_criada_com_sucesso(String nome) {
-        assertTrue(disciplinaRepository.buscarPorNome(nome).isPresent());
+        assertTrue(estruturaAcademicaService.buscarDisciplinaPorNome(nome).isPresent());
     }
 
     @Dado("que já existe uma disciplina com o nome {string}")
     public void que_ja_existe_uma_disciplina_com_o_nome(String nome) {
-        disciplinaRepository.salvar(new Disciplina(disciplinaRepository.proximoId(), nome));
+        estruturaAcademicaService.criarDisciplina(nome);
     }
 
     @Quando("eu tento criar uma nova disciplina com o nome {string}")
     public void eu_tento_criar_uma_nova_disciplina(String nome) {
         totalDisciplinasAntes = disciplinaRepository.totalDeDisciplinas();
         try {
-            disciplinaRepository.salvar(new Disciplina(disciplinaRepository.proximoId(), nome));
+            estruturaAcademicaService.criarDisciplina(nome);
         } catch (IllegalStateException e) {
             this.mensagemDeErro = e.getMessage();
         }

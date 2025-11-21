@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Dashboard Administrador</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Dashboard Admin -->
+    <div class="dashboard-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>SIGEA</h2>
+                <button id="toggle-sidebar" class="toggle-btn">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-page="usuarios">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Usuários</span>
+                </a>
+                <a href="#" class="nav-item" data-page="professores">
+                    <span class="nav-icon">👨‍🏫</span>
+                    <span class="nav-text">Professores</span>
+                </a>
+                <a href="#" class="nav-item" data-page="disciplinas">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">Disciplinas</span>
+                </a>
+                <a href="#" class="nav-item" data-page="periodos">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Períodos Letivos</span>
+                </a>
+                <a href="#" class="nav-item" id="logout-btn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Sair</span>
+                </a>
+            </nav>
+        </div>
+        <div class="main-content">
+            <header class="top-header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-info">
+                    <span id="user-name"></span>
+                </div>
+            </header>
+            <div class="content-area">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <h3 id="total-alunos">0</h3>
+                                <p>Total de Alunos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👨‍🏫</div>
+                            <div class="stat-info">
+                                <h3 id="total-professores">0</h3>
+                                <p>Total de Professores</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <h3 id="disciplinas-ativas">0</h3>
+                                <p>Disciplinas Ativas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏫</div>
+                            <div class="stat-info">
+                                <h3 id="turmas-ativas">0</h3>
+                                <p>Turmas Ativas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuários Page -->
+                <div id="usuarios-page" class="page">
+                    <h2>Gestão de Usuários</h2>
+                    <div id="usuarios-list"></div>
+                </div>
+
+                <!-- Professores Page -->
+                <div id="professores-page" class="page">
+                    <div class="page-header">
+                        <h2>Gestão de Professores</h2>
+                        <button class="btn-primary" id="btn-criar-professor">+ Novo Professor</button>
+                    </div>
+                    <form id="form-criar-professor" class="form-modal" style="display: none;">
+                        <h3>Criar Novo Professor</h3>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="prof-nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="prof-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <input type="password" id="prof-senha" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Criar</button>
+                            <button type="button" class="btn-secondary" id="btn-cancelar-professor">Cancelar</button>
+                        </div>
+                    </form>
+                    <div id="professores-list"></div>
+                </div>
+
+                <!-- Disciplinas Page -->
+                <div id="disciplinas-page" class="page">
+                    <div class="page-header">
+                        <h2>Gestão de Disciplinas</h2>
+                        <button class="btn-primary" id="btn-criar-disciplina">+ Nova Disciplina</button>
+                    </div>
+                    <form id="form-criar-disciplina" class="form-modal" style="display: none;">
+                        <h3>Criar Nova Disciplina</h3>
+                        <div class="form-group">
+                            <label>Código</label>
+                            <input type="text" id="disc-codigo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="disc-nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="disc-descricao"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Criar</button>
+                            <button type="button" class="btn-secondary" id="btn-cancelar-disciplina">Cancelar</button>
+                        </div>
+                    </form>
+                    <div id="disciplinas-list"></div>
+                </div>
+
+                <!-- Períodos Letivos Page -->
+                <div id="periodos-page" class="page">
+                    <div class="page-header">
+                        <h2>Gestão de Períodos Letivos</h2>
+                        <button class="btn-primary" id="btn-criar-periodo">+ Novo Período</button>
+                    </div>
+                    <form id="form-criar-periodo" class="form-modal" style="display: none;">
+                        <h3>Criar Novo Período Letivo</h3>
+                        <div class="form-group">
+                            <label>Identificador (ex: 2025.1)</label>
+                            <input type="text" id="periodo-identificador" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Início</label>
+                            <input type="date" id="periodo-data-inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim</label>
+                            <input type="date" id="periodo-data-fim" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Início Matrícula</label>
+                            <input type="date" id="periodo-data-inicio-matricula" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim Matrícula</label>
+                            <input type="date" id="periodo-data-fim-matricula" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Criar</button>
+                            <button type="button" class="btn-secondary" id="btn-cancelar-periodo">Cancelar</button>
+                        </div>
+                    </form>
+                    <div id="periodos-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin-dashboard.js"></script>
+</body>
+</html>
+

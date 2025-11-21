@@ -6,10 +6,9 @@ CREATE TABLE Usuarios (
     usuario_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-
+    senha_hash VARCHAR(255),
     perfil VARCHAR(50) NOT NULL 
         CHECK (perfil IN ('ALUNO', 'PROFESSOR', 'ADMINISTRADOR')),
-    
     status VARCHAR(50) NOT NULL 
         CHECK (status IN ('ATIVO', 'INATIVO'))
 );

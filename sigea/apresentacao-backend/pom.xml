@@ -16,30 +16,31 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- SpringDoc OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
-        <!-- Dependência interna para sigea-aplicacao -->
         <dependency>
             <groupId>dev.com.sigea</groupId>
             <artifactId>sigea-aplicacao</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Dependência interna para sigea-infraestrutura -->
         <dependency>
             <groupId>dev.com.sigea</groupId>
             <artifactId>sigea-infraestrutura</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
         </dependency>
     </dependencies>
 

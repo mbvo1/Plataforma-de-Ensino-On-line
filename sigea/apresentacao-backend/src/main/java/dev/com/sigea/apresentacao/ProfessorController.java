@@ -13,4 +13,3 @@ public class ProfessorController {
         return "Pong";
     }
 }
-

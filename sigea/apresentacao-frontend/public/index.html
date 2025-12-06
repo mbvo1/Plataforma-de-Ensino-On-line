@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Login de Aluno</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">📚</div>
+            <h1>SIGEA</h1>
+            <p class="subtitle">Sistema Integrado de Gestão Educacional e Acadêmica</p>
+        </div>
+
+        <!-- Formulário de Login -->
+        <div id="login-form" class="auth-form">
+            <h2>Login</h2>
+            
+            <div id="login-error" class="error-message" style="display: none;"></div>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">E-mail:</label>
+                    <input 
+                        type="email" 
+                        id="login-email" 
+                        placeholder="Digite seu e-mail" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-senha">Senha:</label>
+                    <input 
+                        type="password" 
+                        id="login-senha" 
+                        placeholder="Digite sua senha" 
+                        required
+                    >
+                </div>
+                
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+            
+            <div class="form-footer">
+                <p>Não tem conta? <a href="#" onclick="showRegistro()">Cadastre-se</a></p>
+            </div>
+        </div>
+
+        <!-- Formulário de Registro -->
+        <div id="registro-form" class="auth-form" style="display: none;">
+            <h2>Criar Conta</h2>
+            
+            <div id="registro-error" class="error-message" style="display: none;"></div>
+            <div id="registro-success" class="success-message" style="display: none;"></div>
+            
+            <form onsubmit="handleRegistro(event)">
+                <div class="form-group">
+                    <label for="registro-nome">Nome Completo:</label>
+                    <input 
+                        type="text" 
+                        id="registro-nome" 
+                        placeholder="Digite seu nome completo" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="registro-email">E-mail:</label>
+                    <input 
+                        type="email" 
+                        id="registro-email" 
+                        placeholder="Digite seu e-mail" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="registro-senha">Senha:</label>
+                    <input 
+                        type="password" 
+                        id="registro-senha" 
+                        placeholder="Digite sua senha" 
+                        required
+                        minlength="6"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="registro-confirma-senha">Confirmar Senha:</label>
+                    <input 
+                        type="password" 
+                        id="registro-confirma-senha" 
+                        placeholder="Confirme sua senha" 
+                        required
+                        minlength="6"
+                    >
+                </div>
+                
+                <button type="submit" class="btn-primary">Criar Conta</button>
+            </form>
+            
+            <div class="form-footer">
+                <p>Já tem conta? <a href="#" onclick="showLogin()">Fazer login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+</body>
+</html>

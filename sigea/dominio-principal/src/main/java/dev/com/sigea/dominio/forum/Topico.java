@@ -22,5 +22,6 @@ public class Topico {
     public TopicoId getId() { return id; }
     public DisciplinaId getDisciplinaId() { return disciplinaId; }
     public String getTitulo() { return titulo; }
+    public String getConteudo() { return conteudo; }
     public UsuarioId getAutorId() { return autorId; }
 }

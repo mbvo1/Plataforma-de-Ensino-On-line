@@ -45,6 +45,18 @@
     </dependencies>
 
     <build>
+        <resources>
+            <!-- Recursos padrão do backend (application.properties, etc) -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- Copia APENAS a pasta public do frontend para static -->
+            <resource>
+                <directory>../apresentacao-frontend/public</directory>
+                <targetPath>static</targetPath>
+            </resource>
+        </resources>
+        
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

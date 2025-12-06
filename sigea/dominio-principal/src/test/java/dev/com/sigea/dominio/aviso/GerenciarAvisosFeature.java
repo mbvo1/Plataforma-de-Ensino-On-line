@@ -28,7 +28,8 @@ public class GerenciarAvisosFeature {
 
     @Dado("que existe um professor com email {string} e senha {string}")
     public void que_existe_um_professor(String email, String senha) {
-        Usuario prof = new Usuario(usuarioRepository.proximoId(), "Prof " + email, email, Perfil.PROFESSOR);
+        Senha senhaObj = new Senha("HASH_" + senha);
+        Usuario prof = new Usuario(usuarioRepository.proximoId(), "Prof " + email, email, senhaObj, Perfil.PROFESSOR);
         usuarioRepository.salvar(prof);
         if (email.equals("carlos.souza@sigea.com.br")) profCarlosId = prof.getId();
     }
@@ -42,7 +43,8 @@ public class GerenciarAvisosFeature {
 
     @E("que existe um outro professor com email {string}")
     public void que_existe_outro_professor(String email) {
-        Usuario prof = new Usuario(usuarioRepository.proximoId(), "Prof " + email, email, Perfil.PROFESSOR);
+        Senha senhaObj = new Senha("HASH_senha123");
+        Usuario prof = new Usuario(usuarioRepository.proximoId(), "Prof " + email, email, senhaObj, Perfil.PROFESSOR);
         usuarioRepository.salvar(prof);
         profAnaId = prof.getId();
     }

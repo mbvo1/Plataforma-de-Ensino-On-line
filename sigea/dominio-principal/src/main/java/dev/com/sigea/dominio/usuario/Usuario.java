@@ -7,10 +7,11 @@ public class Usuario {
     private UsuarioId id;
     private String nome;
     private String email;
+    private Senha senha;
     private Perfil perfil;
     private UsuarioStatus status;
 
-    public Usuario(UsuarioId id, String nome, String email, Perfil perfil) {
+    public Usuario(UsuarioId id, String nome, String email, Senha senha, Perfil perfil) {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("Nome é obrigatório.");
         }
@@ -20,6 +21,7 @@ public class Usuario {
         this.id = Objects.requireNonNull(id, "ID do usuário não pode ser nulo.");
         this.nome = nome;
         this.email = email;
+        this.senha = Objects.requireNonNull(senha, "Senha não pode ser nula.");
         this.perfil = Objects.requireNonNull(perfil, "Perfil não pode ser nulo.");
         this.status = UsuarioStatus.ATIVO; 
     }
@@ -38,6 +40,10 @@ public class Usuario {
 
     public Perfil getPerfil() {
         return perfil;
+    }
+    
+    public Senha getSenha() {
+        return senha;
     }
 
     public UsuarioStatus getStatus() {

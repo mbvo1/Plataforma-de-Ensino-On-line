@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Dashboard do Aluno</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand">
+            <span class="logo">📚</span>
+            <span class="brand-name">SIGEA</span>
+        </div>
+        <div class="navbar-user">
+            <span id="user-name">Carregando...</span>
+            <button onclick="handleLogout()" class="btn-logout">Sair</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Bem-vindo ao SIGEA!</h1>
+            <p class="subtitle">Sistema Integrado de Gestão Educacional e Acadêmica</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-icon">📖</div>
+                <h3>Conteúdo Didático</h3>
+                <p>Acesse materiais, vídeos e recursos das suas disciplinas</p>
+                <button class="btn-card">Acessar</button>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>Desempenho Acadêmico</h3>
+                <p>Visualize suas notas, médias e progresso</p>
+                <button class="btn-card">Ver Notas</button>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">💬</div>
+                <h3>Fóruns</h3>
+                <p>Participe das discussões com professores e colegas</p>
+                <button class="btn-card">Ver Fóruns</button>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📢</div>
+                <h3>Avisos</h3>
+                <p>Mantenha-se atualizado com os avisos importantes</p>
+                <button class="btn-card">Ver Avisos</button>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">✏️</div>
+                <h3>Atividades</h3>
+                <p>Veja e envie suas atividades e trabalhos</p>
+                <button class="btn-card">Ver Atividades</button>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📅</div>
+                <h3>Minhas Disciplinas</h3>
+                <p>Gerencie suas matrículas e disciplinas</p>
+                <button class="btn-card">Ver Disciplinas</button>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Informações do Usuário</h2>
+            <div class="info-card">
+                <p><strong>Nome:</strong> <span id="info-nome">-</span></p>
+                <p><strong>Email:</strong> <span id="info-email">-</span></p>
+                <p><strong>Perfil:</strong> <span id="info-perfil">-</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

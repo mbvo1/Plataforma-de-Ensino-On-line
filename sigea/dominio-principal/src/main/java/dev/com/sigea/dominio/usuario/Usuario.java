@@ -7,20 +7,25 @@ public class Usuario {
     private UsuarioId id;
     private String nome;
     private String email;
+    private String cpf;
     private Senha senha;
     private Perfil perfil;
     private UsuarioStatus status;
 
-    public Usuario(UsuarioId id, String nome, String email, Senha senha, Perfil perfil) {
+    public Usuario(UsuarioId id, String nome, String email, String cpf, Senha senha, Perfil perfil) {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("Nome é obrigatório.");
         }
         if (email == null || !email.contains("@")) {
             throw new IllegalArgumentException("Email inválido.");
         }
+        if (cpf == null || cpf.length() != 11) {
+            throw new IllegalArgumentException("CPF deve ter 11 dígitos.");
+        }
         this.id = Objects.requireNonNull(id, "ID do usuário não pode ser nulo.");
         this.nome = nome;
         this.email = email;
+        this.cpf = cpf;
         this.senha = Objects.requireNonNull(senha, "Senha não pode ser nula.");
         this.perfil = Objects.requireNonNull(perfil, "Perfil não pode ser nulo.");
         this.status = UsuarioStatus.ATIVO; 
@@ -36,6 +41,10 @@ public class Usuario {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getCpf() {
+        return cpf;
     }
 
     public Perfil getPerfil() {

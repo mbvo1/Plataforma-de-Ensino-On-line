@@ -1,31 +1,20 @@
 package dev.com.sigea.apresentacao.autenticacao.dto;
 
 /**
- * DTO para requisição de registro de novo usuário
+ * DTO para requisição de login do administrador
  */
-public class RegistroRequest {
-    
-    private String nome;
+public class AdminLoginRequest {
     private String email;
     private String cpf;
     private String senha;
     
-    public RegistroRequest() {
+    public AdminLoginRequest() {
     }
     
-    public RegistroRequest(String nome, String email, String cpf, String senha) {
-        this.nome = nome;
+    public AdminLoginRequest(String email, String cpf, String senha) {
         this.email = email;
         this.cpf = cpf;
         this.senha = senha;
-    }
-    
-    public String getNome() {
-        return nome;
-    }
-    
-    public void setNome(String nome) {
-        this.nome = nome;
     }
     
     public String getEmail() {

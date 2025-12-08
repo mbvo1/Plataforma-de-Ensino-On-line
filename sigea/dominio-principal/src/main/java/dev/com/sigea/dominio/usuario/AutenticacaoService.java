@@ -8,14 +8,14 @@ public class AutenticacaoService {
         this.usuarioRepository = usuarioRepository;
     }
     
-    public Usuario registrar(String nome, String email, String senhaTexto, Perfil perfil) {
+    public Usuario registrar(String nome, String email, String cpf, String senhaTexto, Perfil perfil) {
         if (usuarioRepository.buscarPorEmail(email).isPresent()) {
             throw new IllegalArgumentException("Email já está em uso");
         }
         
         UsuarioId novoId = usuarioRepository.proximoId();
         Senha senha = new Senha(hashSenha(senhaTexto));
-        Usuario usuario = new Usuario(novoId, nome, email, senha, perfil);
+        Usuario usuario = new Usuario(novoId, nome, email, cpf, senha, perfil);
         
         usuarioRepository.salvar(usuario);
         

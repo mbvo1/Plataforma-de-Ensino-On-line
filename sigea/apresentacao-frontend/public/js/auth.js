@@ -1,5 +1,26 @@
 const API_URL = 'http://localhost:8080/api/auth';
 
+// Função para formatar CPF
+function formatCPF(input) {
+    let value = input.value.replace(/\D/g, '');
+    
+    if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    
+    input.value = value;
+}
+
+// Adicionar listener para formatar CPF
+document.addEventListener('DOMContentLoaded', () => {
+    const cpfInput = document.getElementById('registro-cpf');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', (e) => formatCPF(e.target));
+    }
+});
+
 function showLogin() {
     document.getElementById('login-form').style.display = 'block';
     document.getElementById('registro-form').style.display = 'none';
@@ -57,8 +78,17 @@ async function handleRegistro(event) {
     
     const nome = document.getElementById('registro-nome').value;
     const email = document.getElementById('registro-email').value;
+    const cpfRaw = document.getElementById('registro-cpf').value;
     const senha = document.getElementById('registro-senha').value;
     const confirmaSenha = document.getElementById('registro-confirma-senha').value;
+    
+    // Valida se CPF foi preenchido
+    if (!cpfRaw || cpfRaw.trim() === '') {
+        showError('registro-error', 'CPF é obrigatório');
+        return;
+    }
+    
+    const cpf = cpfRaw.replace(/\D/g, ''); // Remove formatação
     
     if (senha !== confirmaSenha) {
         showError('registro-error', 'As senhas não coincidem');
@@ -70,13 +100,20 @@ async function handleRegistro(event) {
         return;
     }
     
+    if (cpf.length !== 11) {
+        showError('registro-error', 'CPF inválido. Digite 11 dígitos.');
+        return;
+    }
+    
+    console.log('Enviando dados:', { nome, email, cpf, senha: '***' });
+    
     try {
         const response = await fetch(`${API_URL}/registro`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nome, email, senha })
+            body: JSON.stringify({ nome, email, cpf, senha })
         });
         
         const data = await response.json();
@@ -86,6 +123,7 @@ async function handleRegistro(event) {
             
             document.getElementById('registro-nome').value = '';
             document.getElementById('registro-email').value = '';
+            document.getElementById('registro-cpf').value = '';
             document.getElementById('registro-senha').value = '';
             document.getElementById('registro-confirma-senha').value = '';
             

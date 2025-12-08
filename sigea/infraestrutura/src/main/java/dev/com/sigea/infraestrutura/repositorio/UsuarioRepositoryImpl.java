@@ -39,6 +39,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
             null, 
             usuario.getNome(),
             usuario.getEmail(),
+            usuario.getCpf(),
             usuario.getSenha().getSenhaHash(),
             usuario.getPerfil().name(),
             usuario.getStatus().name()
@@ -50,6 +51,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
             new UsuarioId(String.valueOf(entity.getId())),
             entity.getNome(),
             entity.getEmail(),
+            entity.getCpf(),
             new Senha(entity.getSenhaHash()),
             Perfil.valueOf(entity.getPerfil())
         );

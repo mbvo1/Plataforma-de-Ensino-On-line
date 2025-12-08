@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Dashboard Admin</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item active" data-section="painel">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="#" class="menu-item" data-section="usuarios">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Usuários</span>
+            </a>
+            <a href="#" class="menu-item" data-section="disciplinas">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="#" class="menu-item" data-section="periodos">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Períodos Letivos</span>
+            </a>
+            <a href="#" class="menu-item" data-section="salas">
+                <i class="fas fa-chalkboard"></i>
+                <span class="menu-text">Salas</span>
+            </a>
+            <a href="#" class="menu-item" data-section="relatorios">
+                <i class="fas fa-chart-bar"></i>
+                <span class="menu-text">Relatórios</span>
+            </a>
+            <a href="#" class="menu-item" data-section="configuracoes">
+                <i class="fas fa-cog"></i>
+                <span class="menu-text">Configurações</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Administrador</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Painel Section (Default) -->
+            <section id="painel-section" class="content-section active">
+                <h1 class="welcome-title">Painel do Administrador</h1>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Total de Alunos</h3>
+                        <p class="stat-number" id="total-alunos">0</p>
+                        <p class="card-subtitle">Alunos matriculados</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Total de Professores</h3>
+                        <p class="stat-number" id="total-professores">0</p>
+                        <p class="card-subtitle">Professores ativos</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Disciplinas Ativas</h3>
+                        <p class="stat-number" id="total-disciplinas">0</p>
+                        <p class="card-subtitle">Disciplinas cadastradas</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Turmas Ativas</h3>
+                        <p class="stat-number" id="total-turmas">0</p>
+                        <p class="card-subtitle">Turmas em andamento</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-sections">
+                    <div class="quick-actions">
+                        <h2>Ações Rápidas</h2>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="navegarPara('usuarios')">
+                                <i class="fas fa-user-plus"></i>
+                                Cadastrar Professor
+                            </button>
+                            <button class="action-btn" onclick="navegarPara('disciplinas')">
+                                <i class="fas fa-book-medical"></i>
+                                Criar Disciplina
+                            </button>
+                            <button class="action-btn" onclick="navegarPara('periodos')">
+                                <i class="fas fa-bell"></i>
+                                Publicar Aviso
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="recent-users">
+                        <h2>Últimos Usuários Cadastrados</h2>
+                        <div id="ultimos-usuarios-lista">
+                            <p class="loading-message">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Usuários Section -->
+            <section id="usuarios-section" class="content-section">
+                <h2>Gerenciar Usuários</h2>
+                <p>Gerencie alunos, professores e administradores do sistema.</p>
+            </section>
+
+            <!-- Disciplinas Section -->
+            <section id="disciplinas-section" class="content-section">
+                <h2>Gerenciar Disciplinas</h2>
+                <p>Cadastre e gerencie as disciplinas do sistema.</p>
+            </section>
+
+            <!-- Períodos Section -->
+            <section id="periodos-section" class="content-section">
+                <h2>Períodos Letivos</h2>
+                <p>Configure os períodos letivos e datas de matrícula.</p>
+            </section>
+
+            <!-- Salas Section -->
+            <section id="salas-section" class="content-section">
+                <h2>Gerenciar Salas</h2>
+                <p>Gerencie as salas e turmas do sistema.</p>
+            </section>
+
+            <!-- Relatórios Section -->
+            <section id="relatorios-section" class="content-section">
+                <h2>Relatórios</h2>
+                <p>Visualize relatórios e estatísticas do sistema.</p>
+            </section>
+
+            <!-- Configurações Section -->
+            <section id="configuracoes-section" class="content-section">
+                <h2>Configurações</h2>
+                <p>Configure parâmetros do sistema.</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="/js/admin-dashboard.js"></script>
+</body>
+</html>

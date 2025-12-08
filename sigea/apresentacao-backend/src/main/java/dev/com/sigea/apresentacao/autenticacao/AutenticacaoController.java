@@ -1,5 +1,6 @@
 package dev.com.sigea.apresentacao.autenticacao;
 
+import dev.com.sigea.apresentacao.autenticacao.dto.AdminLoginRequest;
 import dev.com.sigea.apresentacao.autenticacao.dto.AuthResponse;
 import dev.com.sigea.apresentacao.autenticacao.dto.LoginRequest;
 import dev.com.sigea.apresentacao.autenticacao.dto.RegistroRequest;
@@ -61,10 +62,26 @@ public class AutenticacaoController {
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@RequestBody RegistroRequest request) {
         try {
+            // Log para debug
+            System.out.println("DEBUG - Request recebido: nome=" + request.getNome() + 
+                             ", email=" + request.getEmail() + 
+                             ", cpf=" + request.getCpf() + 
+                             ", senha=" + (request.getSenha() != null ? "***" : "null"));
+            
+            // Valida se CPF foi enviado
+            if (request.getCpf() == null || request.getCpf().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("CPF é obrigatório"));
+            }
+            
+            // Remove qualquer formatação do CPF (deixa apenas números)
+            String cpfLimpo = request.getCpf().replaceAll("\\D", "");
+            
             // Registra sempre como ALUNO
             Usuario usuario = autenticacaoService.registrar(
                 request.getNome(),
                 request.getEmail(),
+                cpfLimpo,
                 request.getSenha(),
                 Perfil.ALUNO
             );
@@ -80,6 +97,43 @@ public class AutenticacaoController {
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+    
+    /**
+     * POST /api/auth/login-admin - Autentica um administrador com email, CPF e senha
+     */
+    @PostMapping("/login-admin")
+    public ResponseEntity<?> loginAdmin(@RequestBody AdminLoginRequest request) {
+        try {
+            // Por enquanto, validação simplificada
+            // TODO: Implementar validação real com CPF no banco de dados
+            Usuario usuario = autenticacaoService.autenticar(
+                request.getEmail(), 
+                request.getSenha()
+            );
+            
+            // Verifica se o usuário é administrador
+            if (usuario.getPerfil() != Perfil.ADMINISTRADOR) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse("Acesso negado. Apenas administradores podem fazer login aqui."));
+            }
+            
+            AuthResponse response = new AuthResponse();
+            response.setUsuarioId(usuario.getId().valor());
+            response.setNome(usuario.getNome());
+            response.setEmail(usuario.getEmail());
+            response.setPerfil(usuario.getPerfil().toString());
+            response.setMensagem("Login administrativo realizado com sucesso!");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Credenciais inválidas. Verifique email, CPF e senha."));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getMessage()));
         }
     }

@@ -1074,6 +1074,73 @@ body {
     color: #999;
 }
 
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.3s;
+    background: white;
+    cursor: pointer;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Tags Container para Pré-Requisitos */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    min-height: 40px;
+    padding: 8px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.tags-container:empty::before {
+    content: 'Nenhum pré-requisito selecionado';
+    color: #999;
+    font-size: 14px;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tag-item button {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.tag-item button:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
 .modal-footer {
     display: flex;
     gap: 12px;
@@ -1129,4 +1196,143 @@ body {
 .btn-resetar:hover {
     background: #f57c00;
     transform: translateY(-2px);
+}
+
+/* Gerenciar Disciplinas Styles */
+.periodo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.periodo-atual {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+}
+
+.periodo-status {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.periodo-status.ativo {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.periodo-status.encerrado {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.periodo-nome {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.btn-criar-periodo {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-criar-periodo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-criar-periodo i {
+    font-size: 18px;
+}
+
+/* Action Buttons Grid */
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    max-width: 280px;
+}
+
+.btn-editar-small,
+.btn-gerenciar,
+.btn-desativar-small,
+.btn-excluir {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-editar-small {
+    background: #2196f3;
+    color: white;
+}
+
+.btn-editar-small:hover {
+    background: #1976d2;
+    transform: translateY(-1px);
+}
+
+.btn-gerenciar {
+    background: #9c27b0;
+    color: white;
+}
+
+.btn-gerenciar:hover {
+    background: #7b1fa2;
+    transform: translateY(-1px);
+}
+
+.btn-desativar-small {
+    background: #ff9800;
+    color: white;
+}
+
+.btn-desativar-small:hover {
+    background: #f57c00;
+    transform: translateY(-1px);
+}
+
+.btn-desativar-small.btn-reativar {
+    background: #4caf50;
+}
+
+.btn-desativar-small.btn-reativar:hover {
+    background: #388e3c;
+}
+
+.btn-excluir {
+    background: #f44336;
+    color: white;
+}
+
+.btn-excluir:hover {
+    background: #d32f2f;
+    transform: translateY(-1px);
 }

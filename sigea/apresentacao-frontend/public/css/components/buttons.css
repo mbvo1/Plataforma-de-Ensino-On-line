@@ -1,0 +1,326 @@
+/* Button Styles */
+
+/* Primary Button */
+.btn-cadastrar,
+.btn-criar-periodo {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all var(--transition-normal);
+}
+
+.btn-cadastrar:hover,
+.btn-criar-periodo:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-cadastrar i,
+.btn-criar-periodo i {
+    font-size: 18px;
+}
+
+/* Action Buttons */
+.action-btn {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.action-btn i {
+    font-size: 18px;
+}
+
+/* Secondary Buttons */
+.btn-visualizar,
+.btn-back {
+    background: white;
+    border: 2px solid var(--text-primary);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-visualizar:hover,
+.btn-back:hover {
+    background: var(--text-primary);
+    color: white;
+}
+
+.btn-back i {
+    font-size: 16px;
+}
+
+/* Status Action Buttons */
+.btn-desativar,
+.btn-ativar {
+    padding: 14px 50px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.btn-desativar {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-desativar:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.btn-ativar {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-ativar:hover {
+    background: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+/* Inline Action Buttons */
+.action-buttons-inline {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-editar,
+.btn-desativar-inline {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    border: 1px solid;
+}
+
+.btn-editar {
+    background: white;
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.btn-editar:hover {
+    background: var(--text-primary);
+    color: white;
+}
+
+.btn-desativar-inline {
+    background: white;
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+.btn-desativar-inline:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-reativar {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.btn-reativar:hover {
+    background: var(--success-color);
+    color: white;
+}
+
+/* Grid Action Buttons */
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    max-width: 280px;
+}
+
+.btn-editar-small,
+.btn-gerenciar,
+.btn-desativar-small,
+.btn-excluir {
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    white-space: nowrap;
+}
+
+.btn-editar-small {
+    background: var(--info-color);
+    color: white;
+}
+
+.btn-editar-small:hover {
+    background: var(--info-dark);
+    transform: translateY(-1px);
+}
+
+.btn-gerenciar {
+    background: #9c27b0;
+    color: white;
+}
+
+.btn-gerenciar:hover {
+    background: #7b1fa2;
+    transform: translateY(-1px);
+}
+
+.btn-desativar-small {
+    background: var(--warning-color);
+    color: white;
+}
+
+.btn-desativar-small:hover {
+    background: var(--warning-dark);
+    transform: translateY(-1px);
+}
+
+.btn-desativar-small.btn-reativar {
+    background: #4caf50;
+}
+
+.btn-desativar-small.btn-reativar:hover {
+    background: #388e3c;
+}
+
+.btn-excluir,
+.btn-cancelar-matricula {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-excluir:hover {
+    background: #d32f2f;
+    transform: translateY(-1px);
+}
+
+.btn-cancelar-matricula {
+    background: transparent;
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+}
+
+.btn-cancelar-matricula:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* Modal Buttons */
+.btn-salvar {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.btn-salvar:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-cancelar {
+    background: #f0f0f0;
+    color: var(--text-secondary);
+    border: none;
+    padding: 12px 32px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.btn-cancelar:hover {
+    background: #e0e0e0;
+}
+
+.btn-resetar {
+    background: var(--warning-color);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.btn-resetar:hover {
+    background: var(--warning-dark);
+    transform: translateY(-2px);
+}
+
+/* Button Containers */
+.cadastrar-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.status-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.back-button-container {
+    margin-bottom: 30px;
+}

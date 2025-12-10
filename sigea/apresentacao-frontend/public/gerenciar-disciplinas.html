@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Disciplinas - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-admin.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="gerenciar-usuarios.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Gerenciar Usuários</span>
+            </a>
+            <a href="gerenciar-disciplinas.html" class="menu-item active">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Gestão Acadêmica</span>
+            </a>
+            <a href="avisos-admin.html" class="menu-item">
+                <i class="fas fa-bullhorn"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="calendario-admin.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário Institucional</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Admin - Administrador</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <h1 class="page-title">Gerenciar Disciplinas</h1>
+
+            <!-- Período Letivo e Ações -->
+            <div class="periodo-header">
+                <div class="periodo-atual">
+                    <div class="periodo-status" id="periodo-status">Ativo</div>
+                    <div class="periodo-nome" id="periodo-nome">2025.2</div>
+                </div>
+                <button class="btn-criar-periodo" onclick="criarPeriodoLetivo()">
+                    <i class="fas fa-plus"></i>
+                    Criar período letivo
+                </button>
+            </div>
+
+            <!-- Tabela de Disciplinas -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Período</th>
+                            <th>Nome da Disciplina</th>
+                            <th>Salas Ofertadas</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-disciplinas">
+                        <tr>
+                            <td colspan="6" class="loading-message">Carregando disciplinas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botão Criar Disciplina -->
+            <div class="cadastrar-container">
+                <button class="btn-cadastrar" onclick="criarDisciplina()">
+                    <i class="fas fa-plus"></i>
+                    Criar Disciplina
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Criar Disciplina -->
+    <div id="modal-criar-disciplina" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Criar disciplina</h2>
+                <button class="modal-close" onclick="fecharModalCriarDisciplina()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-criar-disciplina" onsubmit="salvarDisciplina(event)">
+                    <div class="form-group">
+                        <label for="input-nome-disciplina">Nome Disciplina:</label>
+                        <input 
+                            type="text" 
+                            id="input-nome-disciplina" 
+                            placeholder="Digite o nome da disciplina" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-periodo">Período:</label>
+                        <select id="input-periodo" required>
+                            <option value="">Selecione o período da disciplina</option>
+                            <option value="1">1º</option>
+                            <option value="2">2º</option>
+                            <option value="3">3º</option>
+                            <option value="4">4º</option>
+                            <option value="5">5º</option>
+                            <option value="6">6º</option>
+                            <option value="7">7º</option>
+                            <option value="8">8º</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-pre-requisitos">Pré-Requisitos:</label>
+                        <input 
+                            type="text" 
+                            id="input-pre-requisitos" 
+                            placeholder="Digite para buscar uma disciplina..." 
+                            list="lista-disciplinas"
+                        >
+                        <datalist id="lista-disciplinas">
+                        </datalist>
+                        <div id="pre-requisitos-selecionados" class="tags-container"></div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn-salvar">Criar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gerenciar-disciplinas.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+/* Table Styles */
+.table-container {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: #f5f5f5;
+}
+
+.data-table th {
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 15px 20px;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.data-table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Table with center alignment */
+.details-table th,
+.details-table td {
+    text-align: center;
+    padding: 20px;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: var(--radius-round);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-badge.ativo {
+    background-color: var(--success-light);
+    color: var(--success-dark);
+}
+
+.status-badge.inativo {
+    background-color: var(--danger-light);
+    color: var(--danger-dark);
+}
+
+.status-badge.cursando {
+    background: #3498db;
+    color: white;
+}
+
+.status-badge.aprovado {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-badge.reprovado {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* Table Messages */
+.data-table .loading-message,
+.data-table .empty-message,
+.data-table .error-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.data-table .error-message {
+    color: var(--danger-color);
+}
+
+.empty-message,
+.loading-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px;
+    font-style: italic;
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+    .data-table {
+        font-size: 14px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 10px;
+    }
+}

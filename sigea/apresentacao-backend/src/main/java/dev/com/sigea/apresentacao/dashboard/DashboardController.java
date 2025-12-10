@@ -3,6 +3,8 @@ package dev.com.sigea.apresentacao.dashboard;
 import dev.com.sigea.apresentacao.dashboard.dto.DashboardAlunoResponse;
 import dev.com.sigea.apresentacao.dashboard.dto.DashboardStatsResponse;
 import dev.com.sigea.apresentacao.dashboard.dto.UsuarioResumo;
+import dev.com.sigea.infraestrutura.persistencia.DisciplinaEntity;
+import dev.com.sigea.infraestrutura.persistencia.DisciplinaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +20,11 @@ import java.util.stream.Collectors;
 public class DashboardController {
     
     private final UsuarioJpaRepository usuarioRepository;
+    private final DisciplinaJpaRepository disciplinaRepository;
     
-    public DashboardController(UsuarioJpaRepository usuarioRepository) {
+    public DashboardController(UsuarioJpaRepository usuarioRepository, DisciplinaJpaRepository disciplinaRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.disciplinaRepository = disciplinaRepository;
     }
     
     @GetMapping("/aluno/{usuarioId}")
@@ -55,8 +59,13 @@ public class DashboardController {
             .filter(u -> "PROFESSOR".equals(u.getPerfil()))
             .count();
         
-        // Por enquanto, disciplinas e turmas são 0 (serão implementadas depois)
-        long totalDisciplinas = 0;
+        // Contar disciplinas ativas
+        List<DisciplinaEntity> todasDisciplinas = disciplinaRepository.findAll();
+        long totalDisciplinas = todasDisciplinas.stream()
+            .filter(d -> "ATIVO".equals(d.getStatus()))
+            .count();
+        
+        // Por enquanto, turmas são 0 (será implementada depois)
         long totalTurmas = 0;
         
         DashboardStatsResponse response = new DashboardStatsResponse();
@@ -72,8 +81,9 @@ public class DashboardController {
     public ResponseEntity<List<UsuarioResumo>> getUltimosUsuarios() {
         List<UsuarioEntity> todosUsuarios = usuarioRepository.findAll();
         
-        // Pegar os últimos 5 usuários (ordenar por ID decrescente)
+        // Pegar os últimos 5 usuários que não são administradores (ordenar por ID decrescente)
         List<UsuarioResumo> ultimos = todosUsuarios.stream()
+            .filter(u -> !"ADMINISTRADOR".equals(u.getPerfil()))
             .sorted((u1, u2) -> Long.compare(u2.getId(), u1.getId()))
             .limit(5)
             .map(this::toResumo)

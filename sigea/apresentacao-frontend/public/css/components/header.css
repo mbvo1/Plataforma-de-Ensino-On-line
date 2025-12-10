@@ -1,0 +1,74 @@
+/* Header Styles */
+.top-header {
+    background: var(--bg-white);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-icon {
+    font-size: 24px;
+    color: var(--text-secondary);
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.header-right i {
+    font-size: 20px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content Area */
+.content-area {
+    padding: 30px;
+}
+
+.welcome-title,
+.page-title {
+    font-size: 32px;
+    color: var(--text-primary);
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+.page-title {
+    text-align: center;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 50px;
+    margin-bottom: 20px;
+    text-align: center;
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Gerenciar Usuários</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-admin.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="gerenciar-usuarios.html" class="menu-item active">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Gerenciar Usuários</span>
+            </a>
+            <a href="gestao-academica.html" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Gestão Acadêmica</span>
+            </a>
+            <a href="avisos-admin.html" class="menu-item">
+                <i class="fas fa-bullhorn"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="calendario-admin.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário Institucional</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Administrador</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <h1 class="welcome-title">Gerenciar Usuários</h1>
+            
+            <div class="user-management-grid">
+                <div class="user-type-card" onclick="navegarParaAlunos()">
+                    <div class="card-content-center">
+                        <h2>Alunos</h2>
+                    </div>
+                </div>
+
+                <div class="user-type-card" onclick="navegarParaProfessores()">
+                    <div class="card-content-center">
+                        <h2>Professores</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/gerenciar-usuarios.js"></script>
+</body>
+</html>

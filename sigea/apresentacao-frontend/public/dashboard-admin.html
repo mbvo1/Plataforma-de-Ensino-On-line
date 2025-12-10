@@ -17,23 +17,23 @@
         </div>
         
         <nav class="sidebar-menu">
-            <a href="#" class="menu-item active" data-section="painel">
+            <a href="dashboard-admin.html" class="menu-item active">
                 <i class="fas fa-th-large"></i>
                 <span class="menu-text">Painel</span>
             </a>
-            <a href="#" class="menu-item" data-section="usuarios">
+            <a href="gerenciar-usuarios.html" class="menu-item">
                 <i class="fas fa-users"></i>
                 <span class="menu-text">Gerenciar Usuários</span>
             </a>
-            <a href="#" class="menu-item" data-section="gestao-academica">
+            <a href="gestao-academica.html" class="menu-item">
                 <i class="fas fa-graduation-cap"></i>
                 <span class="menu-text">Gestão Acadêmica</span>
             </a>
-            <a href="#" class="menu-item" data-section="avisos">
+            <a href="avisos-admin.html" class="menu-item">
                 <i class="fas fa-bullhorn"></i>
                 <span class="menu-text">Avisos</span>
             </a>
-            <a href="#" class="menu-item" data-section="calendario">
+            <a href="calendario-admin.html" class="menu-item">
                 <i class="fas fa-calendar-alt"></i>
                 <span class="menu-text">Calendário Institucional</span>
             </a>
@@ -61,86 +61,60 @@
         <!-- Content Area -->
         <div class="content-area">
             <!-- Painel Section (Default) -->
-            <section id="painel-section" class="content-section active">
-                <h1 class="welcome-title">Painel do Administrador</h1>
-                
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h3>Total de Alunos</h3>
-                        <p class="stat-number" id="total-alunos">0</p>
-                        <p class="card-subtitle">Alunos matriculados</p>
-                    </div>
+            <h1 class="welcome-title">Painel do Administrador</h1>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Total de Alunos</h3>
+                    <p class="stat-number" id="total-alunos">0</p>
+                    <p class="card-subtitle">Alunos matriculados</p>
+                </div>
 
-                    <div class="info-card">
-                        <h3>Total de Professores</h3>
-                        <p class="stat-number" id="total-professores">0</p>
-                        <p class="card-subtitle">Professores ativos</p>
-                    </div>
+                <div class="info-card">
+                    <h3>Total de Professores</h3>
+                    <p class="stat-number" id="total-professores">0</p>
+                    <p class="card-subtitle">Professores ativos</p>
+                </div>
 
-                    <div class="info-card">
-                        <h3>Disciplinas Ativas</h3>
-                        <p class="stat-number" id="total-disciplinas">0</p>
-                        <p class="card-subtitle">Disciplinas cadastradas</p>
-                    </div>
+                <div class="info-card">
+                    <h3>Disciplinas Ativas</h3>
+                    <p class="stat-number" id="total-disciplinas">0</p>
+                    <p class="card-subtitle">Disciplinas cadastradas</p>
+                </div>
 
-                    <div class="info-card">
-                        <h3>Turmas Ativas</h3>
-                        <p class="stat-number" id="total-turmas">0</p>
-                        <p class="card-subtitle">Turmas em andamento</p>
+                <div class="info-card">
+                    <h3>Turmas Ativas</h3>
+                    <p class="stat-number" id="total-turmas">0</p>
+                    <p class="card-subtitle">Turmas em andamento</p>
+                </div>
+            </div>
+
+            <div class="dashboard-sections">
+                <div class="quick-actions">
+                    <h2>Ações Rápidas</h2>
+                    <div class="action-buttons">
+                        <a href="gerenciar-usuarios.html" class="action-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Cadastrar Usuário
+                        </a>
+                        <a href="gestao-academica.html" class="action-btn">
+                            <i class="fas fa-book-medical"></i>
+                            Gestão Acadêmica
+                        </a>
+                        <a href="avisos-admin.html" class="action-btn">
+                            <i class="fas fa-bullhorn"></i>
+                            Publicar Aviso
+                        </a>
                     </div>
                 </div>
 
-                <div class="dashboard-sections">
-                    <div class="quick-actions">
-                        <h2>Ações Rápidas</h2>
-                        <div class="action-buttons">
-                            <button class="action-btn" onclick="navegarPara('usuarios')">
-                                <i class="fas fa-user-plus"></i>
-                                Cadastrar Usuário
-                            </button>
-                            <button class="action-btn" onclick="navegarPara('gestao-academica')">
-                                <i class="fas fa-book-medical"></i>
-                                Gestão Acadêmica
-                            </button>
-                            <button class="action-btn" onclick="navegarPara('avisos')">
-                                <i class="fas fa-bullhorn"></i>
-                                Publicar Aviso
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="recent-users">
-                        <h2>Últimos Usuários Cadastrados</h2>
-                        <div id="ultimos-usuarios-lista">
-                            <p class="loading-message">Carregando...</p>
-                        </div>
+                <div class="recent-users">
+                    <h2>Últimos Usuários Cadastrados</h2>
+                    <div id="ultimos-usuarios-lista">
+                        <p class="loading-message">Carregando...</p>
                     </div>
                 </div>
-            </section>
-
-            <!-- Usuários Section -->
-            <section id="usuarios-section" class="content-section">
-                <h2>Gerenciar Usuários</h2>
-                <p>Gerencie alunos, professores e administradores do sistema.</p>
-            </section>
-
-            <!-- Gestão Acadêmica Section -->
-            <section id="gestao-academica-section" class="content-section">
-                <h2>Gestão Acadêmica</h2>
-                <p>Gerencie disciplinas, períodos letivos, salas e matrículas.</p>
-            </section>
-
-            <!-- Avisos Section -->
-            <section id="avisos-section" class="content-section">
-                <h2>Avisos</h2>
-                <p>Publique e gerencie avisos institucionais.</p>
-            </section>
-
-            <!-- Calendário Section -->
-            <section id="calendario-section" class="content-section">
-                <h2>Calendário Institucional</h2>
-                <p>Gerencie eventos, provas e datas importantes.</p>
-            </section>
+            </div>
         </div>
     </div>
 

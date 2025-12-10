@@ -5,5 +5,5 @@ import lombok.Data;
 public class CriarProfessorRequest {
     private String nome;
     private String email;
-    private String especialidade;
+    private String cpf;
 }

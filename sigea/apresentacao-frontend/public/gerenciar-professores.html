@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Professores - SIGEA</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-admin.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="gerenciar-usuarios.html" class="menu-item active">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Gerenciar Usuários</span>
+            </a>
+            <a href="gestao-academica.html" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Gestão Acadêmica</span>
+            </a>
+            <a href="avisos-admin.html" class="menu-item">
+                <i class="fas fa-bullhorn"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="calendario-admin.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário Institucional</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Admin - Administrador</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <h1 class="welcome-title">Gerenciar Professores</h1>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Buscar por nome ou e-mail..." 
+                        onkeyup="filtrarProfessores()"
+                    >
+                </div>
+            </div>
+
+            <!-- Tabela de Professores -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nome Completo</th>
+                            <th>E-mail</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-professores">
+                        <tr>
+                            <td colspan="4" class="loading-message">Carregando professores...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botão Cadastrar Professor -->
+            <div class="cadastrar-container">
+                <button class="btn-cadastrar" onclick="cadastrarProfessor()">
+                    <i class="fas fa-plus"></i>
+                    Cadastrar Professor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cadastrar Professor -->
+    <div id="modal-cadastrar" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastrar Professor</h2>
+                <button class="modal-close" onclick="fecharModalCadastro()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-cadastrar-professor" onsubmit="salvarProfessor(event)">
+                    <div class="form-group">
+                        <label for="input-nome">Nome Completo:</label>
+                        <input 
+                            type="text" 
+                            id="input-nome" 
+                            placeholder="Digite o nome completo do professor" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-email">Email:</label>
+                        <input 
+                            type="email" 
+                            id="input-email" 
+                            placeholder="Digite o email do professor" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-cpf">CPF:</label>
+                        <input 
+                            type="text" 
+                            id="input-cpf" 
+                            placeholder="Digite o CPF (somente números)" 
+                            maxlength="11"
+                            pattern="[0-9]{11}"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn-salvar">Salvar</button>
+                        <button type="button" class="btn-cancelar" onclick="fecharModalCadastro()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Professor -->
+    <div id="modal-editar" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="titulo-editar">Professor 1</h2>
+                <button class="modal-close" onclick="fecharModalEdicao()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-editar-professor" onsubmit="salvarEdicao(event)">
+                    <input type="hidden" id="edit-professor-id">
+                    
+                    <div class="form-group">
+                        <label for="edit-nome">Nome Completo:</label>
+                        <input 
+                            type="text" 
+                            id="edit-nome" 
+                            placeholder="Professor 1" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-email">Email:</label>
+                        <input 
+                            type="email" 
+                            id="edit-email" 
+                            placeholder="p1@email.com" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn-salvar">Salvar</button>
+                        <button type="button" class="btn-resetar" onclick="resetarSenha()">Resetar senha</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gerenciar-professores.js"></script>
+</body>
+</html>

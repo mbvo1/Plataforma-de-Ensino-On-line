@@ -9,7 +9,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     loadUserInfo();
-    initializeNavigation();
     carregarDadosDashboard();
 });
 
@@ -61,48 +60,11 @@ function exibirUltimosUsuarios(usuarios) {
     container.innerHTML = html;
 }
 
-function navegarPara(secao) {
-    // Simula clique no item do menu
-    const menuItem = document.querySelector(`.menu-item[data-section="${secao}"]`);
-    if (menuItem) {
-        menuItem.click();
-    }
-}
-
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
-    const perfil = localStorage.getItem('usuarioPerfil');
     
     // Atualiza o nome do usuário no header
-    document.getElementById('user-name').textContent = `Administrador - ${nome || 'Admin'}`;
-}
-
-function initializeNavigation() {
-    const menuItems = document.querySelectorAll('.menu-item[data-section]');
-    
-    menuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            const sectionName = item.getAttribute('data-section');
-            
-            // Remove active class from all menu items
-            menuItems.forEach(mi => mi.classList.remove('active'));
-            
-            // Add active class to clicked item
-            item.classList.add('active');
-            
-            // Hide all sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.remove('active'));
-            
-            // Show selected section
-            const selectedSection = document.getElementById(`${sectionName}-section`);
-            if (selectedSection) {
-                selectedSection.classList.add('active');
-            }
-        });
-    });
+    document.getElementById('user-name').textContent = `Admin - ${nome || 'Usuário'}`;
 }
 
 function handleLogout() {

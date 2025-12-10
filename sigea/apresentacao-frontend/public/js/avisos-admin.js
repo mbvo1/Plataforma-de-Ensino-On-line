@@ -1,0 +1,32 @@
+// Verifica autenticação ao carregar a página
+window.addEventListener('DOMContentLoaded', () => {
+    const usuarioId = localStorage.getItem('usuarioId');
+    const usuarioPerfil = localStorage.getItem('usuarioPerfil');
+    
+    if (!usuarioId || usuarioPerfil !== 'ADMINISTRADOR') {
+        window.location.href = '/login-admin.html';
+        return;
+    }
+    
+    loadUserInfo();
+});
+
+function loadUserInfo() {
+    const nome = localStorage.getItem('usuarioNome');
+    
+    const userNameElement = document.getElementById('user-name');
+    if (userNameElement) {
+        userNameElement.textContent = `Admin - ${nome || 'Usuário'}`;
+    }
+}
+
+function handleLogout() {
+    if (confirm('Deseja realmente sair?')) {
+        localStorage.removeItem('usuarioId');
+        localStorage.removeItem('usuarioNome');
+        localStorage.removeItem('usuarioEmail');
+        localStorage.removeItem('usuarioPerfil');
+        
+        window.location.href = '/login-admin.html';
+    }
+}

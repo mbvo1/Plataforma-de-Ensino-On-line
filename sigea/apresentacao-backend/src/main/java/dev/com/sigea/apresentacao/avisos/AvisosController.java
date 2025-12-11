@@ -8,6 +8,10 @@ import dev.com.sigea.apresentacao.avisos.observer.AvisoObserver;
 import dev.com.sigea.apresentacao.avisos.observer.DashboardAlunoObserver;
 import dev.com.sigea.apresentacao.avisos.observer.DashboardProfessorObserver;
 import dev.com.sigea.apresentacao.avisos.observer.RegistroLeituraObserver;
+import dev.com.sigea.infraestrutura.persistencia.AvisoEntity;
+import dev.com.sigea.infraestrutura.persistencia.AvisoJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.AvisoLeituraEntity;
+import dev.com.sigea.infraestrutura.persistencia.AvisoLeituraJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +33,14 @@ public class AvisosController {
     
     private final List<AvisoObserver> observers = new ArrayList<>();
     private final Map<String, AvisoEnriquecido> avisosArmazenados = new HashMap<>();
+    private final Map<String, String> escoposArmazenados = new HashMap<>();
+    private final AvisoJpaRepository avisoJpaRepository;
+    private final AvisoLeituraJpaRepository leituraJpaRepository;
     
-    public AvisosController() {
+    public AvisosController(AvisoJpaRepository avisoJpaRepository, 
+                           AvisoLeituraJpaRepository leituraJpaRepository) {
+        this.avisoJpaRepository = avisoJpaRepository;
+        this.leituraJpaRepository = leituraJpaRepository;
         // Registra observers
         observers.add(new DashboardAlunoObserver());
         observers.add(new DashboardProfessorObserver());
@@ -74,8 +84,32 @@ public class AvisosController {
         
         avisosArmazenados.put(avisoId, aviso);
         
-        // Observer Pattern: Notifica sobre novo aviso
+        // Armazena escopo separadamente para fácil acesso
         String escopo = request.getEscopo() != null ? request.getEscopo() : "GERAL";
+        escoposArmazenados.put(avisoId, escopo);
+        
+        // Mapeia escopo para alvo_tipo do banco
+        String alvoTipo;
+        switch(escopo) {
+            case "GERAL" -> alvoTipo = "GERAL";
+            case "ALUNOS" -> alvoTipo = "ALUNOS";
+            case "PROFESSORES" -> alvoTipo = "PROFESSORES";
+            default -> alvoTipo = "GERAL";
+        }
+        
+        // Converte autorId String para Long (pega do usuário logado)
+        Long autorIdLong = 1L; // TODO: pegar do contexto de autenticação
+        
+        // Salva no banco de dados
+        AvisoEntity entity = new AvisoEntity(
+            request.getTitulo(),
+            request.getConteudo(),
+            autorIdLong,
+            alvoTipo
+        );
+        AvisoEntity saved = avisoJpaRepository.save(entity);
+        
+        // Observer Pattern: Notifica sobre novo aviso
         observers.forEach(obs -> obs.onAvisoPublicado(
             avisoId, 
             request.getTitulo(),
@@ -83,7 +117,7 @@ public class AvisosController {
         ));
         
         AvisoResponse response = new AvisoResponse();
-        response.setId(avisoId);
+        response.setId(String.valueOf(saved.getId()));
         response.setTitulo(request.getTitulo());
         response.setConteudo(request.getConteudo());
         response.setAutorId(request.getAutorId());
@@ -147,6 +181,32 @@ public class AvisosController {
      */
     @PostMapping("/marcar-lido")
     public ResponseEntity<Void> marcarComoLido(@RequestBody MarcarLidoRequest request) {
+        // Converte IDs para Long com tratamento de erros
+        Long avisoId;
+        Long usuarioId;
+        
+        try {
+            avisoId = Long.parseLong(request.getAvisoId());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        try {
+            if (request.getUsuarioId() == null || request.getUsuarioId().equals("undefined") || request.getUsuarioId().equals("null")) {
+                usuarioId = 1L; // Admin padrão
+            } else {
+                usuarioId = Long.parseLong(request.getUsuarioId());
+            }
+        } catch (NumberFormatException e) {
+            usuarioId = 1L; // Admin padrão em caso de erro
+        }
+        
+        // Registra leitura se ainda não foi lida
+        if (!leituraJpaRepository.existsByAvisoIdAndUsuarioId(avisoId, usuarioId)) {
+            AvisoLeituraEntity leitura = new AvisoLeituraEntity(avisoId, usuarioId);
+            leituraJpaRepository.save(leitura);
+        }
+        
         // Observer Pattern: Notifica sobre leitura
         observers.forEach(obs -> obs.onAvisoLido(
             request.getUsuarioId(),
@@ -163,17 +223,90 @@ public class AvisosController {
     public ResponseEntity<List<AvisoResponse>> listarNaoLidos(
             @RequestParam String usuarioId) {
         
-        // Implementação simplificada - em produção consultaria banco
+        // Trata casos de usuarioId inválido
+        Long usuarioIdLong;
+        try {
+            if (usuarioId == null || usuarioId.equals("undefined") || usuarioId.equals("null")) {
+                usuarioIdLong = 1L; // Admin padrão
+            } else {
+                usuarioIdLong = Long.parseLong(usuarioId);
+            }
+        } catch (NumberFormatException e) {
+            usuarioIdLong = 1L; // Admin padrão em caso de erro
+        }
+        
+        // Busca IDs dos avisos já lidos pelo usuário
+        List<Long> avisosLidos = leituraJpaRepository.findAvisosLidosByUsuarioId(usuarioIdLong);
+        
+        // Busca todos os avisos e filtra os não lidos
         List<AvisoResponse> naoLidos = new ArrayList<>();
         
-        avisosArmazenados.forEach((id, aviso) -> {
-            AvisoResponse resp = new AvisoResponse();
-            resp.setId(id);
-            resp.setTitulo(aviso.getTitulo());
-            resp.setLido(false);
-            naoLidos.add(resp);
+        List<AvisoEntity> entities = avisoJpaRepository.findAll();
+        entities.forEach(entity -> {
+            // Só adiciona se NÃO foi lido
+            if (!avisosLidos.contains(entity.getId())) {
+                AvisoResponse resp = new AvisoResponse();
+                resp.setId(String.valueOf(entity.getId()));
+                resp.setTitulo(entity.getTitulo());
+                resp.setConteudo(entity.getConteudo());
+                resp.setAutorId(String.valueOf(entity.getAutorId()));
+                resp.setEscopo(entity.getAlvoTipo());
+                resp.setLido(false);
+                naoLidos.add(resp);
+            }
         });
         
         return ResponseEntity.ok(naoLidos);
+    }
+    
+    /**
+     * GET /api/avisos/historico?usuarioId=X - Listar histórico completo de avisos
+     */
+    @GetMapping("/historico")
+    public ResponseEntity<List<AvisoResponse>> listarHistorico(
+            @RequestParam String usuarioId) {
+        
+        // Trata casos de usuarioId inválido
+        Long usuarioIdLong;
+        try {
+            if (usuarioId == null || usuarioId.equals("undefined") || usuarioId.equals("null")) {
+                usuarioIdLong = 1L; // Admin padrão
+            } else {
+                usuarioIdLong = Long.parseLong(usuarioId);
+            }
+        } catch (NumberFormatException e) {
+            usuarioIdLong = 1L; // Admin padrão em caso de erro
+        }
+        
+        // Busca IDs dos avisos já lidos pelo usuário
+        List<Long> avisosLidos = leituraJpaRepository.findAvisosLidosByUsuarioId(usuarioIdLong);
+        
+        // Busca todos os avisos
+        List<AvisoResponse> historico = new ArrayList<>();
+        
+        List<AvisoEntity> entities = avisoJpaRepository.findAll();
+        entities.forEach(entity -> {
+            AvisoResponse resp = new AvisoResponse();
+            resp.setId(String.valueOf(entity.getId()));
+            resp.setTitulo(entity.getTitulo());
+            resp.setConteudo(entity.getConteudo());
+            resp.setAutorId(String.valueOf(entity.getAutorId()));
+            resp.setEscopo(entity.getAlvoTipo());
+            resp.setLido(avisosLidos.contains(entity.getId()));
+            historico.add(resp);
+        });
+        
+        return ResponseEntity.ok(historico);
+    }
+    
+    /**
+     * DELETE /api/avisos/{id} - Excluir aviso
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirAviso(@PathVariable String id) {
+        avisoJpaRepository.deleteById(Long.parseLong(id));
+        avisosArmazenados.remove(id);
+        escoposArmazenados.remove(id);
+        return ResponseEntity.ok().build();
     }
 }

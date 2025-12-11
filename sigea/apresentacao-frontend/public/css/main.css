@@ -24,6 +24,8 @@
 /* ===== PAGES ===== */
 @import url('pages/dashboard.css');
 @import url('pages/disciplinas.css');
+@import url('pages/avisos.css');
+@import url('pages/calendario.css');
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {

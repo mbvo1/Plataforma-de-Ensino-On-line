@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEA - Avisos</title>
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -60,8 +60,66 @@
 
         <!-- Content Area -->
         <div class="content-area">
-            <h1 class="welcome-title">Avisos</h1>
-            <p>Publique e gerencie avisos institucionais.</p>
+            <!-- Cabeçalho da página -->
+            <div class="page-header">
+                <div class="header-left-content">
+                    <h1 class="page-title">Avisos</h1>
+                    <a href="#" class="page-subtitle" onclick="toggleHistorico(event)">Ver histórico de avisos</a>
+                </div>
+                <div class="header-right-content">
+                    <button class="btn-primary" onclick="abrirModalNovoAviso()">
+                        <i class="fas fa-plus"></i> Novo Aviso
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Avisos Não Lidos -->
+            <div class="avisos-container" id="avisos-container">
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>Nenhum aviso não lido.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Criar Novo Aviso -->
+    <div id="modal-novo-aviso" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Criar Novo Aviso</h2>
+                <button class="modal-close" onclick="fecharModalNovoAviso()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-novo-aviso" onsubmit="criarAviso(event)">
+                    <div class="form-group">
+                        <label for="titulo-aviso">Título *</label>
+                        <input type="text" id="titulo-aviso" required placeholder="Digite o título do aviso">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mensagem-aviso">Mensagem *</label>
+                        <textarea id="mensagem-aviso" required rows="6" placeholder="Digite a mensagem do aviso"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="destinatarios-aviso">Destinatários *</label>
+                        <select id="destinatarios-aviso" required>
+                            <option value="">Selecione...</option>
+                            <option value="TODOS">Todos os usuários</option>
+                            <option value="ALUNOS">Apenas alunos</option>
+                            <option value="PROFESSORES">Apenas professores</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="fecharModalNovoAviso()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Criar Aviso</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

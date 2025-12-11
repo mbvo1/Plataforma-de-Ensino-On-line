@@ -1,0 +1,364 @@
+/* Calendar Navigation */
+.calendar-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.calendar-month {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 200px;
+    text-align: center;
+}
+
+.btn-nav {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-nav:hover {
+    background: var(--primary-dark);
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Calendar Container */
+.calendar-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #2c3e50;
+    color: white;
+    font-weight: 700;
+    padding: 1rem 0;
+    font-size: 1rem;
+}
+
+.calendar-day-name {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border-color);
+}
+
+.calendar-cell {
+    background: white;
+    min-height: 120px;
+    padding: 0.5rem;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.calendar-cell:hover {
+    background: var(--bg-light);
+}
+
+.calendar-cell.empty {
+    background: var(--bg-secondary);
+}
+
+.calendar-cell.today {
+    background: #fff3cd;
+    border: 2px solid var(--warning);
+}
+
+.calendar-cell.periodo-letivo {
+    background: #d4edda;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+/* Eventos Container */
+.eventos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.evento-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    padding-right: 1.5rem;
+    border-radius: 4px;
+    color: #000;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: 100%;
+}
+
+.evento-tag:hover {
+    opacity: 0.9;
+}
+
+.evento-delete {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.7rem;
+    line-height: 1;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.evento-delete:hover {
+    background: rgba(220, 53, 69, 0.9);
+    transform: translateY(-50%) scale(1.2);
+}
+
+/* Tipos de eventos */
+.evento-tag.feriado {
+    background: var(--danger);
+}
+
+.evento-tag.periodo-inicio,
+.evento-tag.periodo-fim {
+    background: var(--success);
+}
+
+.evento-tag.evento-prova {
+    background: var(--warning);
+    color: #000;
+}
+
+.evento-tag.evento-entrega_atividade {
+    background: var(--info);
+}
+
+.evento-tag.evento-periodo_matricula {
+    background: var(--purple);
+}
+
+/* Legend */
+.calendar-legend {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+/* Modal Customization */
+.modal {
+    display: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.show {
+    display: flex !important;
+}
+
+.modal-calendario {
+    max-width: 500px;
+    padding: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header-calendario {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header-calendario h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.btn-voltar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.btn-voltar:hover {
+    background-color: var(--bg-light);
+}
+
+.modal-calendario .modal-body {
+    padding: 2rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+    background-color: var(--bg-light);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.checkbox-label span {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.modal-actions-calendario {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-postar {
+    background-color: var(--text-secondary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-postar:hover {
+    background-color: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .calendar-month {
+        font-size: 1.2rem;
+        min-width: 150px;
+    }
+    
+    .calendar-cell {
+        min-height: 80px;
+        padding: 0.25rem;
+    }
+    
+    .day-number {
+        font-size: 0.85rem;
+    }
+    
+    .evento-tag {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.3rem;
+    }
+    
+    .calendar-legend {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}

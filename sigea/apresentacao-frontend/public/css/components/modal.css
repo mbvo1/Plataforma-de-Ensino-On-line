@@ -12,6 +12,10 @@
     align-items: center;
 }
 
+.modal.show {
+    display: flex;
+}
+
 .modal-content {
     background: white;
     border-radius: var(--radius-lg);

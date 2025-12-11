@@ -324,3 +324,76 @@
 .back-button-container {
     margin-bottom: 30px;
 }
+
+/* ===== GENERIC BUTTONS (Para usar em qualquer página) ===== */
+
+/* Primary Button */
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.btn-primary i {
+    font-size: 16px;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: #f1f3f5;
+    color: var(--text-primary);
+    border: 1px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e0;
+}
+
+/* Danger Button */
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all var(--transition-normal);
+}
+
+.btn-danger:hover {
+    background: #c53030;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}

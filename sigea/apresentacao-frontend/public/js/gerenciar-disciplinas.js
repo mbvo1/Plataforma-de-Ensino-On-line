@@ -127,7 +127,76 @@ function exibirDisciplinas(disciplinas) {
 }
 
 function criarPeriodoLetivo() {
-    alert('Criar período letivo\n\nEm desenvolvimento...');
+    // Abre o modal de criar período letivo
+    const modal = document.getElementById('modal-criar-periodo');
+    modal.style.display = 'flex';
+    
+    // Limpa o formulário
+    document.getElementById('form-criar-periodo').reset();
+}
+
+function fecharModalPeriodo() {
+    document.getElementById('modal-criar-periodo').style.display = 'none';
+}
+
+function confirmarCriarPeriodo(event) {
+    event.preventDefault();
+    
+    const nome = document.getElementById('nome-periodo').value;
+    const dataInicio = document.getElementById('data-inicio-periodo').value;
+    const dataFim = document.getElementById('data-fim-periodo').value;
+    const inscricaoInicio = document.getElementById('inscricao-inicio-periodo').value;
+    const inscricaoFim = document.getElementById('inscricao-fim-periodo').value;
+    
+    // Validações
+    if (!nome || !dataInicio || !dataFim || !inscricaoInicio || !inscricaoFim) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+    
+    // Mensagem de confirmação
+    const mensagem = `ATENÇÃO!\n\nAo criar o período letivo "${nome}", o período letivo atual será automaticamente ENCERRADO.\n\nTodas as disciplinas do período atual serão transferidas para o novo período com status INATIVO.\n\nDeseja continuar?`;
+    
+    if (!confirm(mensagem)) {
+        return;
+    }
+    
+    // Dados do novo período
+    const novoPeriodo = {
+        nome: nome,
+        dataInicio: dataInicio,
+        dataFim: dataFim,
+        inscricaoInicio: inscricaoInicio,
+        inscricaoFim: inscricaoFim
+    };
+    
+    // Envia requisição para criar período
+    fetch('http://localhost:8080/api/admin/periodos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(novoPeriodo)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.erro || 'Erro ao criar período letivo');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        const mensagemSucesso = data.mensagem || `Período letivo "${data.nome}" criado com sucesso!`;
+        alert(mensagemSucesso);
+        fecharModalPeriodo();
+        carregarPeriodoAtual(); // Atualiza o período exibido
+        carregarDisciplinas(); // Recarrega a lista (estará vazia)
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert(error.message);
+    });
 }
 
 function criarDisciplina() {
@@ -172,6 +241,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (disciplina && !preRequisitosSelecionados.find(p => p.id === disciplina.id)) {
                 preRequisitosSelecionados.push(disciplina);
                 exibirPreRequisitosSelecionados();
+                this.value = '';
+            }
+        });
+    }
+    
+    // Evento para o input de pré-requisitos na edição
+    const editPreRequisitos = document.getElementById('edit-pre-requisitos');
+    if (editPreRequisitos) {
+        editPreRequisitos.addEventListener('change', function() {
+            const disciplinaNome = this.value;
+            const disciplina = todasDisciplinas.find(d => d.nome === disciplinaNome);
+            
+            if (disciplina && !preRequisitosEditados.find(p => p.id === disciplina.id)) {
+                preRequisitosEditados.push(disciplina);
+                exibirPreRequisitosEditados();
                 this.value = '';
             }
         });
@@ -236,12 +320,125 @@ async function salvarDisciplina(event) {
     }
 }
 
-function editarDisciplina(disciplinaId) {
-    alert(`Editar disciplina ID: ${disciplinaId}\n\nEm desenvolvimento...`);
+let preRequisitosEditados = [];
+
+async function editarDisciplina(disciplinaId) {
+    try {
+        // Busca os dados da disciplina
+        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`);
+        
+        if (!response.ok) {
+            throw new Error('Erro ao buscar dados da disciplina');
+        }
+        
+        const disciplina = await response.json();
+        
+        // Preenche o formulário
+        document.getElementById('edit-disciplina-id').value = disciplina.id;
+        document.getElementById('edit-nome-disciplina').value = disciplina.nome;
+        document.getElementById('edit-periodo').value = disciplina.periodo;
+        
+        // Carrega pré-requisitos
+        preRequisitosEditados = disciplina.preRequisitosIds.map(id => {
+            return todasDisciplinas.find(d => d.id === id);
+        }).filter(d => d !== undefined);
+        
+        exibirPreRequisitosEditados();
+        carregarListaDisciplinasEdit();
+        
+        // Abre o modal
+        document.getElementById('modal-editar-disciplina').style.display = 'flex';
+    } catch (error) {
+        console.error('Erro ao editar disciplina:', error);
+        alert('Erro ao carregar dados da disciplina. Tente novamente.');
+    }
+}
+
+function fecharModalEditarDisciplina() {
+    document.getElementById('modal-editar-disciplina').style.display = 'none';
+    preRequisitosEditados = [];
+}
+
+function carregarListaDisciplinasEdit() {
+    const datalist = document.getElementById('lista-disciplinas-edit');
+    datalist.innerHTML = '';
+    
+    const disciplinaIdEditando = parseInt(document.getElementById('edit-disciplina-id').value);
+    
+    todasDisciplinas
+        .filter(d => d.id !== disciplinaIdEditando)
+        .forEach(disciplina => {
+            const option = document.createElement('option');
+            option.value = disciplina.nome;
+            option.setAttribute('data-id', disciplina.id);
+            datalist.appendChild(option);
+        });
+}
+
+function exibirPreRequisitosEditados() {
+    const container = document.getElementById('edit-pre-requisitos-selecionados');
+    container.innerHTML = '';
+    
+    if (preRequisitosEditados.length === 0) {
+        container.innerHTML = '<p class="empty-message">Nenhum</p>';
+        return;
+    }
+    
+    preRequisitosEditados.forEach(disciplina => {
+        const tag = document.createElement('div');
+        tag.className = 'tag-item';
+        tag.innerHTML = `
+            <span>${disciplina.nome}</span>
+            <button type="button" onclick="removerPreRequisitoEdit(${disciplina.id})">&times;</button>
+        `;
+        container.appendChild(tag);
+    });
+}
+
+function removerPreRequisitoEdit(disciplinaId) {
+    preRequisitosEditados = preRequisitosEditados.filter(d => d.id !== disciplinaId);
+    exibirPreRequisitosEditados();
+}
+
+async function atualizarDisciplina(event) {
+    event.preventDefault();
+    
+    const disciplinaId = document.getElementById('edit-disciplina-id').value;
+    const nome = document.getElementById('edit-nome-disciplina').value.trim();
+    const periodo = document.getElementById('edit-periodo').value;
+    const preRequisitosIds = preRequisitosEditados.map(d => d.id);
+    
+    const disciplinaData = {
+        nome: nome,
+        periodo: periodo,
+        preRequisitos: preRequisitosIds
+    };
+    
+    try {
+        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(disciplinaData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao atualizar disciplina');
+        }
+        
+        alert('Disciplina atualizada com sucesso!');
+        fecharModalEditarDisciplina();
+        carregarDisciplinas();
+    } catch (error) {
+        console.error('Erro ao atualizar disciplina:', error);
+        alert(`Erro ao atualizar disciplina: ${error.message}`);
+    }
 }
 
 function gerenciarSalas(disciplinaId) {
-    alert(`Gerenciar salas da disciplina ID: ${disciplinaId}\n\nEm desenvolvimento...`);
+    window.location.href = `gerenciar-salas.html?disciplinaId=${disciplinaId}`;
 }
 
 async function toggleStatusDisciplina(disciplinaId, statusAtual) {
@@ -300,4 +497,104 @@ function handleLogout() {
         
         window.location.href = 'login-admin.html';
     }
+}
+
+// ========== SELETOR DE PERÍODOS ==========
+
+let periodoSelecionadoId = null;
+
+async function toggleSelectorPeriodo() {
+    const selector = document.getElementById('selector-periodos');
+    
+    if (selector.style.display === 'none' || selector.style.display === '') {
+        await carregarTodosPeriodos();
+        selector.style.display = 'block';
+    } else {
+        selector.style.display = 'none';
+    }
+}
+
+function fecharSelectorPeriodo() {
+    document.getElementById('selector-periodos').style.display = 'none';
+}
+
+async function carregarTodosPeriodos() {
+    try {
+        const response = await fetch('http://localhost:8080/api/admin/periodos');
+        
+        if (!response.ok) {
+            throw new Error('Erro ao buscar períodos');
+        }
+        
+        const periodos = await response.json();
+        exibirListaPeriodos(periodos);
+    } catch (error) {
+        console.error('Erro ao carregar períodos:', error);
+        alert('Erro ao carregar lista de períodos.');
+    }
+}
+
+function exibirListaPeriodos(periodos) {
+    const lista = document.getElementById('lista-periodos');
+    
+    if (!periodos || periodos.length === 0) {
+        lista.innerHTML = '<p class="empty-message">Nenhum período cadastrado</p>';
+        return;
+    }
+    
+    const html = periodos.map(periodo => {
+        const statusClass = periodo.status.toLowerCase();
+        const statusFormatado = periodo.status === 'ATIVO' ? 'Ativo' : 'Encerrado';
+        
+        return `
+        <div class="periodo-item" onclick="selecionarPeriodo(${periodo.id})">
+            <div class="periodo-item-header">
+                <span class="periodo-item-nome">${periodo.nome}</span>
+                <span class="periodo-status ${statusClass}">${statusFormatado}</span>
+            </div>
+            <div class="periodo-item-datas">
+                ${periodo.dataInicio ? `<small>Início: ${formatarData(periodo.dataInicio)} | Fim: ${formatarData(periodo.dataFim)}</small>` : ''}
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    lista.innerHTML = html;
+}
+
+async function selecionarPeriodo(periodoId) {
+    periodoSelecionadoId = periodoId;
+    
+    try {
+        const response = await fetch(`http://localhost:8080/api/admin/periodos/${periodoId}/disciplinas`);
+        
+        if (!response.ok) {
+            throw new Error('Erro ao buscar disciplinas do período');
+        }
+        
+        const disciplinas = await response.json();
+        todasDisciplinas = disciplinas;
+        exibirDisciplinas(disciplinas);
+        
+        // Atualiza indicador visual do período selecionado
+        const responsePeriodo = await fetch('http://localhost:8080/api/admin/periodos');
+        const periodos = await responsePeriodo.json();
+        const periodoSelecionado = periodos.find(p => p.id === periodoId);
+        
+        if (periodoSelecionado) {
+            exibirPeriodoAtual(periodoSelecionado);
+        }
+        
+        fecharSelectorPeriodo();
+    } catch (error) {
+        console.error('Erro ao selecionar período:', error);
+        alert('Erro ao carregar disciplinas do período.');
+    }
+}
+
+function formatarData(dataStr) {
+    if (!dataStr) return '';
+    
+    const [ano, mes, dia] = dataStr.split('-');
+    return `${dia}/${mes}/${ano}`;
 }

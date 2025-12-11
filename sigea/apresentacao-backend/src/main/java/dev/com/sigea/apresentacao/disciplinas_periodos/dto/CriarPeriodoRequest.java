@@ -6,4 +6,6 @@ public class CriarPeriodoRequest {
     private String nome;
     private String dataInicio;
     private String dataFim;
+    private String inscricaoInicio;
+    private String inscricaoFim;
 }

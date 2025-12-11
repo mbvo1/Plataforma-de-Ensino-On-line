@@ -28,6 +28,10 @@ public class DisciplinaEntity {
     @Column(name = "salas_ofertadas")
     private Integer salasOfertadas = 0;
     
+    @ManyToOne
+    @JoinColumn(name = "periodo_id")
+    private PeriodoEntity periodoLetivo;
+    
     @ManyToMany
     @JoinTable(
         name = "Disciplina_PreRequisitos",
@@ -95,6 +99,14 @@ public class DisciplinaEntity {
     
     public void setSalasOfertadas(Integer salasOfertadas) {
         this.salasOfertadas = salasOfertadas;
+    }
+    
+    public PeriodoEntity getPeriodoLetivo() {
+        return periodoLetivo;
+    }
+    
+    public void setPeriodoLetivo(PeriodoEntity periodoLetivo) {
+        this.periodoLetivo = periodoLetivo;
     }
     
     public Set<DisciplinaEntity> getPreRequisitos() {

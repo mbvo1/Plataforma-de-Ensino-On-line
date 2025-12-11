@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Salas - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-admin.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="gerenciar-usuarios.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Gerenciar Usuários</span>
+            </a>
+            <a href="gerenciar-disciplinas.html" class="menu-item active">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Gestão Acadêmica</span>
+            </a>
+            <a href="avisos-admin.html" class="menu-item">
+                <i class="fas fa-bullhorn"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="calendario-admin.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário Institucional</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Admin - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Header com Voltar e Adicionar -->
+            <div class="page-header-with-actions">
+                <button class="btn-voltar" onclick="voltarParaDisciplinas()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                
+                <div class="page-header-center">
+                    <h1 class="page-title">Gerenciar Salas</h1>
+                    <!-- Nome da Disciplina -->
+                    <h2 class="disciplina-nome" id="nome-disciplina">Carregando...</h2>
+                </div>
+                
+                <button class="btn-adicionar" onclick="adicionarNovaSala()">
+                    <i class="fas fa-plus-circle"></i>
+                    Adicionar nova sala
+                </button>
+            </div>
+
+            <!-- Tabela de Salas -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Salas</th>
+                            <th>Professor Responsável</th>
+                            <th>Dias</th>
+                            <th>Horário</th>
+                            <th>Vagas (Matric./Total)</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-salas">
+                        <tr>
+                            <td colspan="7" class="loading-message">Carregando salas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Sala -->
+    <div id="modal-adicionar-sala" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Sala</h2>
+                <button class="modal-close" onclick="fecharModalAdicionarSala()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="disciplina-modal-header">
+                    <h3 id="disciplina-modal-nome">Carregando...</h3>
+                </div>
+                
+                <form id="form-adicionar-sala" onsubmit="salvarSala(event)">
+                    <div class="form-group">
+                        <label for="input-identificador-sala">Identificador da sala:</label>
+                        <input 
+                            type="text" 
+                            id="input-identificador-sala" 
+                            placeholder="Digite o identificador da sala" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-professor">Professor Responsável:</label>
+                        <select id="input-professor" required>
+                            <option value="">Selecione o professor responsável</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dias da semana:</label>
+                        <div class="dias-semana-container">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dia-semana" value="SEG">
+                                <span>Seg</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dia-semana" value="TER">
+                                <span>Ter</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dia-semana" value="QUA">
+                                <span>Qua</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dia-semana" value="QUI">
+                                <span>Qui</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dia-semana" value="SEX">
+                                <span>Sex</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dia-semana" value="SAB">
+                                <span>Sáb</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Horário:</label>
+                        <div class="horario-container">
+                            <div class="horario-input-group">
+                                <label for="input-horario-inicio">Horário Início:</label>
+                                <input 
+                                    type="time" 
+                                    id="input-horario-inicio" 
+                                    required
+                                >
+                            </div>
+                            <div class="horario-input-group">
+                                <label for="input-horario-fim">Horário Fim:</label>
+                                <input 
+                                    type="time" 
+                                    id="input-horario-fim" 
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-vagas">Vagas:</label>
+                        <input 
+                            type="number" 
+                            id="input-vagas" 
+                            placeholder="Digite o limite de vagas"
+                            min="1"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn-salvar">Adicionar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Sala -->
+    <div id="modal-editar-sala" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Sala</h2>
+                <button class="modal-close" onclick="fecharModalEditarSala()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="disciplina-modal-header">
+                    <h3 id="disciplina-modal-nome-edit">Carregando...</h3>
+                </div>
+                
+                <form id="form-editar-sala" onsubmit="atualizarSala(event)">
+                    <input type="hidden" id="edit-sala-id">
+                    
+                    <div class="form-group">
+                        <label for="edit-identificador-sala">Identificador da sala:</label>
+                        <input 
+                            type="text" 
+                            id="edit-identificador-sala" 
+                            placeholder="Digite o identificador da sala" 
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-professor">Professor Responsável:</label>
+                        <select id="edit-professor" required>
+                            <option value="">Selecione o professor responsável</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dias da semana:</label>
+                        <div class="dias-semana-container">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="edit-dia-semana" value="SEG">
+                                <span>Seg</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="edit-dia-semana" value="TER">
+                                <span>Ter</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="edit-dia-semana" value="QUA">
+                                <span>Qua</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="edit-dia-semana" value="QUI">
+                                <span>Qui</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="edit-dia-semana" value="SEX">
+                                <span>Sex</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="edit-dia-semana" value="SAB">
+                                <span>Sáb</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Horário:</label>
+                        <div class="horario-container">
+                            <div class="horario-input-group">
+                                <label for="edit-horario-inicio">Horário Início:</label>
+                                <input 
+                                    type="time" 
+                                    id="edit-horario-inicio" 
+                                    required
+                                >
+                            </div>
+                            <div class="horario-input-group">
+                                <label for="edit-horario-fim">Horário Fim:</label>
+                                <input 
+                                    type="time" 
+                                    id="edit-horario-fim" 
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-vagas">Vagas:</label>
+                        <input 
+                            type="number" 
+                            id="edit-vagas" 
+                            placeholder="Digite o limite de vagas"
+                            min="1"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn-salvar">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gerenciar-salas.js"></script>
+</body>
+</html>

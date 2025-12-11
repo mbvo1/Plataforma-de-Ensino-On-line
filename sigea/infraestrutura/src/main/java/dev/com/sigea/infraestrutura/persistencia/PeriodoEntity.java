@@ -16,6 +16,18 @@ public class PeriodoEntity {
     @Column(nullable = false, length = 20)
     private String status = "ATIVO";
     
+    @Column(name = "data_inicio")
+    private java.time.LocalDate dataInicio;
+    
+    @Column(name = "data_fim")
+    private java.time.LocalDate dataFim;
+    
+    @Column(name = "inscricao_inicio")
+    private java.time.LocalDate inscricaoInicio;
+    
+    @Column(name = "inscricao_fim")
+    private java.time.LocalDate inscricaoFim;
+    
     public PeriodoEntity() {
     }
     
@@ -48,5 +60,37 @@ public class PeriodoEntity {
     
     public void setStatus(String status) {
         this.status = status;
+    }
+    
+    public java.time.LocalDate getDataInicio() {
+        return dataInicio;
+    }
+    
+    public void setDataInicio(java.time.LocalDate dataInicio) {
+        this.dataInicio = dataInicio;
+    }
+    
+    public java.time.LocalDate getDataFim() {
+        return dataFim;
+    }
+    
+    public void setDataFim(java.time.LocalDate dataFim) {
+        this.dataFim = dataFim;
+    }
+    
+    public java.time.LocalDate getInscricaoInicio() {
+        return inscricaoInicio;
+    }
+    
+    public void setInscricaoInicio(java.time.LocalDate inscricaoInicio) {
+        this.inscricaoInicio = inscricaoInicio;
+    }
+    
+    public java.time.LocalDate getInscricaoFim() {
+        return inscricaoFim;
+    }
+    
+    public void setInscricaoFim(java.time.LocalDate inscricaoFim) {
+        this.inscricaoFim = inscricaoFim;
     }
 }

@@ -124,6 +124,7 @@ function mesAnterior() {
     if (mesAtual < 0) {
         mesAtual = 11;
         anoAtual--;
+        adicionarFeriadosDoAno(anoAtual);
     }
     renderizarCalendario();
 }
@@ -133,8 +134,44 @@ function proximoMes() {
     if (mesAtual > 11) {
         mesAtual = 0;
         anoAtual++;
+        adicionarFeriadosDoAno(anoAtual);
     }
     renderizarCalendario();
+}
+
+// Adiciona feriados de um ano específico
+function adicionarFeriadosDoAno(ano) {
+    // Remove feriados antigos deste ano
+    eventos = eventos.filter(e => !e.isFeriado || !e.id.includes('-' + ano));
+    
+    // Adiciona feriados fixos
+    Object.keys(feriadosFixos).forEach(dataKey => {
+        const [mes, dia] = dataKey.split('-');
+        const dataFeriado = `${ano}-${mes}-${dia}`;
+        eventos.push({
+            id: 'feriado-' + dataKey + '-' + ano,
+            titulo: feriadosFixos[dataKey],
+            data: dataFeriado,
+            tipo: 'TODOS',
+            isAutomatico: true,
+            isFeriado: true
+        });
+    });
+    
+    // Adiciona feriados móveis
+    const feriadosMoveis = getFeriadosMoveis(ano);
+    Object.keys(feriadosMoveis).forEach(dataKey => {
+        const [mes, dia] = dataKey.split('-');
+        const dataFeriado = `${ano}-${mes}-${dia}`;
+        eventos.push({
+            id: 'feriado-movel-' + dataKey + '-' + ano,
+            titulo: feriadosMoveis[dataKey],
+            data: dataFeriado,
+            tipo: 'TODOS',
+            isAutomatico: true,
+            isFeriado: true
+        });
+    });
 }
 
 // Renderiza o calendário
@@ -187,40 +224,7 @@ function renderizarCalendario() {
         const eventosContainer = document.createElement('div');
         eventosContainer.className = 'eventos-container';
         
-        // Verifica feriados
-        const feriado = isFeriado(data);
-        if (feriado) {
-            const eventoEl = document.createElement('div');
-            eventoEl.className = 'evento-tag feriado';
-            eventoEl.textContent = feriado;
-            eventoEl.title = feriado;
-            eventosContainer.appendChild(eventoEl);
-        }
-        
-        // Verifica período letivo
-        const periodo = getPeriodoNaData(data);
-        if (periodo) {
-            const dataInicio = new Date(periodo.dataInicio);
-            const dataFim = new Date(periodo.dataFim);
-            
-            if (data.toDateString() === dataInicio.toDateString()) {
-                const eventoEl = document.createElement('div');
-                eventoEl.className = 'evento-tag periodo-inicio';
-                eventoEl.textContent = `Início: ${periodo.nome}`;
-                eventoEl.title = `Início do período: ${periodo.nome}`;
-                eventosContainer.appendChild(eventoEl);
-            } else if (data.toDateString() === dataFim.toDateString()) {
-                const eventoEl = document.createElement('div');
-                eventoEl.className = 'evento-tag periodo-fim';
-                eventoEl.textContent = `Fim: ${periodo.nome}`;
-                eventoEl.title = `Fim do período: ${periodo.nome}`;
-                eventosContainer.appendChild(eventoEl);
-            } else {
-                cell.classList.add('periodo-letivo');
-            }
-        }
-        
-        // Verifica eventos
+        // Verifica eventos (incluindo os automáticos do período)
         const eventosNoDia = getEventosNaData(data);
         eventosNoDia.forEach(evento => {
             const eventoEl = document.createElement('div');
@@ -231,16 +235,18 @@ function renderizarCalendario() {
             eventoTexto.textContent = evento.titulo;
             eventoEl.appendChild(eventoTexto);
             
-            // Botão de excluir
-            const btnExcluir = document.createElement('button');
-            btnExcluir.className = 'evento-delete';
-            btnExcluir.innerHTML = '×';
-            btnExcluir.title = 'Excluir evento';
-            btnExcluir.onclick = (e) => {
-                e.stopPropagation();
-                excluirEvento(evento.id);
-            };
-            eventoEl.appendChild(btnExcluir);
+            // Botão de excluir (não mostra para eventos automáticos)
+            if (!evento.isAutomatico) {
+                const btnExcluir = document.createElement('button');
+                btnExcluir.className = 'evento-delete';
+                btnExcluir.innerHTML = '×';
+                btnExcluir.title = 'Excluir evento';
+                btnExcluir.onclick = (e) => {
+                    e.stopPropagation();
+                    excluirEvento(evento.id);
+                };
+                eventoEl.appendChild(btnExcluir);
+            }
             
             // Define o rótulo do tipo
             let tipoLabel = evento.tipo;
@@ -266,10 +272,32 @@ function getPeriodoNaData(data) {
     });
 }
 
+// Parse de data sem problemas de timezone
+function parseData(dataString) {
+    if (!dataString) return null;
+    
+    // Se já for um objeto Date, retorna
+    if (dataString instanceof Date) return dataString;
+    
+    // Verifica se é formato YYYY-MM-DD (sem hora)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dataString)) {
+        const [ano, mes, dia] = dataString.split('-').map(Number);
+        return new Date(ano, mes - 1, dia);
+    }
+    
+    // Para outros formatos (ISO com hora, timestamp, etc), usa Date padrão
+    // mas ajusta para remover o efeito de timezone
+    const data = new Date(dataString);
+    // Cria uma nova data com ano/mes/dia local (sem timezone)
+    return new Date(data.getFullYear(), data.getMonth(), data.getDate());
+}
+
 // Busca eventos em uma data
 function getEventosNaData(data) {
     return eventos.filter(evento => {
-        const dataEvento = new Date(evento.dataEvento);
+        // Suporta tanto 'data' quanto 'dataEvento' para compatibilidade
+        const dataEvento = parseData(evento.data || evento.dataEvento);
+        if (!dataEvento) return false;
         return dataEvento.toDateString() === data.toDateString();
     });
 }
@@ -289,9 +317,81 @@ async function carregarPeriodos() {
 // Carrega eventos
 async function carregarEventos() {
     try {
-        const response = await fetch('http://localhost:8080/api/eventos');
-        if (!response.ok) throw new Error('Erro ao carregar eventos');
-        eventos = await response.json();
+        // Carrega eventos do calendário
+        const responseEventos = await fetch('http://localhost:8080/api/eventos');
+        if (!responseEventos.ok) throw new Error('Erro ao carregar eventos');
+        eventos = await responseEventos.json();
+        
+        console.log('Eventos carregados da API:', eventos.length);
+        
+        // Adiciona feriados do ano atual
+        const anoInicial = new Date().getFullYear();
+        adicionarFeriadosDoAno(anoInicial);
+        
+        // Adiciona feriados do próximo ano também (caso período letivo vá para o ano seguinte)
+        adicionarFeriadosDoAno(anoInicial + 1);
+        
+        console.log('Feriados adicionados:', eventos.filter(e => e.isFeriado).length);
+        
+        // Carrega períodos letivos ativos
+        try {
+            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual');
+            if (responsePeriodos.ok) {
+                const periodo = await responsePeriodos.json();
+                console.log('Período letivo atual:', periodo);
+                
+                // Adiciona eventos automáticos para o período letivo
+                if (periodo && periodo.dataInicio) {
+                    // Evento de início do período letivo
+                    eventos.push({
+                        id: 'periodo-inicio-' + periodo.id,
+                        titulo: `Início do Período ${periodo.nome}`,
+                        data: periodo.dataInicio,
+                        tipo: 'TODOS',
+                        isAutomatico: true
+                    });
+                    
+                    // Evento de fim do período letivo
+                    if (periodo.dataFim) {
+                        eventos.push({
+                            id: 'periodo-fim-' + periodo.id,
+                            titulo: `Fim do Período ${periodo.nome}`,
+                            data: periodo.dataFim,
+                            tipo: 'TODOS',
+                            isAutomatico: true
+                        });
+                    }
+                    
+                    // Evento de início das inscrições
+                    if (periodo.dataInicioInscricao) {
+                        eventos.push({
+                            id: 'periodo-inscricao-inicio-' + periodo.id,
+                            titulo: `Início das Inscrições - ${periodo.nome}`,
+                            data: periodo.dataInicioInscricao,
+                            tipo: 'TODOS',
+                            isAutomatico: true
+                        });
+                    }
+                    
+                    // Evento de fim das inscrições
+                    if (periodo.dataFimInscricao) {
+                        eventos.push({
+                            id: 'periodo-inscricao-fim-' + periodo.id,
+                            titulo: `Fim das Inscrições - ${periodo.nome}`,
+                            data: periodo.dataFimInscricao,
+                            tipo: 'TODOS',
+                            isAutomatico: true
+                        });
+                    }
+                    
+                    console.log('Total de eventos após adicionar período:', eventos.length);
+                    console.log('Eventos do período adicionados:', eventos.filter(e => e.isAutomatico));
+                }
+            }
+        } catch (periodoError) {
+            console.log('Nenhum período letivo ativo encontrado');
+        }
+        
         renderizarCalendario();
     } catch (error) {
         console.error('Erro ao carregar eventos:', error);

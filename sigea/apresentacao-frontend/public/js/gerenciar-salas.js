@@ -134,6 +134,8 @@ function voltarParaDisciplinas() {
 }
 
 async function adicionarNovaSala() {
+    console.log('adicionarNovaSala() chamada');
+    
     // Carrega lista de professores
     await carregarProfessores();
     
@@ -144,11 +146,18 @@ async function adicionarNovaSala() {
     document.getElementById('form-adicionar-sala').reset();
     
     // Abre o modal
-    document.getElementById('modal-adicionar-sala').style.display = 'flex';
+    const modal = document.getElementById('modal-adicionar-sala');
+    if (modal) {
+        modal.classList.add('show');
+        console.log('Modal adicionar sala aberto');
+    }
 }
 
 function fecharModalAdicionarSala() {
-    document.getElementById('modal-adicionar-sala').style.display = 'none';
+    const modal = document.getElementById('modal-adicionar-sala');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 }
 
 async function carregarProfessores() {
@@ -282,7 +291,10 @@ async function editarSala(salaId) {
         });
         
         // Abre o modal
-        document.getElementById('modal-editar-sala').style.display = 'flex';
+        const modal = document.getElementById('modal-editar-sala');
+        if (modal) {
+            modal.classList.add('show');
+        }
     } catch (error) {
         console.error('Erro ao editar sala:', error);
         alert('Erro ao carregar dados da sala. Tente novamente.');
@@ -290,7 +302,10 @@ async function editarSala(salaId) {
 }
 
 function fecharModalEditarSala() {
-    document.getElementById('modal-editar-sala').style.display = 'none';
+    const modal = document.getElementById('modal-editar-sala');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 }
 
 async function carregarProfessoresEdit() {

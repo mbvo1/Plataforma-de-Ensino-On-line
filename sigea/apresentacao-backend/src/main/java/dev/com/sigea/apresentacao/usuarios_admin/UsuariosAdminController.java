@@ -533,7 +533,11 @@ public class UsuariosAdminController {
         PeriodoResponse response = new PeriodoResponse(
                 periodo.getId(),
                 periodo.getNome(),
-                periodo.getStatus()
+                periodo.getStatus(),
+                periodo.getDataInicio() != null ? periodo.getDataInicio().toString() : null,
+                periodo.getDataFim() != null ? periodo.getDataFim().toString() : null,
+                periodo.getInscricaoInicio() != null ? periodo.getInscricaoInicio().toString() : null,
+                periodo.getInscricaoFim() != null ? periodo.getInscricaoFim().toString() : null
         );
         
         return ResponseEntity.ok(response);

@@ -8,6 +8,10 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    // Fecha modal ao carregar
+    const modal = document.getElementById('modal-novo-aviso');
+    if (modal) modal.style.display = 'none';
+    
     loadUserInfo();
     carregarAvisos();
 });
@@ -133,16 +137,18 @@ function formatarData(dataISO) {
 // ========== MODAL NOVO AVISO ==========
 
 function abrirModalNovoAviso() {
+    console.log('abrirModalNovoAviso() chamada');
     const modal = document.getElementById('modal-novo-aviso');
-    modal.style.display = 'flex';
+    modal.classList.add('show');
     
     // Limpa o formulário
     document.getElementById('form-novo-aviso').reset();
+    console.log('Modal aviso aberto');
 }
 
 function fecharModalNovoAviso() {
     const modal = document.getElementById('modal-novo-aviso');
-    modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 // Fecha modal ao clicar fora dele

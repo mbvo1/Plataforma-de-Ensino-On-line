@@ -11,6 +11,10 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    // Fecha todos os modais ao carregar
+    document.getElementById('modal-cadastrar').classList.remove('show');
+    document.getElementById('modal-editar').classList.remove('show');
+    
     loadUserInfo();
     carregarProfessores();
 });
@@ -114,8 +118,8 @@ async function editarProfessor(professorId) {
         document.getElementById('edit-email').value = professor.email;
         document.getElementById('titulo-editar').textContent = professor.nome;
         
-        // Abre o modal
-        document.getElementById('modal-editar').style.display = 'flex';
+        // Abre o modal usando classe
+        document.getElementById('modal-editar').classList.add('show');
     } catch (error) {
         console.error('Erro ao carregar professor:', error);
         alert('Erro ao carregar dados do professor');
@@ -123,7 +127,7 @@ async function editarProfessor(professorId) {
 }
 
 function fecharModalEdicao() {
-    document.getElementById('modal-editar').style.display = 'none';
+    document.getElementById('modal-editar').classList.remove('show');
 }
 
 async function salvarEdicao(event) {
@@ -214,14 +218,17 @@ async function toggleStatusProfessor(professorId, statusAtual) {
 }
 
 function cadastrarProfessor() {
+    console.log('cadastrarProfessor() chamada');
     // Limpa os campos do formulário
     document.getElementById('form-cadastrar-professor').reset();
-    // Abre o modal
-    document.getElementById('modal-cadastrar').style.display = 'flex';
+    // Abre o modal usando classe
+    const modal = document.getElementById('modal-cadastrar');
+    modal.classList.add('show');
+    console.log('Modal aberto');
 }
 
 function fecharModalCadastro() {
-    document.getElementById('modal-cadastrar').style.display = 'none';
+    document.getElementById('modal-cadastrar').classList.remove('show');
 }
 
 async function salvarProfessor(event) {

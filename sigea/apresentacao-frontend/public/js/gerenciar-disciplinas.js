@@ -12,6 +12,14 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
+    // Fecha todos os modais ao carregar
+    const modalCriarDisciplina = document.getElementById('modal-criar-disciplina');
+    const modalEditarDisciplina = document.getElementById('modal-editar-disciplina');
+    const modalCriarPeriodo = document.getElementById('modal-criar-periodo');
+    if (modalCriarDisciplina) modalCriarDisciplina.style.display = 'none';
+    if (modalEditarDisciplina) modalEditarDisciplina.style.display = 'none';
+    if (modalCriarPeriodo) modalCriarPeriodo.style.display = 'none';
+    
     loadUserInfo();
     carregarPeriodoAtual();
     carregarDisciplinas();
@@ -127,16 +135,18 @@ function exibirDisciplinas(disciplinas) {
 }
 
 function criarPeriodoLetivo() {
-    // Abre o modal de criar período letivo
+    console.log('criarPeriodoLetivo() chamada');
+    // Abre o modal de criar período letivo usando classe
     const modal = document.getElementById('modal-criar-periodo');
-    modal.style.display = 'flex';
+    modal.classList.add('show');
     
     // Limpa o formulário
     document.getElementById('form-criar-periodo').reset();
+    console.log('Modal período aberto');
 }
 
 function fecharModalPeriodo() {
-    document.getElementById('modal-criar-periodo').style.display = 'none';
+    document.getElementById('modal-criar-periodo').classList.remove('show');
 }
 
 function confirmarCriarPeriodo(event) {
@@ -200,6 +210,7 @@ function confirmarCriarPeriodo(event) {
 }
 
 function criarDisciplina() {
+    console.log('criarDisciplina() chamada');
     // Limpa o formulário
     document.getElementById('form-criar-disciplina').reset();
     document.getElementById('pre-requisitos-selecionados').innerHTML = '';
@@ -208,12 +219,13 @@ function criarDisciplina() {
     // Carrega a lista de disciplinas para pré-requisitos
     carregarListaDisciplinas();
     
-    // Abre o modal
-    document.getElementById('modal-criar-disciplina').style.display = 'flex';
+    // Abre o modal usando classe
+    document.getElementById('modal-criar-disciplina').classList.add('show');
+    console.log('Modal disciplina aberto');
 }
 
 function fecharModalCriarDisciplina() {
-    document.getElementById('modal-criar-disciplina').style.display = 'none';
+    document.getElementById('modal-criar-disciplina').classList.remove('show');
 }
 
 let preRequisitosSelecionados = [];
@@ -347,7 +359,10 @@ async function editarDisciplina(disciplinaId) {
         carregarListaDisciplinasEdit();
         
         // Abre o modal
-        document.getElementById('modal-editar-disciplina').style.display = 'flex';
+        const modal = document.getElementById('modal-editar-disciplina');
+        if (modal) {
+            modal.classList.add('show');
+        }
     } catch (error) {
         console.error('Erro ao editar disciplina:', error);
         alert('Erro ao carregar dados da disciplina. Tente novamente.');
@@ -355,7 +370,10 @@ async function editarDisciplina(disciplinaId) {
 }
 
 function fecharModalEditarDisciplina() {
-    document.getElementById('modal-editar-disciplina').style.display = 'none';
+    const modal = document.getElementById('modal-editar-disciplina');
+    if (modal) {
+        modal.classList.remove('show');
+    }
     preRequisitosEditados = [];
 }
 

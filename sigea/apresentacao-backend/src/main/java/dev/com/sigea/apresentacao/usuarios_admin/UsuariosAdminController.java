@@ -4,6 +4,7 @@ import dev.com.sigea.apresentacao.usuarios_admin.dto.*;
 import dev.com.sigea.apresentacao.usuarios_admin.factory.UsuarioFactory;
 import dev.com.sigea.apresentacao.usuarios_admin.strategy.*;
 import dev.com.sigea.infraestrutura.persistencia.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
@@ -558,58 +559,77 @@ public class UsuariosAdminController {
     
     @PostMapping("/disciplinas/{disciplinaId}/salas")
     public ResponseEntity<?> criarSala(@PathVariable Long disciplinaId, @RequestBody CriarSalaRequest request) {
-        // Validações básicas
-        if (request.getIdentificador() == null || request.getIdentificador().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Identificador é obrigatório"));
+        try {
+            // Validações básicas
+            if (request.getIdentificador() == null || request.getIdentificador().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Identificador é obrigatório"));
+            }
+            if (request.getProfessorId() == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Professor é obrigatório"));
+            }
+            if (request.getDiasSemana() == null || request.getDiasSemana().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Dias da semana são obrigatórios"));
+            }
+            if (request.getVagas() == null || request.getVagas() <= 0) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Vagas deve ser maior que zero"));
+            }
+            
+            // Busca disciplina
+            Optional<DisciplinaEntity> disciplinaOpt = disciplinaJpaRepository.findById(disciplinaId);
+            if (disciplinaOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Disciplina não encontrada"));
+            }
+            
+            // Busca professor
+            Optional<UsuarioEntity> professorOpt = usuarioJpaRepository.findById(request.getProfessorId());
+            if (professorOpt.isEmpty() || !"PROFESSOR".equals(professorOpt.get().getPerfil())) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Professor inválido"));
+            }
+            
+            // Busca período letivo ativo
+            Optional<PeriodoEntity> periodoOpt = periodoJpaRepository.findByStatus("ATIVO");
+            if (periodoOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Não há período letivo ativo. Por favor, crie um período letivo antes de criar salas."));
+            }
+            
+            PeriodoEntity periodoAtivo = periodoOpt.get();
+            Long periodoLetivoId = periodoAtivo.getId();
+            
+            // Verifica se a disciplina pertence ao período ativo
+            DisciplinaEntity disciplina = disciplinaOpt.get();
+            if (disciplina.getPeriodoLetivo() == null || !disciplina.getPeriodoLetivo().getId().equals(periodoLetivoId)) {
+                return ResponseEntity.badRequest().body(Map.of("message", 
+                    "A disciplina não está associada ao período letivo ativo (" + periodoAtivo.getNome() + "). " +
+                    "Por favor, edite a disciplina para associá-la ao período correto."));
+            }
+            
+            // Formata horário como "SEG,QUA,SEX 08:30-10:30"
+            String diasStr = String.join(",", request.getDiasSemana());
+            String horario = diasStr + " " + request.getHorarioInicio() + "-" + request.getHorarioFim();
+            
+            // Cria nova sala
+            SalaEntity novaSala = new SalaEntity();
+            novaSala.setIdentificador(request.getIdentificador());
+            novaSala.setDisciplinaId(disciplinaId);
+            novaSala.setPeriodoLetivoId(periodoLetivoId);
+            novaSala.setProfessorId(request.getProfessorId());
+            novaSala.setHorario(horario);
+            novaSala.setLimiteVagas(request.getVagas());
+            
+            SalaEntity salaSalva = salaJpaRepository.save(novaSala);
+            
+            // Atualiza contador de salas ofertadas da disciplina (apenas salas ativas)
+            Long totalSalas = salaJpaRepository.countByDisciplinaIdAndStatus(disciplinaId, "ATIVO");
+            disciplina.setSalasOfertadas(totalSalas.intValue());
+            disciplinaJpaRepository.save(disciplina);
+            
+            return ResponseEntity.ok(converterParaSalaResponse(salaSalva));
+        } catch (Exception e) {
+            // Log do erro para debug
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao criar sala: " + e.getMessage()));
         }
-        if (request.getProfessorId() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Professor é obrigatório"));
-        }
-        if (request.getDiasSemana() == null || request.getDiasSemana().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Dias da semana são obrigatórios"));
-        }
-        if (request.getVagas() == null || request.getVagas() <= 0) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Vagas deve ser maior que zero"));
-        }
-        
-        // Busca disciplina
-        Optional<DisciplinaEntity> disciplinaOpt = disciplinaJpaRepository.findById(disciplinaId);
-        if (disciplinaOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        // Busca professor
-        Optional<UsuarioEntity> professorOpt = usuarioJpaRepository.findById(request.getProfessorId());
-        if (professorOpt.isEmpty() || !"PROFESSOR".equals(professorOpt.get().getPerfil())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Professor inválido"));
-        }
-        
-        // Busca período letivo ativo
-        Optional<PeriodoEntity> periodoOpt = periodoJpaRepository.findByStatus("ATIVO");
-        Long periodoLetivoId = periodoOpt.map(PeriodoEntity::getId).orElse(null);
-        
-        // Formata horário como "SEG,QUA,SEX 08:30-10:30"
-        String diasStr = String.join(",", request.getDiasSemana());
-        String horario = diasStr + " " + request.getHorarioInicio() + "-" + request.getHorarioFim();
-        
-        // Cria nova sala
-        SalaEntity novaSala = new SalaEntity();
-        novaSala.setIdentificador(request.getIdentificador());
-        novaSala.setDisciplinaId(disciplinaId);
-        novaSala.setPeriodoLetivoId(periodoLetivoId);
-        novaSala.setProfessorId(request.getProfessorId());
-        novaSala.setHorario(horario);
-        novaSala.setLimiteVagas(request.getVagas());
-        
-        SalaEntity salaSalva = salaJpaRepository.save(novaSala);
-        
-        // Atualiza contador de salas ofertadas da disciplina (apenas salas ativas)
-        DisciplinaEntity disciplina = disciplinaOpt.get();
-        Long totalSalas = salaJpaRepository.countByDisciplinaIdAndStatus(disciplinaId, "ATIVO");
-        disciplina.setSalasOfertadas(totalSalas.intValue());
-        disciplinaJpaRepository.save(disciplina);
-        
-        return ResponseEntity.ok(converterParaSalaResponse(salaSalva));
     }
     
     @GetMapping("/salas/{id}")

@@ -335,8 +335,11 @@ function abrirModalEditar(aviso) {
         arquivoEditarUrl = null;
     }
     
-    // Mostra o modal
-    document.getElementById('modalEditarAviso').style.display = 'flex';
+    // Mostra o modal centralizado
+    const modal = document.getElementById('modalEditarAviso');
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
 }
 
 // Fecha modal de edição
@@ -806,7 +809,11 @@ function abrirModalEditarAtividade(atv) {
     // reset file input
     document.getElementById('arquivoAtividadeEditar').value = '';
 
-    document.getElementById('modalEditarAtividade').style.display = 'flex';
+    // Mostra o modal centralizado
+    const modal = document.getElementById('modalEditarAtividade');
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
 }
 
 function fecharModalEditarAtividade() {

@@ -2045,4 +2045,279 @@ body {
     color: #999;
 }
 
+/* ===== MENU DROPDOWN (3 PONTOS) ===== */
+.menu-dropdown-aviso {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 150px;
+    z-index: 1000;
+    display: none; /* Oculto por padrão */
+    margin-top: 5px;
+}
+
+.menu-dropdown-aviso.show {
+    display: block; /* Mostra quando tem a classe 'show' */
+}
+
+.menu-dropdown-aviso button {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.2s;
+}
+
+.menu-dropdown-aviso button:hover {
+    background: #f5f5f5;
+}
+
+.menu-dropdown-aviso .edit-option {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.menu-dropdown-aviso .edit-option i {
+    color: #007bff;
+}
+
+.menu-dropdown-aviso .delete-option i {
+    color: #dc3545;
+}
+
+/* ===== MODAL DE EDIÇÃO ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay[style*="flex"] {
+    display: flex !important;
+}
+
+.modal-editar-aviso {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideInModal 0.3s ease-out;
+}
+
+@keyframes slideInModal {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header-edit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 2px solid #e9ecef;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header-edit h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.btn-close-modal {
+    background: white;
+    border: none;
+    font-size: 24px;
+    color: #667eea;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: #f1f3f5;
+    transform: scale(1.1);
+}
+
+.modal-body-edit {
+    padding: 24px;
+}
+
+.modal-body-edit textarea,
+.modal-body-edit input[type="text"] {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: inherit;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+
+.modal-body-edit textarea {
+    min-height: 120px;
+}
+
+.modal-body-edit textarea:focus,
+.modal-body-edit input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.arquivo-anexado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.arquivo-info-edit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.arquivo-info-edit i {
+    color: #666;
+    font-size: 16px;
+}
+
+.arquivo-info-edit span,
+.arquivo-info-edit a {
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+}
+
+.arquivo-info-edit a:hover {
+    text-decoration: underline;
+    color: #667eea;
+}
+
+.btn-remover-arquivo-edit {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.btn-remover-arquivo-edit:hover {
+    color: #c82333;
+}
+
+.adicionar-arquivo-edit {
+    margin-bottom: 16px;
+}
+
+.btn-anexar-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.btn-anexar-edit:hover {
+    background: #e0e0e0;
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-anexar-edit i {
+    font-size: 16px;
+}
+
+.modal-footer-edit {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 24px;
+    border-top: 2px solid #e9ecef;
+}
+
+.btn-cancelar-edit {
+    background: transparent;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancelar-edit:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-salvar-edit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-salvar-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
 /* ========== FIM ESTILOS TURMA DETALHES ========== */

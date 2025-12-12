@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividade - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ensure long unbroken text wraps and doesn't expand horizontally */
+        #detDescricao {
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-height: 48vh;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        /* Make arquivo link break if long */
+        #detArquivoContainer .btn-link {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="userName">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="turma-header">
+                <h1 id="pageTitulo">Atividade</h1>
+            </div>
+
+            <div class="turma-container">
+                <div class="turma-codigo-wrapper">
+                    <div class="back-button-container">
+                        <a href="javascript:history.back()" class="btn-back">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="turma-acoes" style="padding:16px;">
+                    <div class="atividade-detalhe-card" style="background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:18px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                <i class="fas fa-folder" style="font-size:22px"></i>
+                                <div>
+                                    <div id="detTituloTopo" style="font-weight:700; font-size:20px;"></div>
+                                    <div id="detSubInfo" style="font-size:13px; color:var(--text-secondary);">Professor • Turma</div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <hr style="margin:12px 0;">
+
+                        <div style="display:flex; gap:20px;">
+                            <div style="flex:1">
+                                <h2 id="detTituloCentro" style="text-align:center; margin:0 0 12px 0;"></h2>
+                                <div id="detDescricao" style="white-space:pre-wrap; margin-bottom:12px;"></div>
+
+                                <div id="detArquivoContainer" style="margin-bottom:12px;">
+                                    <a id="detArquivoLink" href="#" target="_blank" class="btn-link">
+                                        <i class="fas fa-paperclip"></i>
+                                        <span id="detArquivoNome">Arquivo</span>
+                                    </a>
+                                </div>
+
+                                <div style="font-size:13px; color:var(--text-secondary);">Prazo: <span id="detPrazo">--</span></div>
+                            </div>
+
+                            <div style="width:220px;">
+                                <div style="border:1px solid #ccc; padding:12px; text-align:center; cursor:default;">
+                                    <div style="font-size:12px;color:var(--text-secondary);">Entregues</div>
+                                    <div id="detEntregues" style="font-weight:bold; font-size:18px;">0</div>
+                                    <div style="height:8px;"></div>
+                                    <div style="font-size:12px;color:var(--text-secondary);">Pendentes</div>
+                                    <div id="detPendentes" style="font-weight:bold; font-size:18px;">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:16px; text-align:right; font-size:12px; color:var(--text-secondary);">Postado em: <span id="detDataPostagem">--</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// read atividade data from sessionStorage and render
+(function(){
+    const userName = localStorage.getItem('usuarioNome');
+    if (userName) document.getElementById('userName').textContent = `Professor - ${userName}`;
+
+    let atv = null;
+    try { atv = JSON.parse(sessionStorage.getItem('atividadeDetalhes')); } catch(e) { atv = null; }
+    if (!atv) {
+        // if not in sessionStorage, try to read id from query and fetch list (fallback)
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id) {
+            // attempt to fetch activities for turma and find one with id
+            // requires turma id not provided; so show message
+            document.getElementById('detTituloTopo').textContent = 'Atividade não encontrada';
+            return;
+        }
+        document.getElementById('detTituloTopo').textContent = 'Atividade não encontrada';
+        return;
+    }
+
+    document.getElementById('detTituloTopo').textContent = atv.titulo || '';
+    document.getElementById('detTituloCentro').textContent = atv.titulo || '';
+    const turmaNome = atv.turmaNome || '';
+    document.getElementById('detSubInfo').textContent = `${atv.professorNome || 'Professor'}${turmaNome ? ' • ' + turmaNome : ''}`;
+    document.getElementById('detDescricao').textContent = atv.descricao || '';
+    document.getElementById('detDataPostagem').textContent = atv.dataCriacao || atv.dataCriacaoIso || '';
+    document.getElementById('detPrazo').textContent = atv.prazo || atv.prazoIso || '--';
+
+    if (atv.arquivoPath) {
+        // prefer persisted data URL saved as atividadeArquivo_<id> in sessionStorage
+        let href = null;
+        try {
+            const sess = sessionStorage.getItem(`atividadeArquivo_${atv.atividadeId}`);
+            if (sess) href = sess;
+        } catch (e) {
+            // ignore
+        }
+        if (!href && atv.arquivoUrl) href = atv.arquivoUrl;
+
+        // Only consider href valid if it's a data URL, absolute/relative URL (starts with http(s) or '/'),
+        // otherwise do not attempt to navigate to a bare filename that the backend doesn't serve.
+        const isValidHref = href && (href.startsWith('data:') || href.startsWith('http') || href.startsWith('/'));
+
+        if (isValidHref) {
+            const link = document.getElementById('detArquivoLink');
+            link.href = href;
+            document.getElementById('detArquivoNome').textContent = atv.arquivoPath;
+            link.target = '_blank';
+        } else {
+            // no usable href available in-session — hide the link to avoid 404 error
+            document.getElementById('detArquivoContainer').style.display = 'none';
+        }
+    } else {
+        document.getElementById('detArquivoContainer').style.display = 'none';
+    }
+
+    // placeholders
+    document.getElementById('detEntregues').textContent = '0';
+    document.getElementById('detPendentes').textContent = '0';
+})();
+</script>
+</body>
+</html>

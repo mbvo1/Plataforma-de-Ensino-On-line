@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Avisos</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/pages/avisos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item active">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item active">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggleTop">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="user-name">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Cabeçalho da página (sem botão de criar e sem histórico) -->
+            <div class="page-header">
+                <div class="header-left-content">
+                    <h1 class="page-title">Avisos</h1>
+                </div>
+            </div>
+
+            <!-- Lista de Avisos Não Lidos -->
+            <div class="avisos-container" id="avisos-container">
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>Nenhum aviso não lido.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/avisos-professor.js"></script>
+</body>
+</html>

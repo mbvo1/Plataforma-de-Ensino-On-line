@@ -8,6 +8,7 @@ import java.util.List;
 @Repository
 public interface SalaJpaRepository extends JpaRepository<SalaEntity, Long> {
     List<SalaEntity> findByDisciplinaId(Long disciplinaId);
+    List<SalaEntity> findByProfessorId(Long professorId);
     Long countByDisciplinaId(Long disciplinaId);
     Long countByDisciplinaIdAndStatus(Long disciplinaId, String status);
 }

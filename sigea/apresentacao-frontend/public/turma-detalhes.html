@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turma - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Prevent long unbroken text from expanding cards horizontally */
+        .aviso-body p,
+        .atividade-descricao,
+        .form-aviso .atividade-descricao {
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-height: 40vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        /* Make file links break on long names */
+        .aviso-arquivo, .arquivo-info, .arquivo-info-edit, .btn-link {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="userName">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Nome da Turma Centralizado -->
+            <div class="turma-header">
+                <h1 id="turmaNome">Carregando...</h1>
+            </div>
+
+            <!-- Container com Código e Ações -->
+            <div class="turma-container">
+                <!-- Código da Turma (Esquerda) -->
+                <div class="turma-codigo-wrapper">
+                    <div class="back-button-container">
+                        <a href="turmas-professor.html" class="btn-back">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                    
+                    <div class="turma-codigo-box">
+                        <h3>Código da Turma:</h3>
+                        <div class="codigo-display" id="codigoTurma">...</div>
+                    </div>
+                </div>
+
+                <!-- Área de Ações (Centro) -->
+                <div class="turma-acoes">
+                    <button class="btn-acao" id="btnAdicionarAviso">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Adicionar aviso para turma.</span>
+                    </button>
+                    
+                    <!-- Formulário de Aviso (oculto inicialmente) -->
+                    <div class="form-aviso" id="formAviso" style="display: none;">
+                        <textarea 
+                            id="textoAviso" 
+                            placeholder="Adicionar aviso para turma..."
+                            rows="4"
+                        ></textarea>
+                        
+                        <!-- Arquivo selecionado -->
+                        <div class="arquivo-selecionado" id="arquivoSelecionado" style="display: none;">
+                            <a href="#" class="arquivo-info" id="linkArquivo" target="_blank">
+                                <i class="fas fa-paperclip"></i>
+                                <span id="nomeArquivo">Arquivo</span>
+                            </a>
+                            <button class="btn-remover-arquivo" id="btnRemoverArquivo" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="form-aviso-footer">
+                            <div class="form-aviso-left">
+                                <label class="btn-anexar" for="arquivoAviso" title="Anexar arquivo">
+                                    <i class="fas fa-folder"></i>
+                                </label>
+                                <input type="file" id="arquivoAviso" style="display: none;">
+                                <span class="arquivo-label">Arquivo</span>
+                            </div>
+                            
+                            <div class="form-aviso-right">
+                                <button class="btn-cancelar" id="btnCancelarAviso" type="button">Cancelar</button>
+                                <button class="btn-postar" id="btnPostarAviso" type="button">Postar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-acao" id="btnAdicionarAtividade">
+                        <i class="fas fa-tasks"></i>
+                        <span>Adicionar atividade para turma.</span>
+                    </button>
+                    <!-- Formulário de Atividade (oculto inicialmente) -->
+                    <div class="form-aviso form-atividade" id="formAtividade" style="display:none; margin-top:12px;">
+                        <input id="tituloAtividade" class="atividade-titulo" placeholder="Título da atividade" type="text" />
+
+                        <textarea id="descricaoAtividade" class="atividade-descricao" placeholder="Descrição da atividade" rows="6"></textarea>
+
+                        <div class="form-aviso-footer">
+                            <div class="form-aviso-left">
+                                <label class="btn-anexar" for="arquivoAtividade" title="Anexar arquivo">
+                                    <i class="fas fa-folder"></i>
+                                </label>
+                                <input type="file" id="arquivoAtividade" style="display:none;">
+                                <span class="arquivo-label" id="arquivoNomeAtividade">Nenhum arquivo</span>
+                                <button class="btn-remover-arquivo" id="btnRemoverArquivoAtividade" type="button" title="Remover arquivo" style="margin-left:8px;display:none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+
+                                <label style="display:flex;align-items:center;gap:8px;margin-left:12px;">
+                                    <input type="checkbox" id="temPrazo" />
+                                    <span style="font-size:14px;color:var(--text-secondary)">Possui prazo</span>
+                                </label>
+                                <input type="datetime-local" id="prazoAtividade" style="display:none;margin-left:8px;" />
+                            </div>
+
+                            <div class="form-aviso-right">
+                                <button class="btn-cancelar" id="btnCancelarAtividade" type="button">Cancelar</button>
+                                <button class="btn-postar" id="btnPostarAtividade" type="button">Postar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Avisos Postados -->
+                    <div class="avisos-list" id="avisosList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Aviso -->
+    <div class="modal-overlay" id="modalEditarAviso" style="display: none;">
+        <div class="modal-editar-aviso">
+            <div class="modal-header-edit">
+                <h2>Editar Aviso</h2>
+                <button class="btn-close-modal" id="btnFecharModalEditar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-edit">
+                <textarea 
+                    id="textoAvisoEditar" 
+                    placeholder="Mensagem do aviso..."
+                    rows="6"
+                ></textarea>
+                
+                <!-- Arquivo anexado -->
+                <div class="arquivo-anexado" id="arquivoAnexadoEditar" style="display: none;">
+                    <div class="arquivo-info-edit">
+                        <i class="fas fa-paperclip"></i>
+                        <span id="nomeArquivoEditar">arquivo.pdf</span>
+                    </div>
+                    <button class="btn-remover-arquivo-edit" id="btnRemoverArquivoEditar" type="button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <!-- Adicionar novo arquivo -->
+                <div class="adicionar-arquivo-edit">
+                    <label class="btn-anexar-edit" for="arquivoAvisoEditar" title="Anexar arquivo">
+                        <i class="fas fa-folder"></i>
+                        <span>Adicionar arquivo</span>
+                    </label>
+                    <input type="file" id="arquivoAvisoEditar" style="display: none;">
+                </div>
+            </div>
+            <div class="modal-footer-edit">
+                <button class="btn-cancelar-edit" id="btnCancelarEditar" type="button">Cancelar</button>
+                <button class="btn-salvar-edit" id="btnSalvarEditar" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Atividade -->
+    <div class="modal-overlay" id="modalEditarAtividade" style="display: none;">
+        <div class="modal-editar-aviso">
+            <div class="modal-header-edit">
+                <h2>Editar Atividade</h2>
+                <button class="btn-close-modal" id="btnFecharModalAtividadeEditar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-edit">
+                <input id="tituloAtividadeEditar" placeholder="Título da atividade" type="text" />
+                <textarea id="descricaoAtividadeEditar" placeholder="Descrição da atividade" rows="6"></textarea>
+
+                <div class="arquivo-anexado" id="arquivoAnexadoAtividadeEditar" style="display:none;">
+                    <div class="arquivo-info-edit">
+                        <i class="fas fa-paperclip"></i>
+                        <span id="nomeArquivoAtividadeEditar">arquivo.pdf</span>
+                    </div>
+                    <button class="btn-remover-arquivo-edit" id="btnRemoverArquivoAtividadeEditar" type="button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="adicionar-arquivo-edit">
+                    <label class="btn-anexar-edit" for="arquivoAtividadeEditar" title="Anexar arquivo">
+                        <i class="fas fa-folder"></i>
+                        <span>Adicionar arquivo</span>
+                    </label>
+                    <input type="file" id="arquivoAtividadeEditar" style="display: none;">
+                </div>
+
+                <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                    <input type="checkbox" id="temPrazoEditar" />
+                    <span style="font-size:14px;color:var(--text-secondary)">Possui prazo</span>
+                </label>
+                <input type="datetime-local" id="prazoAtividadeEditar" style="display:none;margin-top:6px;" />
+            </div>
+            <div class="modal-footer-edit">
+                <button class="btn-cancelar-edit" id="btnCancelarAtividadeEditar" type="button">Cancelar</button>
+                <button class="btn-salvar-edit" id="btnSalvarAtividadeEditar" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes Atividade -->
+    <div class="modal-overlay" id="modalDetalhesAtividade" style="display: none;">
+        <div class="modal-detalhes-atividade" style="max-width:900px; width:100%;">
+            <div class="modal-header-edit" style="justify-content:center;">
+                <h2 id="detalhesTitulo" style="text-align:center;">Atividade</h2>
+                <button class="btn-close-modal" id="btnFecharModalDetalhes" style="position:absolute; right:16px; top:12px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-edit" style="display:flex; gap:20px; align-items:flex-start;">
+                <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">
+                        <div id="detalhesProfessorTurma">Professor • Turma</div>
+                        <div id="detalhesDataPostagem">dd/mm/yyyy hh:mm</div>
+                    </div>
+
+                    <h3 style="margin-top:0; margin-bottom:8px; text-align:center;" id="detalhesTituloCentro"></h3>
+
+                    <div style="border-top:1px solid #ddd; padding-top:12px; margin-bottom:12px;">
+                        <strong>Descrição:</strong>
+                        <p id="detalhesDescricao" style="white-space:pre-wrap;"></p>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <a id="detalhesArquivoLink" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:inherit;">
+                            <i class="fas fa-paperclip"></i>
+                            <span id="detalhesArquivoNome">Arquivo anexado</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div style="width:220px;">
+                    <div style="border:1px solid #ccc; padding:12px; text-align:center; cursor:pointer;" id="detalhesQuadroEntregas">
+                        <div style="font-size:12px;color:var(--text-secondary);">Entregues</div>
+                        <div id="detalhesEntregues" style="font-weight:bold; font-size:18px;">0</div>
+                        <div style="height:8px;"></div>
+                        <div style="font-size:12px;color:var(--text-secondary);">Pendentes</div>
+                        <div id="detalhesPendentes" style="font-weight:bold; font-size:18px;">0</div>
+                    </div>
+                    <div style="margin-top:12px; font-size:12px; color:var(--text-secondary);">Prazo</div>
+                    <div id="detalhesPrazo" style="font-weight:bold;">--</div>
+                </div>
+            </div>
+            <div class="modal-footer-edit" style="margin-top:12px; display:flex; justify-content:flex-end;">
+                <button class="btn-cancelar-edit" id="btnFecharModalDetalhesFooter" type="button">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/turma-detalhes.js"></script>
+</body>
+</html>

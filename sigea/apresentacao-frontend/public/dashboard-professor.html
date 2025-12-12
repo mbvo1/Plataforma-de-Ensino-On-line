@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Dashboard Professor</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item active">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="user-name">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <h1 class="welcome-title">Painel do Professor</h1>
+            
+            <div class="dashboard-grid">
+                <!-- Minhas Turmas -->
+                <div class="dashboard-card">
+                    <h2><i class="fas fa-users-class"></i> Minhas turmas</h2>
+                    <div class="card-content">
+                        <p class="empty-state">Nenhuma turma criada</p>
+                    </div>
+                </div>
+
+                <!-- Aulas do dia -->
+                <div class="dashboard-card">
+                    <h2><i class="fas fa-calendar-day"></i> Aulas do dia</h2>
+                    <div class="card-content">
+                        <p class="date-today" id="date-today">01/10/2025</p>
+                        <ul class="aulas-list" id="aulas-list">
+                            <li class="aula-item">Disciplina 1 - Turma A: 08:15 - 10:15</li>
+                            <li class="aula-item">Disciplina 1 - Turma B: 10:30 - 12:30</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Lançar Notas/Faltas -->
+                <div class="dashboard-card">
+                    <h2><i class="fas fa-clipboard-list"></i> Lançar Notas/Faltas</h2>
+                    <div class="card-content">
+                        <ul class="disciplinas-list" id="disciplinas-list">
+                            <li class="disciplina-item">Disciplina 1 - turma A</li>
+                            <li class="disciplina-item">Disciplina 1 - turma B</li>
+                            <li class="disciplina-item">Disciplina 7 - turma A</li>
+                            <li class="disciplina-item">Disciplina 7 - turma B</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Fórum -->
+                <div class="dashboard-card">
+                    <h2><i class="fas fa-comments"></i> Fórum</h2>
+                    <div class="card-content">
+                        <p class="forum-subtitle">Mensagens Novas:</p>
+                        <ul class="forum-list" id="forum-list">
+                            <li class="forum-item">Aluna 1 - Disciplina 1: Dúvida sobre a questão 1</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard-professor.js"></script>
+</body>
+</html>

@@ -209,13 +209,13 @@ public class UsuariosAdminController {
             return ResponseEntity.badRequest().body(Map.of("message", "Email já cadastrado"));
         }
         
-        // Cria novo professor com senha padrão "senha123"
+        // Cria novo professor com senha padrão "senha123" (com hash)
         UsuarioEntity novoProfessor = new UsuarioEntity(
             null,
             request.getNome(),
             request.getEmail(),
             request.getCpf(),
-            "senha123", // Senha padrão (em produção, usar hash BCrypt)
+            "HASH_senha123", // Senha padrão com hash (consistente com AutenticacaoService)
             "PROFESSOR",
             "ATIVO"
         );

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atribuir Notas - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .notas-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .notas-header {
+            margin-bottom: 2rem;
+        }
+
+        .notas-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .notas-subtitle {
+            font-size: 1rem;
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .notas-table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .notas-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .notas-table thead {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .notas-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .notas-table th:nth-child(2),
+        .notas-table th:nth-child(3),
+        .notas-table th:nth-child(4),
+        .notas-table th:nth-child(5),
+        .notas-table th:nth-child(6) {
+            text-align: center;
+        }
+
+        .notas-table tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        .notas-table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .notas-table td {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .notas-table td:first-child {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .notas-table td:nth-child(2),
+        .notas-table td:nth-child(3),
+        .notas-table td:nth-child(4),
+        .notas-table td:nth-child(5),
+        .notas-table td:nth-child(6) {
+            text-align: center;
+        }
+
+        .input-nota {
+            width: 60px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .input-nota:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .media-cell {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .media-aprovado {
+            color: #28a745;
+        }
+
+        .media-reprovado {
+            color: #dc3545;
+        }
+
+        .btn-salvar {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn-salvar:hover {
+            background: var(--primary-color-dark);
+        }
+
+        .btn-salvar:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray);
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .btn-voltar {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .btn-voltar:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item active">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="forum-professor.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="userName">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="notas-container">
+                <button class="btn-voltar" onclick="voltarParaDisciplina()">
+                    ← Voltar
+                </button>
+
+                <div class="notas-header">
+                    <h1 class="notas-title" id="titulo-disciplina">Carregando...</h1>
+                    <p class="notas-subtitle">Atribuir notas</p>
+                </div>
+
+                <div id="loading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Carregando notas...</p>
+                </div>
+
+                <div id="notas-content" style="display: none;">
+                    <div class="notas-table-container">
+                        <table class="notas-table">
+                            <thead>
+                                <tr>
+                                    <th>Alunos</th>
+                                    <th>Av1</th>
+                                    <th>Av2</th>
+                                    <th>Segunda Chamada</th>
+                                    <th>Final</th>
+                                    <th>Média</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alunos-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <button class="btn-salvar" onclick="salvarNotas()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <i class="fas fa-user-slash"></i>
+                    <p>Nenhum aluno matriculado nesta disciplina</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/notas-professor.js"></script>
+</body>
+</html>
+

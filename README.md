@@ -15,17 +15,70 @@ O objetivo principal é fornecer à comunidade acadêmica — administradores, p
 * **JDK 17** (ou superior)
 * **Apache Maven** 3.8 (ou superior)
 
-### Comandos
+### Passo a Passo
 
-Para compilar o projeto e executar todos os testes automatizados, navegue até a pasta raiz (`sigea/`) e execute o seguinte comando:
+#### 1. Compilar o Projeto
 
+Navegue até a pasta raiz do projeto (`sigea/`) e execute:
+
+```bash
+cd sigea
 mvn clean install
+```
 
-Para apenas executar os testes (sem recompilar tudo), utilize:
-
-mvn test
+Este comando irá:
+- Compilar todos os módulos do projeto
+- Executar todos os testes automatizados
+- Gerar os arquivos JAR necessários
 
 Ao final da execução, o build deve ser concluído com **`BUILD SUCCESS`**, indicando que todas as 18 especificações de teste passaram.
+
+#### 2. Executar a Aplicação
+
+Após a compilação bem-sucedida, execute o backend Spring Boot:
+
+```bash
+cd apresentacao-backend
+mvn spring-boot:run
+```
+
+Ou, alternativamente, execute diretamente o JAR gerado:
+
+```bash
+java -jar apresentacao-backend/target/sigea-apresentacao-backend-1.0.0-SNAPSHOT.jar
+```
+
+#### 3. Acessar a Aplicação
+
+Após iniciar a aplicação, você poderá acessar:
+
+* **Frontend**: `http://localhost:8080`
+* **API REST**: `http://localhost:8080/api`
+* **Console H2 Database**: `http://localhost:8080/h2-console`
+  - JDBC URL: `jdbc:h2:file:./sigea`
+  - Username: `sa`
+  - Password: (deixe em branco)
+
+#### 4. Executar Apenas os Testes
+
+Para executar apenas os testes sem recompilar tudo:
+
+```bash
+cd sigea
+mvn test
+```
+
+### Observações
+
+* O banco de dados H2 é criado automaticamente na primeira execução
+* As migrações do Flyway são executadas automaticamente ao iniciar a aplicação
+* Os arquivos enviados são salvos na pasta `apresentacao-backend/uploads/`
+
+---
+
+## 📋 Documentação Adicional
+
+* **[Padrões de Projeto](padroes.md)** - Documentação completa dos padrões de projeto adotados no projeto
 
 ---
 

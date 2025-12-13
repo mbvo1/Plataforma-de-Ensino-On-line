@@ -33,5 +33,10 @@ public class TopicoRepositoryEmMemoria implements TopicoRepository {
             .filter(topico -> topico.getDisciplinaId().equals(disciplinaId))
             .collect(Collectors.toList());
     }
+    
+    @Override
+    public void excluir(TopicoId id) {
+        topicos.remove(id);
+    }
 }
 

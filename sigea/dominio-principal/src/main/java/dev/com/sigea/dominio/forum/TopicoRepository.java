@@ -10,4 +10,5 @@ public interface TopicoRepository {
     Optional<Topico> buscarPorId(TopicoId id);
     TopicoId proximoId();
     List<Topico> listarPorDisciplina(DisciplinaId disciplinaId);
+    void excluir(TopicoId id);
 }

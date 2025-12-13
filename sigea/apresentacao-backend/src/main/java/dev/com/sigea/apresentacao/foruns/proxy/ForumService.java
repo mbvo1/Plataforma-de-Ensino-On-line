@@ -9,7 +9,8 @@ import java.util.List;
  * Proxy Pattern - Interface do serviço de fórum
  */
 public interface ForumService {
-    Topico criarTopico(DisciplinaId disciplinaId, UsuarioId autorId, String titulo, String conteudo);
+    Topico criarTopico(DisciplinaId disciplinaId, UsuarioId autorId, String titulo, String conteudo, String arquivoPath);
     List<Topico> listarTopicos(DisciplinaId disciplinaId, UsuarioId usuarioId);
     void responderTopico(String topicoId, UsuarioId autorId, String conteudo);
+    void excluirTopico(String topicoId, UsuarioId usuarioId);
 }

@@ -14,12 +14,18 @@ public class Sala {
     private final SalaId id;
     private final DisciplinaId disciplinaId;
     private final int limiteDeVagas;
+    private final UsuarioId professorId;
     private final List<Matricula> matriculas = new ArrayList<>();
 
     public Sala(SalaId id, DisciplinaId disciplinaId, int limiteDeVagas) {
+        this(id, disciplinaId, limiteDeVagas, null);
+    }
+    
+    public Sala(SalaId id, DisciplinaId disciplinaId, int limiteDeVagas, UsuarioId professorId) {
         this.id = Objects.requireNonNull(id);
         this.disciplinaId = Objects.requireNonNull(disciplinaId);
         this.limiteDeVagas = limiteDeVagas;
+        this.professorId = professorId;
     }
 
     public boolean isAlunoMatriculado(UsuarioId alunoId) {
@@ -58,6 +64,10 @@ public class Sala {
 
     public DisciplinaId getDisciplinaId() {
         return disciplinaId;
+    }
+    
+    public UsuarioId getProfessorId() {
+        return professorId;
     }
 
     public List<Matricula> getMatriculas() {

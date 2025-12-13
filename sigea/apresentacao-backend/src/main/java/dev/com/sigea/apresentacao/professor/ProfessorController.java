@@ -637,4 +637,45 @@ public class ProfessorController {
                 .body(Map.of("message", "Erro ao excluir aviso: " + e.getMessage()));
         }
     }
+
+    /**
+     * GET /api/professor/salas?professorId={id}
+     * Lista as salas (disciplinas) que o professor é responsável
+     */
+    @GetMapping("/salas")
+    public ResponseEntity<?> listarSalasDoProfessor(@RequestParam Long professorId) {
+        try {
+            List<dev.com.sigea.infraestrutura.persistencia.SalaEntity> salas = 
+                salaJpaRepository.findByProfessorId(professorId);
+            
+            List<Map<String, Object>> response = salas.stream()
+                .filter(sala -> "ATIVO".equalsIgnoreCase(sala.getStatus()))
+                .map(sala -> {
+                    Map<String, Object> salaMap = new java.util.HashMap<>();
+                    salaMap.put("id", sala.getId());
+                    salaMap.put("identificador", sala.getIdentificador());
+                    salaMap.put("disciplinaId", sala.getDisciplinaId());
+                    salaMap.put("professorId", sala.getProfessorId());
+                    salaMap.put("horario", sala.getHorario());
+                    salaMap.put("limiteVagas", sala.getLimiteVagas());
+                    salaMap.put("status", sala.getStatus());
+                    
+                    // Buscar nome da disciplina
+                    disciplinaJpaRepository.findById(sala.getDisciplinaId())
+                        .ifPresent(disciplina -> {
+                            salaMap.put("disciplinaNome", disciplina.getNome());
+                            salaMap.put("disciplinaCodigo", disciplina.getCodigo());
+                        });
+                    
+                    return salaMap;
+                })
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao buscar salas: " + e.getMessage()));
+        }
+    }
 }

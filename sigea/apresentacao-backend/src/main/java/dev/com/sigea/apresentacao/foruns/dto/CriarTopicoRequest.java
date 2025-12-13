@@ -10,6 +10,7 @@ public class CriarTopicoRequest {
     private String conteudo;
     private String disciplinaId;
     private String autorId;
+    private String arquivoPath;
     
     public DisciplinaId getDisciplinaId() {
         return new DisciplinaId(disciplinaId);
@@ -17,5 +18,9 @@ public class CriarTopicoRequest {
     
     public UsuarioId getAutorId() {
         return new UsuarioId(autorId);
+    }
+    
+    public String getArquivoPath() {
+        return arquivoPath;
     }
 }

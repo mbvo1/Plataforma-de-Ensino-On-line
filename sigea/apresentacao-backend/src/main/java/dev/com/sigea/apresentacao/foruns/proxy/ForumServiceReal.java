@@ -29,9 +29,9 @@ public class ForumServiceReal implements ForumService {
     }
     
     @Override
-    public Topico criarTopico(DisciplinaId disciplinaId, UsuarioId autorId, String titulo, String conteudo) {
+    public Topico criarTopico(DisciplinaId disciplinaId, UsuarioId autorId, String titulo, String conteudo, String arquivoPath) {
         TopicoId novoId = new TopicoId(UUID.randomUUID().toString());
-        Topico topico = new Topico(novoId, disciplinaId, titulo, conteudo, autorId);
+        Topico topico = new Topico(novoId, disciplinaId, titulo, conteudo, autorId, arquivoPath);
         topicoRepository.salvar(topico);
         
         // Notifica observers sobre novo tópico
@@ -51,5 +51,11 @@ public class ForumServiceReal implements ForumService {
         
         // Notifica observers sobre nova resposta
         observers.forEach(obs -> obs.onNovaResposta(topicoId, conteudo));
+    }
+    
+    @Override
+    public void excluirTopico(String topicoId, UsuarioId usuarioId) {
+        topicoRepository.excluir(new TopicoId(topicoId));
+        System.out.println("Tópico " + topicoId + " excluído por " + usuarioId);
     }
 }

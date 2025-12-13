@@ -11,15 +11,22 @@ import dev.com.sigea.apresentacao.foruns.proxy.ForumServiceProxy;
 import dev.com.sigea.apresentacao.foruns.proxy.ForumServiceReal;
 import dev.com.sigea.dominio.disciplina.DisciplinaId;
 import dev.com.sigea.dominio.forum.Topico;
+import dev.com.sigea.dominio.forum.TopicoId;
 import dev.com.sigea.dominio.forum.TopicoRepository;
 import dev.com.sigea.dominio.sala.SalaRepository;
 import dev.com.sigea.dominio.usuario.UsuarioId;
+import dev.com.sigea.infraestrutura.persistencia.RespostaEntity;
+import dev.com.sigea.infraestrutura.persistencia.RespostaJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
+import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -36,8 +43,16 @@ import java.util.stream.Collectors;
 public class ForunsController {
     
     private final ForumService forumService;
+    private final TopicoRepository topicoRepository;
+    private final UsuarioJpaRepository usuarioJpaRepository;
+    private final RespostaJpaRepository respostaJpaRepository;
     
-    public ForunsController(TopicoRepository topicoRepository, SalaRepository salaRepository) {
+    public ForunsController(TopicoRepository topicoRepository, SalaRepository salaRepository, 
+                           UsuarioJpaRepository usuarioJpaRepository, RespostaJpaRepository respostaJpaRepository) {
+        this.topicoRepository = topicoRepository;
+        this.usuarioJpaRepository = usuarioJpaRepository;
+        this.respostaJpaRepository = respostaJpaRepository;
+        
         // Cria serviço real e adiciona observers
         ForumServiceReal realService = new ForumServiceReal(topicoRepository);
         realService.adicionarObserver(new DashboardProfessorObserver());
@@ -57,7 +72,8 @@ public class ForunsController {
             request.getDisciplinaId(),
             request.getAutorId(),
             request.getTitulo(),
-            request.getConteudo()
+            request.getConteudo(),
+            request.getArquivoPath()
         );
         
         return ResponseEntity.ok(toTopicoResponse(topico));
@@ -81,6 +97,19 @@ public class ForunsController {
             .collect(Collectors.toList());
         
         return ResponseEntity.ok(responses);
+    }
+    
+    /**
+     * DELETE /api/foruns/topicos/{id} - Excluir tópico
+     * Apenas o autor pode excluir seu próprio tópico
+     */
+    @DeleteMapping("/topicos/{topicoId}")
+    public ResponseEntity<Void> excluirTopico(
+            @PathVariable String topicoId,
+            @RequestParam String usuarioId) {
+        
+        forumService.excluirTopico(topicoId, new UsuarioId(usuarioId));
+        return ResponseEntity.ok().build();
     }
     
     /**
@@ -123,20 +152,90 @@ public class ForunsController {
     }
     
     /**
+     * GET /api/foruns/topicos/{id} - Buscar tópico por ID
+     */
+    @GetMapping("/topicos/{topicoId}")
+    public ResponseEntity<TopicoResponse> buscarTopico(
+            @PathVariable String topicoId,
+            @RequestParam String usuarioId) {
+        
+        Optional<Topico> topicoOpt = topicoRepository.buscarPorId(new TopicoId(topicoId));
+        
+        if (topicoOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(toTopicoResponse(topicoOpt.get()));
+    }
+    
+    /**
+     * GET /api/foruns/topicos/{id}/respostas - Listar respostas de um tópico
+     */
+    @GetMapping("/topicos/{topicoId}/respostas")
+    public ResponseEntity<List<RespostaResponse>> listarRespostas(
+            @PathVariable String topicoId) {
+        
+        Long topicoIdLong = Long.parseLong(topicoId);
+        List<RespostaEntity> respostas = respostaJpaRepository.findByTopicoIdOrderByDataCriacaoAsc(topicoIdLong);
+        
+        List<RespostaResponse> responses = respostas.stream()
+            .map(this::toRespostaResponse)
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(responses);
+    }
+    
+    /**
      * POST /api/foruns/topicos/{id}/respostas - Responder tópico
      * Proxy verifica acesso, Observer notifica
      */
     @PostMapping("/topicos/{topicoId}/respostas")
-    public ResponseEntity<Void> responderTopico(
+    public ResponseEntity<RespostaResponse> responderTopico(
             @PathVariable String topicoId,
             @RequestBody RespostaRequest request) {
         
+        // Persiste a resposta no banco
+        RespostaEntity resposta = new RespostaEntity(
+            Long.parseLong(topicoId),
+            Long.parseLong(request.getAutorId().valor()),
+            request.getConteudo()
+        );
+        
+        RespostaEntity salva = respostaJpaRepository.save(resposta);
+        
+        // Notifica observers
         forumService.responderTopico(
             topicoId,
             request.getAutorId(),
             request.getConteudo()
         );
         
+        return ResponseEntity.ok(toRespostaResponse(salva));
+    }
+    
+    /**
+     * DELETE /api/foruns/respostas/{id} - Excluir resposta/comentário
+     * Apenas o autor pode excluir seu próprio comentário
+     */
+    @DeleteMapping("/respostas/{respostaId}")
+    public ResponseEntity<Void> excluirResposta(
+            @PathVariable Long respostaId,
+            @RequestParam String usuarioId) {
+        
+        Optional<RespostaEntity> respostaOpt = respostaJpaRepository.findById(respostaId);
+        
+        if (respostaOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        RespostaEntity resposta = respostaOpt.get();
+        
+        // Verifica se o usuário é o autor da resposta
+        if (!resposta.getAutorId().toString().equals(usuarioId)) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        respostaJpaRepository.deleteById(respostaId);
         return ResponseEntity.ok().build();
     }
     
@@ -147,6 +246,49 @@ public class ForunsController {
         response.setConteudo(topico.getConteudo());
         response.setAutorId(topico.getAutorId().valor());
         response.setDisciplinaId(topico.getDisciplinaId().valor());
+        response.setArquivoPath(topico.getArquivoPath());
+        
+        // Busca o nome do autor
+        try {
+            Long autorIdLong = Long.parseLong(topico.getAutorId().valor());
+            Optional<UsuarioEntity> autorOpt = usuarioJpaRepository.findById(autorIdLong);
+            if (autorOpt.isPresent()) {
+                response.setNomeAutor(autorOpt.get().getNome());
+                response.setProfessor("PROFESSOR".equals(autorOpt.get().getPerfil()));
+            }
+        } catch (Exception e) {
+            response.setNomeAutor("Usuário " + topico.getAutorId().valor());
+        }
+        
+        return response;
+    }
+    
+    private RespostaResponse toRespostaResponse(RespostaEntity resposta) {
+        RespostaResponse response = new RespostaResponse();
+        response.setId(resposta.getId());
+        response.setTopicoId(resposta.getTopicoId());
+        response.setAutorId(resposta.getAutorId());
+        response.setConteudo(resposta.getConteudo());
+        response.setVerificadaPeloProfessor(resposta.getVerificadaPeloProfessor());
+        
+        // Formata data
+        if (resposta.getDataCriacao() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            response.setDataCriacao(resposta.getDataCriacao().format(formatter));
+        }
+        
+        // Busca o nome do autor
+        try {
+            Optional<UsuarioEntity> autorOpt = usuarioJpaRepository.findById(resposta.getAutorId());
+            if (autorOpt.isPresent()) {
+                response.setNomeAutor(autorOpt.get().getNome());
+            } else {
+                response.setNomeAutor("Usuário " + resposta.getAutorId());
+            }
+        } catch (Exception e) {
+            response.setNomeAutor("Usuário " + resposta.getAutorId());
+        }
+        
         return response;
     }
 }

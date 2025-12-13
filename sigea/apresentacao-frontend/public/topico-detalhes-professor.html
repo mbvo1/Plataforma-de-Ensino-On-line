@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tópico - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .topico-container {
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .btn-voltar {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .btn-voltar:hover {
+            color: var(--primary-color);
+        }
+
+        .topico-card-principal {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .topico-titulo-principal {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .topico-autor-principal {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 1rem;
+        }
+
+        .topico-conteudo-principal {
+            color: var(--text-dark);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .topico-footer-principal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+
+        .topico-data-principal {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .btn-comentar {
+            background: transparent;
+            border: 1px solid #333;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-comentar:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .topico-arquivo {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f5f5f5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topico-arquivo a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topico-arquivo a:hover {
+            text-decoration: underline;
+        }
+
+        .comentarios-section {
+            margin-top: 2rem;
+        }
+
+        .comentarios-titulo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .comentario-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .btn-excluir-comentario {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .btn-excluir-comentario:hover {
+            color: #dc3545;
+        }
+
+        .comentario-autor {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .comentario-conteudo {
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .comentario-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .no-comentarios {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-gray);
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .novo-comentario-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .novo-comentario-container.show {
+            display: block;
+        }
+
+        .novo-comentario-form {
+            background: white;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .novo-comentario-textarea {
+            width: 100%;
+            min-height: 100px;
+            border: none;
+            resize: vertical;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .novo-comentario-textarea::placeholder {
+            color: #999;
+        }
+
+        .novo-comentario-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .btn-publicar-comentario {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-publicar-comentario:hover {
+            background: var(--primary-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-gray);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="forum-professor.html" class="menu-item active">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="user-name">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="topico-container">
+                <button class="btn-voltar" onclick="voltarParaForum()">
+                    ← Voltar
+                </button>
+
+                <!-- Loading -->
+                <div id="loading" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Carregando tópico...</p>
+                </div>
+
+                <!-- Tópico Principal -->
+                <div id="topico-principal" style="display: none;">
+                    <div class="topico-card-principal">
+                        <div class="topico-titulo-principal" id="topico-titulo"></div>
+                        <div class="topico-autor-principal" id="topico-autor"></div>
+                        <div class="topico-conteudo-principal" id="topico-conteudo"></div>
+                        
+                        <!-- Arquivo anexado -->
+                        <div class="topico-arquivo" id="topico-arquivo" style="display: none;">
+                            <i class="fas fa-paperclip"></i>
+                            <a href="#" id="topico-arquivo-link" target="_blank">Arquivo anexado</a>
+                        </div>
+
+                        <div class="topico-footer-principal">
+                            <div class="topico-data-principal" id="topico-data"></div>
+                            <button class="btn-comentar" onclick="toggleNovoComentario()">
+                                <i class="fas fa-comment"></i>
+                                Comente
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Comentários -->
+                    <div class="comentarios-section">
+                        <h2 class="comentarios-titulo">Comentários</h2>
+                        
+                        <div id="comentarios-list">
+                            <!-- Comentários serão inseridos aqui -->
+                        </div>
+
+                        <div id="no-comentarios" class="no-comentarios" style="display: none;">
+                            <i class="fas fa-comments" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                            <p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>
+                        </div>
+                    </div>
+
+                    <!-- Formulário para novo comentário -->
+                    <div id="novo-comentario-container" class="novo-comentario-container">
+                        <div class="novo-comentario-form">
+                            <textarea 
+                                id="comentario-texto" 
+                                class="novo-comentario-textarea" 
+                                placeholder="Adicione o comentário"></textarea>
+                            <div class="novo-comentario-actions">
+                                <button class="btn-publicar-comentario" onclick="publicarComentario()">
+                                    Publicar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/topico-detalhes-professor.js"></script>
+</body>
+</html>

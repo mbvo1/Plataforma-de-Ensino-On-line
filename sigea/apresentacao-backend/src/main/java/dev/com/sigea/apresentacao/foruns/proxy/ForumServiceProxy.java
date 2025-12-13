@@ -23,13 +23,13 @@ public class ForumServiceProxy implements ForumService {
     }
     
     @Override
-    public Topico criarTopico(DisciplinaId disciplinaId, UsuarioId autorId, String titulo, String conteudo) {
+    public Topico criarTopico(DisciplinaId disciplinaId, UsuarioId autorId, String titulo, String conteudo, String arquivoPath) {
         // Proxy: Verifica se o usuário tem acesso à disciplina
         verificarAcesso(disciplinaId, autorId);
         
         System.out.println("✓ Acesso verificado para criar tópico - Usuário: " + autorId);
         
-        return forumServiceReal.criarTopico(disciplinaId, autorId, titulo, conteudo);
+        return forumServiceReal.criarTopico(disciplinaId, autorId, titulo, conteudo, arquivoPath);
     }
     
     @Override
@@ -50,15 +50,24 @@ public class ForumServiceProxy implements ForumService {
         forumServiceReal.responderTopico(topicoId, autorId, conteudo);
     }
     
+    @Override
+    public void excluirTopico(String topicoId, UsuarioId usuarioId) {
+        // Apenas delega para o serviço real (validação de autor feita lá)
+        System.out.println("✓ Excluindo tópico - Usuário: " + usuarioId);
+        forumServiceReal.excluirTopico(topicoId, usuarioId);
+    }
+    
     /**
-     * Verifica se o usuário está matriculado na disciplina
+     * Verifica se o usuário está matriculado na disciplina ou é professor responsável
      */
     private void verificarAcesso(DisciplinaId disciplinaId, UsuarioId usuarioId) {
         // Busca todas as salas da disciplina
         List<Sala> salas = salaRepository.listarPorDisciplina(disciplinaId);
         
+        // Verifica se é aluno matriculado ou professor responsável
         boolean temAcesso = salas.stream()
-            .anyMatch(sala -> sala.isAlunoMatriculado(usuarioId));
+            .anyMatch(sala -> sala.isAlunoMatriculado(usuarioId) || 
+                             (sala.getProfessorId() != null && sala.getProfessorId().equals(usuarioId)));
         
         if (!temAcesso) {
             throw new SecurityException(

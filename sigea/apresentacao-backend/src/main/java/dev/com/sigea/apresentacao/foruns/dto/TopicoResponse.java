@@ -12,4 +12,5 @@ public class TopicoResponse {
     private String nomeAutor;
     private boolean isProfessor;
     private int totalRespostas;
+    private String arquivoPath;
 }

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fórum - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .forum-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .forum-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .btn-novo-topico {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-novo-topico:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .topicos-container {
+            padding: 2rem;
+        }
+
+        .topico-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .topico-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .topico-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-excluir-topico {
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-size: 1.25rem;
+            transition: color 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .btn-excluir-topico:hover {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .topico-titulo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .topico-autor {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topico-conteudo {
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .topico-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .topico-data {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topico-respostas {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .no-topicos {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-gray);
+        }
+
+        .no-topicos i {
+            font-size: 4rem;
+            color: #e0e0e0;
+            margin-bottom: 1rem;
+        }
+
+        .no-topicos h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-gray);
+        }
+
+        .btn-voltar {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .btn-voltar:hover {
+            color: var(--primary-color);
+        }
+
+        /* Modal para criar tópico */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-gray);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-cancelar {
+            background: #f5f5f5;
+            color: var(--text-dark);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-salvar {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-salvar:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-arquivo {
+            background: #f5f5f5;
+            border: 2px dashed #d0d0d0;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        .btn-arquivo:hover {
+            background: #ebebeb;
+            border-color: var(--primary-color);
+        }
+
+        .btn-arquivo i {
+            font-size: 1.5rem;
+        }
+
+        #arquivoTopico {
+            display: none;
+        }
+
+        .arquivo-nome {
+            margin-top: 0.5rem;
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+
+        .arquivo-selecionado {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #e8f4fd;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            color: var(--primary-color);
+        }
+
+        .btn-remover-arquivo {
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 0.125rem 0.25rem;
+            font-size: 0.875rem;
+            margin-left: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .btn-remover-arquivo:hover {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="forum-professor.html" class="menu-item active">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="user-name">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <button class="btn-voltar" onclick="voltarParaForuns()">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+
+            <div class="forum-header-container">
+                <h1 class="forum-title" id="forum-titulo">Fórum: Carregando...</h1>
+                <button class="btn-novo-topico" onclick="abrirModalNovoTopico()">
+                    <i class="fas fa-plus"></i> Novo Tópico
+                </button>
+            </div>
+
+            <div class="topicos-container">
+                <div id="loading" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Carregando tópicos...</p>
+                </div>
+
+                <div id="topicos-list" style="display: none;">
+                    <!-- Tópicos serão inseridos aqui -->
+                </div>
+
+                <div id="no-topicos" class="no-topicos" style="display: none;">
+                    <i class="fas fa-comments"></i>
+                    <h3>Nenhum tópico criado ainda</h3>
+                    <p>Seja o primeiro a criar um tópico neste fórum!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Novo Tópico -->
+    <div id="modalNovoTopico" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Tópico</h2>
+                <button class="btn-close" onclick="fecharModalNovoTopico()">&times;</button>
+            </div>
+            <form id="formNovoTopico">
+                <div class="form-group">
+                    <label for="tituloTopico">Título *</label>
+                    <input type="text" id="tituloTopico" required placeholder="Digite o título do tópico">
+                </div>
+                <div class="form-group">
+                    <label for="conteudoTopico">Conteúdo *</label>
+                    <textarea id="conteudoTopico" required placeholder="Digite o conteúdo do tópico"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Adicionar arquivo</label>
+                    <input type="file" id="arquivoTopico" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.zip">
+                    <div class="btn-arquivo" onclick="document.getElementById('arquivoTopico').click()">
+                        <i class="fas fa-paperclip"></i>
+                        <span>Arquivo</span>
+                    </div>
+                    <div id="arquivo-nome" class="arquivo-nome"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancelar" onclick="fecharModalNovoTopico()">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Publicar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/forum-detalhes-professor.js"></script>
+</body>
+</html>

@@ -55,6 +55,23 @@ public class ProfessorEventosController {
         return ResponseEntity.ok(r);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id, @RequestParam Long professorId) {
+        // Verifica se o evento existe
+        if (!repo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Verifica se o evento pertence ao professor
+        EventoProfessorEntity evento = repo.findById(id).orElse(null);
+        if (evento == null || !evento.getProfessorId().equals(professorId)) {
+            return ResponseEntity.status(403).build(); // Forbidden
+        }
+        
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
     // DTOs
     public static class EventoProfessorRequest {
         private String titulo;

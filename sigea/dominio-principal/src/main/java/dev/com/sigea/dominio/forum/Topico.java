@@ -10,13 +10,19 @@ public class Topico {
     private final String titulo;
     private final String conteudo;
     private final UsuarioId autorId;
+    private final String arquivoPath;
 
     public Topico(TopicoId id, DisciplinaId disciplinaId, String titulo, String conteudo, UsuarioId autorId) {
+        this(id, disciplinaId, titulo, conteudo, autorId, null);
+    }
+
+    public Topico(TopicoId id, DisciplinaId disciplinaId, String titulo, String conteudo, UsuarioId autorId, String arquivoPath) {
         this.id = Objects.requireNonNull(id);
         this.disciplinaId = Objects.requireNonNull(disciplinaId);
         this.titulo = Objects.requireNonNull(titulo);
         this.conteudo = Objects.requireNonNull(conteudo);
         this.autorId = Objects.requireNonNull(autorId);
+        this.arquivoPath = arquivoPath;
     }
 
     public TopicoId getId() { return id; }
@@ -24,4 +30,5 @@ public class Topico {
     public String getTitulo() { return titulo; }
     public String getConteudo() { return conteudo; }
     public UsuarioId getAutorId() { return autorId; }
+    public String getArquivoPath() { return arquivoPath; }
 }

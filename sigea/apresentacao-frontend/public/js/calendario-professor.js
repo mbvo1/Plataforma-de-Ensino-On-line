@@ -149,11 +149,23 @@ function renderizarCalendario() {
             const eventoEl = document.createElement('div');
             eventoEl.className = `evento-tag evento-${(evento.tipo||'todos').toLowerCase()}`;
             const eventoTexto = document.createElement('span'); eventoTexto.textContent = evento.titulo; eventoEl.appendChild(eventoTexto);
-            if (!evento.isAutomatico) {
-                const btnExcluir = document.createElement('button'); btnExcluir.className = 'evento-delete'; btnExcluir.innerHTML = '×'; btnExcluir.title = 'Excluir evento'; btnExcluir.onclick = (e) => { e.stopPropagation(); excluirEvento(evento.id); };
+            
+            // Only show delete button for professor-created events (not automatic and marked as isProfessorEvent)
+            if (!evento.isAutomatico && evento.isProfessorEvent === true) {
+                const btnExcluir = document.createElement('button'); 
+                btnExcluir.className = 'evento-delete'; 
+                btnExcluir.innerHTML = '×'; 
+                btnExcluir.title = 'Excluir evento'; 
+                btnExcluir.onclick = (e) => { e.stopPropagation(); excluirEvento(evento.id); };
                 eventoEl.appendChild(btnExcluir);
             }
-            let tipoLabel = evento.tipo; if (evento.tipo === 'TODOS') tipoLabel = 'Todos os Usuários'; else if (evento.tipo === 'ALUNOS') tipoLabel = 'Apenas Alunos'; else if (evento.tipo === 'PROFESSORES') tipoLabel = 'Apenas Professores';
+            
+            let tipoLabel = evento.tipo; 
+            if (evento.tipo === 'TODOS') tipoLabel = 'Todos os Usuários'; 
+            else if (evento.tipo === 'ALUNOS') tipoLabel = 'Apenas Alunos'; 
+            else if (evento.tipo === 'PROFESSORES') tipoLabel = 'Apenas Professores';
+            else if (evento.tipo === 'PROFESSOR') tipoLabel = 'Evento do Professor';
+            
             eventoEl.title = `${evento.titulo} - ${tipoLabel}`;
             eventosContainer.appendChild(eventoEl);
         });
@@ -199,7 +211,15 @@ async function carregarEventos() {
         }).map(e => ({ ...e }));
 
         // Merge institutional + professor-specific events
-        eventos = filtered.concat(profEvents.map(e => ({ id: e.id, titulo: e.titulo, dataEvento: e.dataEvento, tipo: 'PROFESSOR', responsavelId: e.professorId })));
+        // Mark professor events with isProfessorEvent flag for correct deletion
+        eventos = filtered.concat(profEvents.map(e => ({ 
+            id: e.id, 
+            titulo: e.titulo, 
+            dataEvento: e.dataEvento, 
+            tipo: 'PROFESSOR', 
+            responsavelId: e.professorId,
+            isProfessorEvent: true // Flag to identify professor-specific events
+        })));
 
         // Adiciona feriados do ano atual e próximo
         const anoInicial = new Date().getFullYear();
@@ -226,12 +246,54 @@ async function carregarEventos() {
 
 async function excluirEvento(eventoId) {
     if (!confirm('Deseja realmente excluir este evento?')) return;
+    
     try {
-        const response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Erro ao excluir evento');
+        // Find the event to determine if it's a professor-specific event
+        const evento = eventos.find(e => e.id === eventoId);
+        
+        if (!evento) {
+            alert('Evento não encontrado.');
+            return;
+        }
+
+        // Check if it's a professor-specific event
+        const isProfessorEvent = evento.isProfessorEvent === true;
+        const usuarioId = localStorage.getItem('usuarioId');
+        
+        let response;
+        if (isProfessorEvent) {
+            // Delete from professor events table
+            response = await fetch(`http://localhost:8080/api/professor/eventos/${eventoId}?professorId=${usuarioId}`, { 
+                method: 'DELETE' 
+            });
+        } else {
+            // Delete from institutional events table
+            response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, { 
+                method: 'DELETE' 
+            });
+        }
+        
+        if (response.status === 404) {
+            alert('Evento não encontrado. Pode já ter sido excluído.');
+            await carregarEventos();
+            return;
+        }
+        
+        if (response.status === 403) {
+            alert('Você não tem permissão para excluir este evento.');
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
         await carregarEventos();
         alert('Evento excluído com sucesso!');
-    } catch (error) { console.error('Erro ao excluir evento:', error); alert('Erro ao excluir evento. Tente novamente.'); }
+    } catch (error) {
+        console.error('Erro ao excluir evento:', error);
+        alert('Erro ao excluir evento. Verifique sua conexão e tente novamente.');
+    }
 }
 
 function abrirModalEvento() {

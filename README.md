@@ -52,7 +52,8 @@ java -jar apresentacao-backend/target/sigea-apresentacao-backend-1.0.0-SNAPSHOT.
 
 Após iniciar a aplicação, você poderá acessar:
 
-* **Frontend**: `http://localhost:8080`
+* **Frontend**: `http://localhost:8080` - Aluno,  `http://localhost:8080(http://localhost:8080/login-professor.html)` - Professor, `http://localhost:8080(http://localhost:8080/login-admin.html)` - Admin
+Obs: login de Admin : E-mail: admin@sigea.com, Cpf: 00000000000, Senha: admin123
 * **API REST**: `http://localhost:8080/api`
 * **Console H2 Database**: `http://localhost:8080/h2-console`
   - JDBC URL: `jdbc:h2:file:./sigea`

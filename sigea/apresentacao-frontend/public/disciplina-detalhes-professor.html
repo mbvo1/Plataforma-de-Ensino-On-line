@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Disciplina - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .btn-voltar {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .btn-voltar:hover {
+            color: var(--primary-color);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .disciplina-content {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .tabela-alunos-container {
+            flex: 2;
+            max-width: 550px;
+        }
+
+        .tabela-alunos {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 2px solid #333;
+        }
+
+        .tabela-alunos th,
+        .tabela-alunos td {
+            border: 1px solid #333;
+            padding: 0.75rem 1rem;
+            text-align: center;
+        }
+
+        .tabela-alunos th {
+            background: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .tabela-alunos th:first-child,
+        .tabela-alunos td:first-child {
+            text-align: left;
+        }
+
+        .tabela-alunos td {
+            font-size: 0.9rem;
+        }
+
+        .acoes-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+            padding-top: 1rem;
+        }
+
+        .btn-acao {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: color 0.2s;
+        }
+
+        .btn-acao:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-acao::before {
+            content: '•';
+            font-size: 1.25rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-gray);
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-gray);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard-professor.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-professor.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="disciplinas-professor.html" class="menu-item active">
+                <i class="fas fa-book"></i>
+                <span class="menu-text">Disciplinas</span>
+            </a>
+            <a href="forum-professor.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="calendario-professor.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-professor.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user"></i>
+                <span id="userName">Professor - Usuário</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <button class="btn-voltar" onclick="voltarParaDisciplinas()">
+                ← Voltar
+            </button>
+
+            <h1 class="page-title" id="titulo-disciplina">Carregando...</h1>
+
+            <div class="disciplina-content">
+                <!-- Tabela de Alunos -->
+                <div class="tabela-alunos-container">
+                    <div id="loading" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Carregando alunos...</p>
+                    </div>
+
+                    <div id="tabela-container" style="display: none;">
+                        <table class="tabela-alunos">
+                            <thead>
+                                <tr>
+                                    <th>Alunos</th>
+                                    <th>Av1</th>
+                                    <th>Av2</th>
+                                    <th>Faltas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alunos-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-user-slash"></i>
+                        <p>Nenhum aluno matriculado nesta disciplina</p>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="acoes-container">
+                    <button class="btn-acao" onclick="realizarChamada()">
+                        Realizar chamada
+                    </button>
+                    <button class="btn-acao" onclick="atribuirNotas()">
+                        Atribuir notas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/disciplina-detalhes-professor.js"></script>
+</body>
+</html>

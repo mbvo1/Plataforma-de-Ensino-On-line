@@ -5,6 +5,7 @@ import dev.com.sigea.apresentacao.dashboard.dto.DashboardStatsResponse;
 import dev.com.sigea.apresentacao.dashboard.dto.UsuarioResumo;
 import dev.com.sigea.infraestrutura.persistencia.DisciplinaEntity;
 import dev.com.sigea.infraestrutura.persistencia.DisciplinaJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.TurmaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,12 @@ public class DashboardController {
     
     private final UsuarioJpaRepository usuarioRepository;
     private final DisciplinaJpaRepository disciplinaRepository;
+    private final TurmaJpaRepository turmaRepository;
     
-    public DashboardController(UsuarioJpaRepository usuarioRepository, DisciplinaJpaRepository disciplinaRepository) {
+    public DashboardController(UsuarioJpaRepository usuarioRepository, DisciplinaJpaRepository disciplinaRepository, TurmaJpaRepository turmaRepository) {
         this.usuarioRepository = usuarioRepository;
         this.disciplinaRepository = disciplinaRepository;
+        this.turmaRepository = turmaRepository;
     }
     
     @GetMapping("/aluno/{usuarioId}")
@@ -65,8 +68,8 @@ public class DashboardController {
             .filter(d -> "ATIVO".equals(d.getStatus()))
             .count();
         
-        // Por enquanto, turmas são 0 (será implementada depois)
-        long totalTurmas = 0;
+        // Contar total de turmas criadas por todos os professores
+        long totalTurmas = turmaRepository.count();
         
         DashboardStatsResponse response = new DashboardStatsResponse();
         response.setTotalAlunos(totalAlunos);

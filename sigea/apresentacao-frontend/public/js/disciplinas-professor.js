@@ -42,11 +42,14 @@ function renderDisciplina(d) {
         <div class="disciplina-right">Alunos : <strong>${alunosCount}</strong></div>
     `;
     card.addEventListener('click', () => {
-        // navigate to a page that lists salas/discipline details (not implemented)
-        // store disciplina selected
+        // Navega para a página de detalhes da disciplina
         try { sessionStorage.setItem('disciplinaSelecionada', JSON.stringify(d)); } catch(_) {}
-        // For now, link to turmas view
-        window.location.href = 'turmas-professor.html';
+        const params = new URLSearchParams({
+            salaId: d.salaId || d.id || '',
+            disciplina: d.nome || '',
+            sala: identificador
+        });
+        window.location.href = `disciplina-detalhes-professor.html?${params.toString()}`;
     });
     container.appendChild(card);
 }

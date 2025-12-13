@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import dev.com.sigea.infraestrutura.persistencia.DisciplinaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.SalaJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.TopicoJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.TopicoEntity;
 
 @RestController
 @RequestMapping("/api/professor")
@@ -41,19 +43,22 @@ public class ProfessorController {
     private final AtividadeTurmaJpaRepository atividadeTurmaJpaRepository;
     private final DisciplinaJpaRepository disciplinaJpaRepository;
     private final SalaJpaRepository salaJpaRepository;
+    private final TopicoJpaRepository topicoJpaRepository;
 
     public ProfessorController(TurmaJpaRepository turmaJpaRepository, 
                                UsuarioJpaRepository usuarioJpaRepository,
                                AvisoTurmaJpaRepository avisoTurmaJpaRepository,
                                AtividadeTurmaJpaRepository atividadeTurmaJpaRepository,
                                DisciplinaJpaRepository disciplinaJpaRepository,
-                               SalaJpaRepository salaJpaRepository) {
+                               SalaJpaRepository salaJpaRepository,
+                               TopicoJpaRepository topicoJpaRepository) {
         this.turmaJpaRepository = turmaJpaRepository;
         this.usuarioJpaRepository = usuarioJpaRepository;
         this.avisoTurmaJpaRepository = avisoTurmaJpaRepository;
         this.atividadeTurmaJpaRepository = atividadeTurmaJpaRepository;
         this.disciplinaJpaRepository = disciplinaJpaRepository;
         this.salaJpaRepository = salaJpaRepository;
+        this.topicoJpaRepository = topicoJpaRepository;
     }
 
     @Value("${file.upload-dir:uploads}")
@@ -676,6 +681,106 @@ public class ProfessorController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Erro ao buscar salas: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * GET /api/professor/aulas-hoje?professorId={id}&diaSemana={dia}
+     * Retorna as aulas do dia baseado no horário das salas
+     */
+    @GetMapping("/aulas-hoje")
+    public ResponseEntity<?> listarAulasHoje(
+            @RequestParam Long professorId,
+            @RequestParam String diaSemana) {
+        try {
+            // Busca todas as salas do professor
+            List<dev.com.sigea.infraestrutura.persistencia.SalaEntity> salas = salaJpaRepository.findAll().stream()
+                .filter(s -> s.getProfessorId() != null && s.getProfessorId().equals(professorId))
+                .collect(Collectors.toList());
+            
+            List<java.util.Map<String, Object>> aulas = new java.util.ArrayList<>();
+            
+            for (var sala : salas) {
+                String horario = sala.getHorario();
+                
+                // Verifica se o horário contém o dia da semana atual
+                if (horario != null && horario.toLowerCase().contains(diaSemana.toLowerCase())) {
+                    var discOpt = disciplinaJpaRepository.findById(sala.getDisciplinaId());
+                    String disciplinaNome = discOpt.map(d -> d.getNome()).orElse("Disciplina " + sala.getDisciplinaId());
+                    
+                    java.util.Map<String, Object> aula = new java.util.HashMap<>();
+                    aula.put("salaId", sala.getId());
+                    aula.put("disciplinaNome", disciplinaNome);
+                    aula.put("salaIdentificador", sala.getIdentificador());
+                    aula.put("horario", horario);
+                    aulas.add(aula);
+                }
+            }
+            
+            return ResponseEntity.ok(aulas);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao buscar aulas: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * GET /api/professor/forum/mensagens-novas?professorId={id}
+     * Retorna tópicos novos (não lidos) das disciplinas do professor
+     */
+    @GetMapping("/forum/mensagens-novas")
+    public ResponseEntity<?> listarMensagensNovas(@RequestParam Long professorId) {
+        try {
+            // Busca todas as salas (disciplinas) do professor
+            List<dev.com.sigea.infraestrutura.persistencia.SalaEntity> salas = salaJpaRepository.findAll().stream()
+                .filter(s -> s.getProfessorId() != null && s.getProfessorId().equals(professorId))
+                .collect(Collectors.toList());
+            
+            // Coleta os IDs das disciplinas
+            java.util.Set<Long> disciplinaIds = salas.stream()
+                .map(s -> s.getDisciplinaId())
+                .collect(java.util.stream.Collectors.toSet());
+            
+            List<java.util.Map<String, Object>> mensagens = new java.util.ArrayList<>();
+            
+            // Para cada disciplina, busca os tópicos recentes (criados por outros usuários)
+            for (Long disciplinaId : disciplinaIds) {
+                var discOpt = disciplinaJpaRepository.findById(disciplinaId);
+                String disciplinaNome = discOpt.map(d -> d.getNome()).orElse("Disciplina " + disciplinaId);
+                
+                // Busca tópicos da disciplina que não foram criados pelo professor
+                List<TopicoEntity> topicos = topicoJpaRepository.findByDisciplinaIdOrderByIdDesc(disciplinaId);
+                
+                for (TopicoEntity topico : topicos) {
+                    // Filtra tópicos que não foram criados pelo professor
+                    if (!topico.getAutorId().equals(professorId)) {
+                        // Busca nome do autor
+                        String autorNome = usuarioJpaRepository.findById(topico.getAutorId())
+                            .map(u -> u.getNome())
+                            .orElse("Usuário " + topico.getAutorId());
+                        
+                        java.util.Map<String, Object> msg = new java.util.HashMap<>();
+                        msg.put("topicoId", topico.getId());
+                        msg.put("disciplinaId", disciplinaId);
+                        msg.put("disciplinaNome", disciplinaNome);
+                        msg.put("titulo", topico.getTitulo());
+                        msg.put("autorNome", autorNome);
+                        mensagens.add(msg);
+                        
+                        // Limita a 5 mensagens no dashboard
+                        if (mensagens.size() >= 5) break;
+                    }
+                }
+                
+                if (mensagens.size() >= 5) break;
+            }
+            
+            return ResponseEntity.ok(mensagens);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao buscar mensagens: " + e.getMessage()));
         }
     }
 }

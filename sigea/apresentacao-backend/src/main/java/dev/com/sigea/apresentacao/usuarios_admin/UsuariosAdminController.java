@@ -24,15 +24,18 @@ public class UsuariosAdminController {
     private final DisciplinaJpaRepository disciplinaJpaRepository;
     private final PeriodoJpaRepository periodoJpaRepository;
     private final SalaJpaRepository salaJpaRepository;
+    private final MatriculaJpaRepository matriculaJpaRepository;
     
     public UsuariosAdminController(UsuarioJpaRepository usuarioJpaRepository, 
                                    DisciplinaJpaRepository disciplinaJpaRepository,
                                    PeriodoJpaRepository periodoJpaRepository,
-                                   SalaJpaRepository salaJpaRepository) {
+                                   SalaJpaRepository salaJpaRepository,
+                                   MatriculaJpaRepository matriculaJpaRepository) {
         this.usuarioJpaRepository = usuarioJpaRepository;
         this.disciplinaJpaRepository = disciplinaJpaRepository;
         this.periodoJpaRepository = periodoJpaRepository;
         this.salaJpaRepository = salaJpaRepository;
+        this.matriculaJpaRepository = matriculaJpaRepository;
     }
     
     @GetMapping("/alunos")
@@ -110,17 +113,76 @@ public class UsuariosAdminController {
             return ResponseEntity.notFound().build();
         }
         
-        // Por enquanto retorna lista vazia
-        // Futuramente: buscar matrículas do banco de dados
+        // Busca todas as matrículas do aluno
+        List<MatriculaEntity> matriculas = matriculaJpaRepository.findByAlunoId(id);
+        
         List<HistoricoDisciplinaResponse> historico = new ArrayList<>();
+        
+        for (MatriculaEntity matricula : matriculas) {
+            // Busca a sala
+            Optional<SalaEntity> salaOpt = salaJpaRepository.findById(matricula.getSalaId());
+            if (salaOpt.isEmpty()) continue;
+            
+            SalaEntity sala = salaOpt.get();
+            
+            // Busca a disciplina
+            Optional<DisciplinaEntity> disciplinaOpt = disciplinaJpaRepository.findById(sala.getDisciplinaId());
+            if (disciplinaOpt.isEmpty()) continue;
+            
+            DisciplinaEntity disciplina = disciplinaOpt.get();
+            
+            // Busca o período letivo
+            String periodoLetivo = "";
+            if (sala.getPeriodoLetivoId() != null) {
+                Optional<PeriodoEntity> periodoOpt = periodoJpaRepository.findById(sala.getPeriodoLetivoId());
+                if (periodoOpt.isPresent()) {
+                    periodoLetivo = periodoOpt.get().getNome();
+                }
+            }
+            
+            // Formata o status para exibição
+            String statusExibicao;
+            String situacao = matricula.getSituacao();
+            String statusMatricula = matricula.getStatus();
+            
+            if ("CANCELADA".equals(statusMatricula)) {
+                statusExibicao = "Cancelada";
+            } else if ("APROVADO".equals(situacao)) {
+                statusExibicao = "Aprovado";
+            } else if ("REPROVADO".equals(situacao)) {
+                statusExibicao = "Reprovado";
+            } else {
+                statusExibicao = "Cursando";
+            }
+            
+            historico.add(new HistoricoDisciplinaResponse(
+                matricula.getId(),
+                disciplina.getNome(),
+                periodoLetivo,
+                statusExibicao
+            ));
+        }
         
         return ResponseEntity.ok(historico);
     }
     
     @PatchMapping("/matriculas/{id}/cancelar")
-    public ResponseEntity<Void> cancelarMatricula(@PathVariable Long id) {
-        // Por enquanto apenas retorna sucesso
-        // Futuramente: implementar lógica de cancelamento
+    public ResponseEntity<?> cancelarMatricula(@PathVariable Long id) {
+        Optional<MatriculaEntity> matriculaOpt = matriculaJpaRepository.findById(id);
+        
+        if (matriculaOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        MatriculaEntity matricula = matriculaOpt.get();
+        
+        if ("CANCELADA".equals(matricula.getStatus())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Matrícula já está cancelada"));
+        }
+        
+        matricula.setStatus("CANCELADA");
+        matriculaJpaRepository.save(matricula);
+        
         return ResponseEntity.ok().build();
     }
     
@@ -785,7 +847,8 @@ public class UsuariosAdminController {
         }
         
         // Busca vagas ocupadas (count de matrículas ativas)
-        int vagasOcupadas = 0; // TODO: implementar contagem de matrículas
+        long vagasOcupadasLong = matriculaJpaRepository.countBySalaIdAndStatus(sala.getId(), "ATIVA");
+        int vagasOcupadas = (int) vagasOcupadasLong;
         
         return new SalaResponse(
                 sala.getId(),

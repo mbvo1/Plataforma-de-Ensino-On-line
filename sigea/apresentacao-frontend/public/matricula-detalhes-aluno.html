@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Realizar Matrícula</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .matricula-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .matricula-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .btn-voltar {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+            padding: 8px;
+        }
+        
+        .btn-voltar:hover {
+            color: #666;
+        }
+        
+        .matricula-titulo {
+            flex: 1;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+        
+        .disciplinas-selecao {
+            margin-bottom: 30px;
+        }
+        
+        .disciplina-campo {
+            margin-bottom: 16px;
+        }
+        
+        .disciplina-campo label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        
+        .disciplina-campo select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+        
+        .disciplina-campo select:focus {
+            outline: none;
+            border-color: #333;
+        }
+        
+        .grade-horaria {
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        .grade-horaria table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .grade-horaria th,
+        .grade-horaria td {
+            border: 1px solid #333;
+            padding: 10px 8px;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .grade-horaria th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .grade-horaria .horario-col {
+            font-size: 12px;
+            font-weight: 500;
+            background-color: #fafafa;
+            min-width: 80px;
+        }
+        
+        .grade-horaria .intervalo {
+            background-color: #f0f0f0;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .grade-horaria .ocupado {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            font-weight: 500;
+            font-size: 11px;
+        }
+        
+        .grade-horaria .conflito {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .btn-matricular-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .btn-matricular {
+            padding: 14px 48px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-matricular:hover {
+            background-color: #555;
+        }
+        
+        .btn-matricular:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .mensagem-erro {
+            color: #c62828;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .mensagem-sucesso {
+            color: #2e7d32;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-aluno.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-aluno.html" class="menu-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="desempenho-aluno.html" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Desempenho</span>
+            </a>
+            <a href="calendario-aluno.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-aluno.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="forum-aluno.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="matricula-aluno.html" class="menu-item active">
+                <i class="fas fa-id-card"></i>
+                <span class="menu-text">Matrícula</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Aluno - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="matricula-container">
+                <div class="matricula-header">
+                    <button class="btn-voltar" onclick="voltarPagina()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1 class="matricula-titulo">Realizar Matrícula</h1>
+                </div>
+                
+                <div class="disciplinas-selecao">
+                    <div class="disciplina-campo">
+                        <label>Disciplina 1:</label>
+                        <select id="disciplina1" onchange="atualizarGrade()">
+                            <option value="">Disciplina</option>
+                        </select>
+                    </div>
+                    
+                    <div class="disciplina-campo">
+                        <label>Disciplina 2:</label>
+                        <select id="disciplina2" onchange="atualizarGrade()">
+                            <option value="">Disciplina</option>
+                        </select>
+                    </div>
+                    
+                    <div class="disciplina-campo">
+                        <label>Disciplina 3:</label>
+                        <select id="disciplina3" onchange="atualizarGrade()">
+                            <option value="">Disciplina</option>
+                        </select>
+                    </div>
+                    
+                    <div class="disciplina-campo">
+                        <label>Disciplina 4:</label>
+                        <select id="disciplina4" onchange="atualizarGrade()">
+                            <option value="">Disciplina</option>
+                        </select>
+                    </div>
+                    
+                    <div class="disciplina-campo">
+                        <label>Disciplina 5:</label>
+                        <select id="disciplina5" onchange="atualizarGrade()">
+                            <option value="">Disciplina</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grade-horaria">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Segunda-Feira</th>
+                                <th>Terça-Feira</th>
+                                <th>Quarta-Feira</th>
+                                <th>Quinta-Feira</th>
+                                <th>Sexta-Feira</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradeBody">
+                            <tr>
+                                <td class="horario-col">8:15-9:15</td>
+                                <td id="seg-0815"></td>
+                                <td id="ter-0815"></td>
+                                <td id="qua-0815"></td>
+                                <td id="qui-0815"></td>
+                                <td id="sex-0815"></td>
+                            </tr>
+                            <tr>
+                                <td class="horario-col">9:15-10:15</td>
+                                <td id="seg-0915"></td>
+                                <td id="ter-0915"></td>
+                                <td id="qua-0915"></td>
+                                <td id="qui-0915"></td>
+                                <td id="sex-0915"></td>
+                            </tr>
+                            <tr class="intervalo">
+                                <td class="horario-col">10:15-10:45</td>
+                                <td>INTERVALO</td>
+                                <td>INTERVALO</td>
+                                <td>INTERVALO</td>
+                                <td>INTERVALO</td>
+                                <td>INTERVALO</td>
+                            </tr>
+                            <tr>
+                                <td class="horario-col">10:45-11:45</td>
+                                <td id="seg-1045"></td>
+                                <td id="ter-1045"></td>
+                                <td id="qua-1045"></td>
+                                <td id="qui-1045"></td>
+                                <td id="sex-1045"></td>
+                            </tr>
+                            <tr>
+                                <td class="horario-col">11:45-12:45</td>
+                                <td id="seg-1145"></td>
+                                <td id="ter-1145"></td>
+                                <td id="qua-1145"></td>
+                                <td id="qui-1145"></td>
+                                <td id="sex-1145"></td>
+                            </tr>
+                            <tr>
+                                <td class="horario-col">13:30-14:30</td>
+                                <td id="seg-1330"></td>
+                                <td id="ter-1330"></td>
+                                <td id="qua-1330"></td>
+                                <td id="qui-1330"></td>
+                                <td id="sex-1330"></td>
+                            </tr>
+                            <tr>
+                                <td class="horario-col">14:30-15:30</td>
+                                <td id="seg-1430"></td>
+                                <td id="ter-1430"></td>
+                                <td id="qua-1430"></td>
+                                <td id="qui-1430"></td>
+                                <td id="sex-1430"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="btn-matricular-container">
+                    <button class="btn-matricular" id="btnMatricular" onclick="realizarMatricula()">
+                        Realizar Matrícula
+                    </button>
+                    <p id="mensagem"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/matricula-detalhes-aluno.js"></script>
+</body>
+</html>

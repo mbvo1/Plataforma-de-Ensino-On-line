@@ -30,4 +30,19 @@ public interface MatriculaJpaRepository extends JpaRepository<MatriculaEntity, L
      * Conta alunos matriculados em uma sala.
      */
     long countBySalaIdAndStatus(Long salaId, String status);
+    
+    /**
+     * Busca todas as matrículas de um aluno.
+     */
+    List<MatriculaEntity> findByAlunoId(Long alunoId);
+    
+    /**
+     * Busca matrículas ativas de um aluno.
+     */
+    List<MatriculaEntity> findByAlunoIdAndStatus(Long alunoId, String status);
+    
+    /**
+     * Busca matrículas de um aluno por situação (APROVADO, REPROVADO, CURSANDO).
+     */
+    List<MatriculaEntity> findByAlunoIdAndSituacao(Long alunoId, String situacao);
 }

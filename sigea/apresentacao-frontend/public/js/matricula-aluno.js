@@ -1,3 +1,6 @@
+// Estado global
+let matriculas = [];
+
 // Função para limpar dados do usuário
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
@@ -32,12 +35,12 @@ window.addEventListener('DOMContentLoaded', () => {
     
     loadUserInfo();
     initializeMenuToggle();
-    carregarMatricula();
+    carregarMatriculas();
 });
 
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
-    const userNameElement = document.getElementById('user-name');
+    const userNameElement = document.getElementById('userName');
     if (userNameElement) {
         userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
     }
@@ -54,9 +57,11 @@ function initializeMenuToggle() {
     }
 }
 
-async function carregarMatricula() {
-    const container = document.getElementById('matricula-content');
+// Carregar matrículas do aluno
+async function carregarMatriculas() {
     const usuarioId = localStorage.getItem('usuarioId');
+    const subtitulo = document.getElementById('subtitulo');
+    const container = document.getElementById('disciplinasContainer');
     
     try {
         const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`);
@@ -65,72 +70,125 @@ async function carregarMatricula() {
             throw new Error('Erro ao carregar matrículas');
         }
         
-        const matriculas = await response.json();
-        
-        if (!matriculas || matriculas.length === 0) {
-            container.innerHTML = `
-                <p class="empty-state">Você não possui matrículas ativas.</p>
-                <button class="btn-primary" onclick="abrirModalMatricula()">
-                    <i class="fas fa-plus"></i> Realizar Matrícula
-                </button>
-            `;
-            return;
-        }
-        
-        let html = `
-            <div class="matricula-header">
-                <h2>Minhas Matrículas</h2>
-                <button class="btn-primary" onclick="abrirModalMatricula()">
-                    <i class="fas fa-plus"></i> Nova Matrícula
-                </button>
-            </div>
-            <table class="matricula-table">
-                <thead>
-                    <tr>
-                        <th>Disciplina</th>
-                        <th>Sala</th>
-                        <th>Status</th>
-                        <th>Data Matrícula</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-        
-        matriculas.forEach(m => {
-            html += `<tr>
-                <td>${m.disciplinaNome}</td>
-                <td>${m.salaIdentificador}</td>
-                <td class="status-${m.status.toLowerCase()}">${m.status}</td>
-                <td>${formatarData(m.dataMatricula)}</td>
-            </tr>`;
-        });
-        
-        html += '</tbody></table>';
-        container.innerHTML = html;
+        matriculas = await response.json();
+        renderizarMatriculas();
         
     } catch (error) {
         console.error('Erro ao carregar matrículas:', error);
-        container.innerHTML = `
-            <p class="empty-state">Você não possui matrículas ativas.</p>
-            <button class="btn-primary" onclick="abrirModalMatricula()">
-                <i class="fas fa-plus"></i> Realizar Matrícula
-            </button>
-        `;
+        subtitulo.textContent = 'Erro ao carregar dados';
+        container.innerHTML = '<p class="mensagem-vazia">Erro ao carregar matrículas.</p>';
     }
 }
 
-function formatarData(dataStr) {
-    if (!dataStr) return '-';
-    const data = new Date(dataStr);
-    return data.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+// Renderizar lista de matrículas
+function renderizarMatriculas() {
+    const container = document.getElementById('disciplinasContainer');
+    const subtitulo = document.getElementById('subtitulo');
+    
+    if (matriculas.length === 0) {
+        subtitulo.textContent = 'Nenhuma disciplina matriculada';
+        container.innerHTML = '<p class="mensagem-vazia">Você ainda não está matriculado em nenhuma disciplina. Clique em "Matricular disciplina" para se matricular.</p>';
+        return;
+    }
+    
+    subtitulo.textContent = '';
+    
+    // Atualizar botão para "Editar Matrícula"
+    const btnMatricula = document.querySelector('.btn-matricular');
+    if (btnMatricula) {
+        btnMatricula.textContent = 'Editar Matrícula';
+    }
+    
+    container.innerHTML = matriculas.map(matricula => {
+        const horario = matricula.horario || '';
+        const disciplinaNome = matricula.disciplinaNome || 'Disciplina';
+        const salaIdentificador = matricula.salaIdentificador || 'Turma';
+        const professorNome = matricula.professorNome || 'Nome';
+        
+        // Parsear dias e horário
+        const diasHorario = parseDiasHorario(horario);
+        
+        return `
+            <div class="disciplina-card">
+                <div class="disciplina-titulo">${disciplinaNome} - ${salaIdentificador}</div>
+                <div class="disciplina-info">
+                    <div class="disciplina-detalhe">Dias: ${diasHorario.diasTexto}</div>
+                    <div class="disciplina-detalhe">Horário: ${diasHorario.horario}</div>
+                    <div class="disciplina-detalhe">Professor: "${professorNome}"</div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-function abrirModalMatricula() {
-    alert('Funcionalidade de matrícula em desenvolvimento.');
+// Parsear dias e horário do formato "SEG,QUA 08:15-10:15"
+function parseDiasHorario(horarioStr) {
+    if (!horarioStr) return { diasTexto: 'Não definido', horario: 'Não definido' };
+    
+    const partes = horarioStr.split(' ');
+    if (partes.length < 2) return { diasTexto: horarioStr, horario: '' };
+    
+    const dias = partes[0];
+    const horario = partes[1];
+    
+    // Mapear abreviações para nomes completos
+    const diasMap = {
+        'SEG': 'Segunda',
+        'TER': 'Terça',
+        'QUA': 'Quarta',
+        'QUI': 'Quinta',
+        'SEX': 'Sexta',
+        'SAB': 'Sábado'
+    };
+    
+    const diasArray = dias.split(',');
+    const diasNomes = diasArray.map(d => diasMap[d.trim()] || d.trim());
+    
+    let diasTexto;
+    if (diasNomes.length === 1) {
+        diasTexto = diasNomes[0];
+    } else if (diasNomes.length === 2) {
+        diasTexto = diasNomes.join(' e ');
+    } else {
+        diasTexto = diasNomes.slice(0, -1).join(', ') + ' e ' + diasNomes[diasNomes.length - 1];
+    }
+    
+    // Formatar horário de "08:15-10:15" para "8:15 - 10:15"
+    const horarioFormatado = horario.replace('-', ' - ');
+    
+    return { diasTexto, horario: horarioFormatado };
+}
+
+// Cancelar matrícula
+async function cancelarMatricula(matriculaId) {
+    if (!confirm('Tem certeza que deseja cancelar esta matrícula?')) {
+        return;
+    }
+    
+    const usuarioId = localStorage.getItem('usuarioId');
+    
+    try {
+        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas/${matriculaId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Matrícula cancelada com sucesso!');
+            carregarMatriculas();
+        } else {
+            alert('Erro ao cancelar matrícula');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao cancelar matrícula');
+    }
+}
+
+// Abrir página de matrícula
+function abrirMatricula() {
+    // Salvar matrículas atuais para pré-preencher na página de edição
+    localStorage.setItem('matriculasAtuais', JSON.stringify(matriculas));
+    window.location.href = 'matricula-detalhes-aluno.html';
 }
 
 function handleLogout() {

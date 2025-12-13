@@ -240,6 +240,12 @@ body {
     gap: 10px;
     color: #333;
     font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.header-right:hover {
+    opacity: 0.8;
 }
 
 .header-right i {
@@ -824,6 +830,11 @@ body {
 
 .status-badge.reprovado {
     background: #e74c3c;
+    color: white;
+}
+
+.status-badge.cancelada {
+    background: #95a5a6;
     color: white;
 }
 

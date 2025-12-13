@@ -7,9 +7,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
-    if (!usuarioId || usuarioPerfil !== 'PROFESSOR') {
-        alert('Você precisa fazer login como PROFESSOR para acessar esta página.');
-        window.location.href = '/login-professor.html';
+    if (!usuarioId || usuarioPerfil !== 'ALUNO') {
+        alert('Você precisa fazer login como ALUNO para acessar esta página.');
+        window.location.href = '/index.html';
         return;
     }
 
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (!disciplinaId) {
         alert('Disciplina não especificada.');
-        window.location.href = '/forum-professor.html';
+        window.location.href = '/forum-aluno.html';
         return;
     }
 
@@ -47,7 +47,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
     }
 }
 
@@ -59,7 +59,7 @@ function handleLogout() {
         localStorage.removeItem('usuarioPerfil');
         localStorage.removeItem('forumDisciplinaId');
         localStorage.removeItem('forumDisciplinaNome');
-        window.location.href = '/login-professor.html';
+        window.location.href = '/index.html';
     }
 }
 
@@ -69,7 +69,7 @@ function atualizarTitulo() {
 }
 
 function voltarParaForuns() {
-    window.location.href = '/forum-professor.html';
+    window.location.href = '/forum-aluno.html';
 }
 
 async function carregarTopicos() {
@@ -199,7 +199,7 @@ function criarCardTopico(topico) {
 
 function abrirTopicoDetalhes(topicoId) {
     // Navega para a página de detalhes do tópico
-    window.location.href = `/topico-detalhes-professor.html?topicoId=${topicoId}&disciplinaId=${disciplinaId}`;
+    window.location.href = `topico-detalhes-aluno.html?topicoId=${topicoId}&disciplinaId=${disciplinaId}`;
 }
 
 // Modal de novo tópico
@@ -357,3 +357,4 @@ window.onclick = function(event) {
         fecharModalNovoTopico();
     }
 }
+

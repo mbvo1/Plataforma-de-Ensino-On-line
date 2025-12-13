@@ -33,42 +33,84 @@
 
         .disciplina-content {
             display: flex;
-            gap: 3rem;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 2rem;
         }
 
         .tabela-alunos-container {
-            flex: 2;
-            max-width: 550px;
+            flex: 1;
+            width: 100%;
+            overflow-x: auto;
         }
 
         .tabela-alunos {
             width: 100%;
             border-collapse: collapse;
             background: white;
-            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 1000px;
+        }
+
+        .tabela-alunos thead {
+            background: var(--primary-color, #007bff);
+            color: white;
         }
 
         .tabela-alunos th,
         .tabela-alunos td {
-            border: 1px solid #333;
-            padding: 0.75rem 1rem;
-            text-align: center;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.9rem;
         }
 
         .tabela-alunos th {
-            background: white;
             font-weight: 600;
-            font-size: 0.9rem;
+            color: white;
         }
 
-        .tabela-alunos th:first-child,
+        .tabela-alunos th:nth-child(2),
+        .tabela-alunos th:nth-child(3),
+        .tabela-alunos th:nth-child(4),
+        .tabela-alunos th:nth-child(5),
+        .tabela-alunos th:nth-child(6),
+        .tabela-alunos th:nth-child(7),
+        .tabela-alunos th:nth-child(8) {
+            text-align: center;
+        }
+
         .tabela-alunos td:first-child {
-            text-align: left;
+            font-weight: 500;
+            color: var(--text-dark);
         }
 
-        .tabela-alunos td {
-            font-size: 0.9rem;
+        .tabela-alunos td:nth-child(2),
+        .tabela-alunos td:nth-child(3),
+        .tabela-alunos td:nth-child(4),
+        .tabela-alunos td:nth-child(5),
+        .tabela-alunos td:nth-child(6),
+        .tabela-alunos td:nth-child(7),
+        .tabela-alunos td:nth-child(8) {
+            text-align: center;
+        }
+
+        .tabela-alunos tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        .tabela-alunos tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .media-aprovado {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .media-reprovado {
+            color:  : #dc3545;
+            font-weight: 600;
         }
 
         .acoes-container {
@@ -175,7 +217,7 @@
                 <i class="fas fa-envelope header-icon"></i>
                 <span class="header-title">SIGEA</span>
             </div>
-            <div class="header-right">
+            <div class="header-right" onclick="window.location.href='perfil-professor.html'" style="cursor: pointer;">
                 <i class="fas fa-user"></i>
                 <span id="userName">Professor - Usuário</span>
             </div>
@@ -201,8 +243,12 @@
                             <thead>
                                 <tr>
                                     <th>Alunos</th>
-                                    <th>Av1</th>
-                                    <th>Av2</th>
+                                    <th>AV1</th>
+                                    <th>AV2</th>
+                                    <th>Segunda Chamada</th>
+                                    <th>Média Parcial</th>
+                                    <th>Prova Final</th>
+                                    <th>Média Final</th>
                                     <th>Faltas</th>
                                 </tr>
                             </thead>
@@ -211,6 +257,7 @@
                         </table>
                     </div>
 
+
                     <div id="empty-state" class="empty-state" style="display: none;">
                         <i class="fas fa-user-slash"></i>
                         <p>Nenhum aluno matriculado nesta disciplina</p>
@@ -218,7 +265,7 @@
                 </div>
 
                 <!-- Botões de Ação -->
-                <div class="acoes-container">
+                <div class="acoes-container" style="flex-direction: row; gap: 1rem; flex-wrap: wrap;">
                     <button class="btn-acao" onclick="realizarChamada()">
                         Realizar chamada
                     </button>

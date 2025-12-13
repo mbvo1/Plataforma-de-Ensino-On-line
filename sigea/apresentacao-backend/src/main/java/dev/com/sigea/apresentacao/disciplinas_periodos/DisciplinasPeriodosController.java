@@ -7,6 +7,8 @@ import dev.com.sigea.infraestrutura.persistencia.PeriodoEntity;
 import dev.com.sigea.infraestrutura.persistencia.PeriodoJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.DisciplinaEntity;
 import dev.com.sigea.infraestrutura.persistencia.DisciplinaJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.SalaEntity;
+import dev.com.sigea.infraestrutura.persistencia.SalaJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
@@ -24,11 +26,14 @@ public class DisciplinasPeriodosController {
     private final List<PeriodoObserver> observers = new ArrayList<>();
     private final PeriodoJpaRepository periodoJpaRepository;
     private final DisciplinaJpaRepository disciplinaJpaRepository;
+    private final SalaJpaRepository salaJpaRepository;
     
     public DisciplinasPeriodosController(PeriodoJpaRepository periodoJpaRepository,
-                                        DisciplinaJpaRepository disciplinaJpaRepository) {
+                                        DisciplinaJpaRepository disciplinaJpaRepository,
+                                        SalaJpaRepository salaJpaRepository) {
         this.periodoJpaRepository = periodoJpaRepository;
         this.disciplinaJpaRepository = disciplinaJpaRepository;
+        this.salaJpaRepository = salaJpaRepository;
         observers.add(new ModuloMatriculasObserver());
         observers.add(new CalendarioObserver());
     }
@@ -60,6 +65,21 @@ public class DisciplinasPeriodosController {
                 // Busca todas as disciplinas do período anterior
                 List<DisciplinaEntity> disciplinasAnteriores = disciplinaJpaRepository.findByPeriodoLetivoId(periodoAntigo.getId());
                 
+                // Desativa todas as disciplinas do período anterior
+                for (DisciplinaEntity disciplina : disciplinasAnteriores) {
+                    disciplina.setStatus("INATIVO");
+                    disciplinaJpaRepository.save(disciplina);
+                    
+                    // Busca todas as salas dessa disciplina
+                    List<SalaEntity> salasDaDisciplina = salaJpaRepository.findByDisciplinaId(disciplina.getId());
+                    
+                    // Desativa todas as salas da disciplina
+                    for (SalaEntity sala : salasDaDisciplina) {
+                        sala.setStatus("INATIVO");
+                        salaJpaRepository.save(sala);
+                    }
+                }
+                
                 // Copia as disciplinas para o novo período como INATIVAS
                 for (DisciplinaEntity disciplinaOriginal : disciplinasAnteriores) {
                     // Cria uma nova disciplina (cópia) para o novo período
@@ -73,8 +93,6 @@ public class DisciplinasPeriodosController {
                     
                     // Salva a nova disciplina
                     disciplinaJpaRepository.save(novaDisciplina);
-                    
-                    // A disciplina original permanece no período anterior
                 }
                 
                 // Observer Pattern: notifica encerramento do período antigo
@@ -94,6 +112,24 @@ public class DisciplinasPeriodosController {
             
             // Se não existe período anterior, apenas salva o novo
             PeriodoEntity periodoSalvo = periodoJpaRepository.save(novoPeriodo);
+            
+            // Desativa todas as disciplinas e salas existentes (caso existam sem período)
+            List<DisciplinaEntity> todasDisciplinas = disciplinaJpaRepository.findAll();
+            for (DisciplinaEntity disciplina : todasDisciplinas) {
+                if (disciplina.getStatus() != null && disciplina.getStatus().equals("ATIVO")) {
+                    disciplina.setStatus("INATIVO");
+                    disciplinaJpaRepository.save(disciplina);
+                    
+                    // Desativa todas as salas dessa disciplina
+                    List<SalaEntity> salasDaDisciplina = salaJpaRepository.findByDisciplinaId(disciplina.getId());
+                    for (SalaEntity sala : salasDaDisciplina) {
+                        if (sala.getStatus() != null && sala.getStatus().equals("ATIVO")) {
+                            sala.setStatus("INATIVO");
+                            salaJpaRepository.save(sala);
+                        }
+                    }
+                }
+            }
             
             Map<String, Object> response = new HashMap<>();
             response.put("id", periodoSalvo.getId());

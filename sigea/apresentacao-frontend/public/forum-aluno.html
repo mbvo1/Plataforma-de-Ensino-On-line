@@ -4,8 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEA - Fórum</title>
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .forum-container {
+            padding: 2rem;
+        }
+
+        .forum-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .forum-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .forum-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .forum-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .forum-card-professor {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .forum-card-professor i {
+            color: var(--primary-color);
+        }
+
+        .no-forums {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray);
+        }
+
+        .no-forums i {
+            font-size: 3rem;
+            color: #e0e0e0;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray);
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar Menu -->
@@ -60,22 +126,36 @@
                 <i class="fas fa-envelope header-icon"></i>
                 <span class="header-title">SIGEA</span>
             </div>
-            <div class="header-right">
-                <i class="fas fa-user-circle"></i>
-                <span id="user-name">Aluno - Usuário</span>
-            </div>
+                <div class="header-right" onclick="window.location.href='perfil-aluno.html'" style="cursor: pointer;">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">Aluno - Usuário</span>
+                </div>
         </div>
 
         <!-- Content Area -->
         <div class="content-area">
-            <h1 class="page-title">Fórum</h1>
-            
-            <div class="forum-container" id="forum-content">
-                <p class="loading">Carregando fórum...</p>
+            <h1 class="welcome-title">Fórum</h1>
+        </div>
+
+        <!-- Forum Content -->
+        <div class="forum-container">
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Carregando fóruns...</p>
+            </div>
+
+            <div id="forum-grid" class="forum-grid" style="display: none;">
+                <!-- Cards serão inseridos aqui via JavaScript -->
+            </div>
+
+            <div id="no-forums" class="no-forums" style="display: none;">
+                <i class="fas fa-comments"></i>
+                <p>Você ainda não está matriculado em nenhuma disciplina.</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Quando você se matricular em uma disciplina, o fórum aparecerá aqui automaticamente.</p>
             </div>
         </div>
     </div>
 
-    <script src="/js/forum-aluno.js"></script>
+    <script src="js/forum-aluno.js"></script>
 </body>
 </html>

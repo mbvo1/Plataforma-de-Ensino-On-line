@@ -1,3 +1,20 @@
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.page-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+    margin-top: 8px;
+}
+
 /* Calendar Navigation */
 .calendar-navigation {
     display: flex;
@@ -179,6 +196,17 @@
 
 .evento-tag.evento-periodo_matricula {
     background: var(--purple);
+}
+
+.evento-tag.evento-professor {
+    background: #3498db;
+    color: white;
+}
+
+/* Atividade de Turma */
+.evento-tag.evento-atividade-turma {
+    background: #9b59b6; /* Purple color for turma activities */
+    color: white;
 }
 
 /* Legend */

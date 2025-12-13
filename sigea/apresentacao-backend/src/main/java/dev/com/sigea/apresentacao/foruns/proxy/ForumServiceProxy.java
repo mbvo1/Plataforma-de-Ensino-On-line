@@ -5,6 +5,8 @@ import dev.com.sigea.dominio.forum.Topico;
 import dev.com.sigea.dominio.sala.Sala;
 import dev.com.sigea.dominio.sala.SalaRepository;
 import dev.com.sigea.dominio.usuario.UsuarioId;
+import dev.com.sigea.infraestrutura.persistencia.MatriculaJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.SalaJpaRepository;
 
 import java.util.List;
 
@@ -16,10 +18,15 @@ public class ForumServiceProxy implements ForumService {
     
     private final ForumService forumServiceReal;
     private final SalaRepository salaRepository;
+    private final SalaJpaRepository salaJpaRepository;
+    private final MatriculaJpaRepository matriculaJpaRepository;
     
-    public ForumServiceProxy(ForumService forumServiceReal, SalaRepository salaRepository) {
+    public ForumServiceProxy(ForumService forumServiceReal, SalaRepository salaRepository,
+                            SalaJpaRepository salaJpaRepository, MatriculaJpaRepository matriculaJpaRepository) {
         this.forumServiceReal = forumServiceReal;
         this.salaRepository = salaRepository;
+        this.salaJpaRepository = salaJpaRepository;
+        this.matriculaJpaRepository = matriculaJpaRepository;
     }
     
     @Override
@@ -61,18 +68,41 @@ public class ForumServiceProxy implements ForumService {
      * Verifica se o usuário está matriculado na disciplina ou é professor responsável
      */
     private void verificarAcesso(DisciplinaId disciplinaId, UsuarioId usuarioId) {
-        // Busca todas as salas da disciplina
-        List<Sala> salas = salaRepository.listarPorDisciplina(disciplinaId);
-        
-        // Verifica se é aluno matriculado ou professor responsável
-        boolean temAcesso = salas.stream()
-            .anyMatch(sala -> sala.isAlunoMatriculado(usuarioId) || 
-                             (sala.getProfessorId() != null && sala.getProfessorId().equals(usuarioId)));
-        
-        if (!temAcesso) {
-            throw new SecurityException(
-                "Acesso não autorizado. Você não está matriculado nesta disciplina."
-            );
+        try {
+            Long disciplinaIdLong = Long.parseLong(disciplinaId.valor());
+            Long usuarioIdLong = Long.parseLong(usuarioId.valor());
+            
+            // Busca todas as salas da disciplina no banco
+            List<dev.com.sigea.infraestrutura.persistencia.SalaEntity> salas = salaJpaRepository.findByDisciplinaId(disciplinaIdLong);
+            
+            if (salas.isEmpty()) {
+                throw new SecurityException("Disciplina não encontrada ou sem salas.");
+            }
+            
+            // Verifica se é professor responsável de alguma sala
+            boolean isProfessor = salas.stream()
+                .anyMatch(sala -> sala.getProfessorId() != null && sala.getProfessorId().equals(usuarioIdLong));
+            
+            if (isProfessor) {
+                return; // Professor tem acesso
+            }
+            
+            // Verifica se é aluno matriculado em alguma sala da disciplina
+            boolean isAlunoMatriculado = salas.stream()
+                .anyMatch(sala -> {
+                    // Verifica se há matrícula ativa do aluno nesta sala
+                    dev.com.sigea.infraestrutura.persistencia.MatriculaEntity matricula = 
+                        matriculaJpaRepository.findBySalaIdAndAlunoId(sala.getId(), usuarioIdLong);
+                    return matricula != null && "ATIVA".equals(matricula.getStatus());
+                });
+            
+            if (!isAlunoMatriculado) {
+                throw new SecurityException(
+                    "Acesso não autorizado. Você não está matriculado nesta disciplina."
+                );
+            }
+        } catch (NumberFormatException e) {
+            throw new SecurityException("ID inválido: " + e.getMessage());
         }
     }
 }

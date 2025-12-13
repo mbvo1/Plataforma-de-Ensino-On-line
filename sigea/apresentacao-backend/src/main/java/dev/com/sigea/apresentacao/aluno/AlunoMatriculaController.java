@@ -29,17 +29,20 @@ public class AlunoMatriculaController {
     private final DisciplinaJpaRepository disciplinaRepository;
     private final UsuarioJpaRepository usuarioRepository;
     private final PeriodoLetivoJpaRepository periodoLetivoRepository;
+    private final PeriodoJpaRepository periodoJpaRepository;
 
     public AlunoMatriculaController(MatriculaJpaRepository matriculaRepository,
                                      SalaJpaRepository salaRepository,
                                      DisciplinaJpaRepository disciplinaRepository,
                                      UsuarioJpaRepository usuarioRepository,
-                                     PeriodoLetivoJpaRepository periodoLetivoRepository) {
+                                     PeriodoLetivoJpaRepository periodoLetivoRepository,
+                                     PeriodoJpaRepository periodoJpaRepository) {
         this.matriculaRepository = matriculaRepository;
         this.salaRepository = salaRepository;
         this.disciplinaRepository = disciplinaRepository;
         this.usuarioRepository = usuarioRepository;
         this.periodoLetivoRepository = periodoLetivoRepository;
+        this.periodoJpaRepository = periodoJpaRepository;
     }
 
     /**
@@ -293,6 +296,25 @@ public class AlunoMatriculaController {
             }
             
             SalaEntity sala = salaOpt.get();
+            
+            // Verifica se está no período de inscrição
+            Optional<PeriodoEntity> periodoAtivoOpt = periodoJpaRepository.findByStatus("ATIVO");
+            if (periodoAtivoOpt.isPresent()) {
+                PeriodoEntity periodoAtivo = periodoAtivoOpt.get();
+                LocalDate hoje = LocalDate.now();
+                
+                if (periodoAtivo.getInscricaoInicio() != null && periodoAtivo.getInscricaoFim() != null) {
+                    if (hoje.isBefore(periodoAtivo.getInscricaoInicio()) || hoje.isAfter(periodoAtivo.getInscricaoFim())) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("message", "Não está no período de inscrição. O período de inscrição é de " +
+                                periodoAtivo.getInscricaoInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
+                                " até " + periodoAtivo.getInscricaoFim().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+                    }
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Não há período letivo ativo no momento"));
+            }
             
             // Busca matrículas ativas do aluno
             List<MatriculaEntity> matriculasAtivas = matriculaRepository.findByAlunoIdAndStatus(alunoId, "ATIVA");

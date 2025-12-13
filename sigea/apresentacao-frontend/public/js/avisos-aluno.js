@@ -1,110 +1,138 @@
-// Função para limpar dados do usuário
-function limparDadosUsuario() {
-    localStorage.removeItem('usuarioId');
-    localStorage.removeItem('usuarioNome');
-    localStorage.removeItem('usuarioEmail');
-    localStorage.removeItem('usuarioPerfil');
-}
-
-// Verifica se o login é válido
-function isLoginValido() {
+// View-only avisos loader for students (based on professor avisos view)
+window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
-    
-    return usuarioId && 
-           usuarioPerfil && 
-           usuarioId !== 'null' && 
-           usuarioId !== 'undefined' && 
-           usuarioId.trim() !== '' &&
-           usuarioPerfil !== 'null' && 
-           usuarioPerfil !== 'undefined' &&
-           usuarioPerfil.trim() !== '' &&
-           usuarioPerfil === 'ALUNO';
-}
-
-// Verifica autenticação ao carregar a página
-window.addEventListener('DOMContentLoaded', () => {
-    if (!isLoginValido()) {
-        limparDadosUsuario();
+    if (!usuarioId || usuarioPerfil !== 'ALUNO') {
         window.location.href = '/index.html';
         return;
     }
-    
+
     loadUserInfo();
-    initializeMenuToggle();
     carregarAvisos();
+    initializeMenuToggle();
 });
 
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
-    if (userNameElement) {
-        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+    if (userNameElement) userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+}
+
+async function carregarAvisos() {
+    const container = document.getElementById('avisos-container');
+    let usuarioId = localStorage.getItem('usuarioId');
+    if (!usuarioId || usuarioId === 'undefined' || usuarioId === 'null') {
+        container.innerHTML = `
+            <div class="empty-state error-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Erro: Usuário não identificado.</p>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        const endpoint = `http://localhost:8080/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error('Erro ao carregar avisos');
+        const avisos = await response.json();
+
+        if (!avisos || avisos.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>Nenhum aviso não lido.</p>
+                </div>
+            `;
+        } else {
+            exibirAvisos(avisos);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar avisos:', error);
+        container.innerHTML = `
+            <div class="empty-state error-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Erro ao carregar avisos. Tente novamente.</p>
+            </div>
+        `;
+    }
+}
+
+function exibirAvisos(avisos) {
+    const container = document.getElementById('avisos-container');
+    const html = avisos.map(aviso => {
+        const badgeLido = aviso.lido ? '<span class="badge-lido">Lido</span>' : '';
+        return `
+        <div class="aviso-card ${aviso.lido ? 'aviso-lido' : ''}">
+            <button class="btn-close-aviso" title="Marcar como lido" onclick="marcarComoLido(${aviso.id})">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="aviso-header">
+                <h3>${aviso.titulo || ''} ${badgeLido}</h3>
+                <div class="aviso-data">${formatarData(aviso.dataExpiracao) || ''}</div>
+            </div>
+            <div class="aviso-body">
+                <p>${aviso.conteudo || ''}</p>
+            </div>
+            <div class="aviso-footer">
+                <span class="aviso-destinatarios"><i class="fas fa-users"></i> ${aviso.escopo || 'Geral'}</span>
+            </div>
+        </div>
+    `;
+    }).join('');
+    container.innerHTML = html;
+}
+
+function formatarData(dataISO) {
+    if (!dataISO) return '';
+    try {
+        const data = new Date(dataISO);
+        return data.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    } catch (e) {
+        return '';
+    }
+}
+
+async function marcarComoLido(avisoId) {
+    let usuarioId = localStorage.getItem('usuarioId');
+    if (!usuarioId || usuarioId === 'undefined' || usuarioId === 'null') {
+        alert('Erro: Usuário não identificado.');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8080/api/avisos/marcar-lido', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ avisoId, usuarioId })
+        });
+        if (response.ok) {
+            carregarAvisos(); // Recarrega a lista removendo o aviso marcado como lido
+        } else {
+            alert('Erro ao marcar aviso como lido.');
+        }
+    } catch (e) {
+        console.error('Erro ao marcar como lido', e);
+        alert('Erro ao marcar aviso como lido. Tente novamente.');
     }
 }
 
 function initializeMenuToggle() {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-    }
-}
-
-async function carregarAvisos() {
-    const container = document.getElementById('avisos-list');
-    const usuarioId = localStorage.getItem('usuarioId');
-    
-    try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/avisos`);
-        
-        if (!response.ok) {
-            throw new Error('Erro ao carregar avisos');
-        }
-        
-        const avisos = await response.json();
-        
-        if (!avisos || avisos.length === 0) {
-            container.innerHTML = '<p class="empty-state">Nenhum aviso disponível.</p>';
-            return;
-        }
-        
-        container.innerHTML = '';
-        avisos.forEach(aviso => {
-            const card = document.createElement('div');
-            card.className = 'aviso-card';
-            card.innerHTML = `
-                <div class="aviso-header">
-                    <h3>${aviso.titulo}</h3>
-                    <span class="aviso-data">${formatarData(aviso.dataCriacao)}</span>
-                </div>
-                <p class="aviso-conteudo">${aviso.conteudo}</p>
-                <span class="aviso-autor">Por: ${aviso.autor || 'Sistema'}</span>
-            `;
-            container.appendChild(card);
-        });
-        
-    } catch (error) {
-        console.error('Erro ao carregar avisos:', error);
-        container.innerHTML = '<p class="empty-state">Nenhum aviso disponível.</p>';
-    }
-}
-
-function formatarData(dataStr) {
-    const data = new Date(dataStr);
-    return data.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    if (menuToggle && sidebar) menuToggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 }
 
 function handleLogout() {
     if (confirm('Deseja realmente sair?')) {
-        localStorage.clear();
-        window.location.href = '/';
+        localStorage.removeItem('usuarioId');
+        localStorage.removeItem('usuarioNome');
+        localStorage.removeItem('usuarioEmail');
+        localStorage.removeItem('usuarioPerfil');
+        window.location.href = '/index.html';
     }
 }

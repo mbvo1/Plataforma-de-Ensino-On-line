@@ -6,6 +6,108 @@
     <title>SIGEA - Desempenho Acadêmico</title>
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .desempenho-table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+
+        .desempenho-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .desempenho-table thead {
+            background: var(--primary-color, #007bff);
+            color: white;
+        }
+
+        .desempenho-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .desempenho-table th:nth-child(2),
+        .desempenho-table th:nth-child(3),
+        .desempenho-table th:nth-child(4),
+        .desempenho-table th:nth-child(5),
+        .desempenho-table th:nth-child(6),
+        .desempenho-table th:nth-child(7),
+        .desempenho-table th:nth-child(8) {
+            text-align: center;
+        }
+
+        .desempenho-table tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        .desempenho-table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .desempenho-table td {
+            padding: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .desempenho-table td:first-child {
+            font-weight: 500;
+            color: var(--text-dark, #333);
+        }
+
+        .desempenho-table td:nth-child(2),
+        .desempenho-table td:nth-child(3),
+        .desempenho-table td:nth-child(4),
+        .desempenho-table td:nth-child(5),
+        .desempenho-table td:nth-child(6),
+        .desempenho-table td:nth-child(7),
+        .desempenho-table td:nth-child(8) {
+            text-align: center;
+        }
+
+        .media-aprovado {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .media-reprovado {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray, #666);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray, #666);
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar Menu -->
@@ -60,7 +162,7 @@
                 <i class="fas fa-envelope header-icon"></i>
                 <span class="header-title">SIGEA</span>
             </div>
-            <div class="header-right">
+            <div class="header-right" onclick="window.location.href='perfil-aluno.html'" style="cursor: pointer;">
                 <i class="fas fa-user-circle"></i>
                 <span id="user-name">Aluno - Usuário</span>
             </div>
@@ -68,10 +170,37 @@
 
         <!-- Content Area -->
         <div class="content-area">
-            <h1 class="page-title">Desempenho Acadêmico</h1>
+            <h1 class="page-title">Desempenho</h1>
             
-            <div class="desempenho-container" id="desempenho-content">
-                <p class="loading">Carregando desempenho...</p>
+            <div id="loading" class="loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Carregando desempenho...</p>
+            </div>
+            
+            <div id="desempenho-content" style="display: none;">
+                <div class="desempenho-table-container">
+                    <table class="desempenho-table">
+                        <thead>
+                            <tr>
+                                <th>Disciplina</th>
+                                <th>AV1</th>
+                                <th>AV2</th>
+                                <th>Segunda Chamada</th>
+                                <th>Média Parcial</th>
+                                <th>Prova Final</th>
+                                <th>Média Final</th>
+                                <th>Faltas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="desempenho-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <i class="fas fa-book-open"></i>
+                <p>Você ainda não está matriculado em nenhuma disciplina</p>
             </div>
         </div>
     </div>

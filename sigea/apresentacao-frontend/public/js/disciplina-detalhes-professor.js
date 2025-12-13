@@ -32,14 +32,15 @@ async function carregarAlunos() {
     const tbody = document.getElementById('alunos-tbody');
 
     try {
-        // Busca alunos matriculados na sala
-        const response = await fetch(`http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`);
+        // Busca notas completas dos alunos da sala
+        const response = await fetch(`http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`);
         
         if (!response.ok) {
-            throw new Error('Erro ao carregar alunos');
+            throw new Error('Erro ao carregar notas');
         }
 
-        const alunos = await response.json();
+        const dados = await response.json();
+        const alunos = dados.alunos || [];
         console.log('Alunos carregados:', alunos);
 
         loadingElement.style.display = 'none';
@@ -52,15 +53,56 @@ async function carregarAlunos() {
         // Ordena alunos por nome (ordem alfabética)
         alunos.sort((a, b) => a.nome.localeCompare(b.nome));
 
+        // Busca faltas de todos os alunos de uma vez
+        const faltasResponse = await fetch(`http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`);
+        const alunosComFaltas = faltasResponse.ok ? await faltasResponse.json() : [];
+        const faltasMap = new Map();
+        alunosComFaltas.forEach(a => {
+            faltasMap.set(a.alunoId, a.totalFaltas || 0);
+        });
+
         // Preenche a tabela
         tbody.innerHTML = '';
         alunos.forEach(aluno => {
+            // Calcula média parcial
+            const mediaParcial = calcularMediaParcial(aluno.av1, aluno.av2, aluno.segundaChamada);
+            
+            // Calcula média final
+            let mediaFinal = null;
+            if (mediaParcial !== null && mediaParcial !== undefined && aluno.final !== null && aluno.final !== undefined) {
+                mediaFinal = (mediaParcial + aluno.final) / 2.0;
+            }
+            
+            // Formata valores
+            const av1 = aluno.av1 !== null && aluno.av1 !== undefined ? aluno.av1.toFixed(2) : '—';
+            const av2 = aluno.av2 !== null && aluno.av2 !== undefined ? aluno.av2.toFixed(2) : '—';
+            const segundaChamada = aluno.segundaChamada !== null && aluno.segundaChamada !== undefined ? aluno.segundaChamada.toFixed(2) : '—';
+            const mediaParcialFormat = mediaParcial !== null && mediaParcial !== undefined ? mediaParcial.toFixed(2) : '—';
+            const provaFinal = aluno.final !== null && aluno.final !== undefined ? aluno.final.toFixed(2) : '—';
+            const mediaFinalFormat = mediaFinal !== null && mediaFinal !== undefined ? mediaFinal.toFixed(2) : '—';
+            const faltas = faltasMap.get(aluno.alunoId) || 0;
+            
             const tr = document.createElement('tr');
+            
+            // Determina classe CSS para média final
+            let mediaFinalClass = '';
+            if (mediaFinal !== null && mediaFinal !== undefined) {
+                if (mediaFinal >= 6) {
+                    mediaFinalClass = 'media-aprovado';
+                } else {
+                    mediaFinalClass = 'media-reprovado';
+                }
+            }
+            
             tr.innerHTML = `
                 <td>${aluno.nome}</td>
-                <td>${aluno.notaAv1 !== null ? aluno.notaAv1 : '—'}</td>
-                <td>${aluno.notaAv2 !== null ? aluno.notaAv2 : '—'}</td>
-                <td>${aluno.totalFaltas || 0}</td>
+                <td>${av1}</td>
+                <td>${av2}</td>
+                <td>${segundaChamada}</td>
+                <td>${mediaParcialFormat}</td>
+                <td>${provaFinal}</td>
+                <td class="${mediaFinalClass}">${mediaFinalFormat}</td>
+                <td>${faltas}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -72,6 +114,34 @@ async function carregarAlunos() {
         loadingElement.style.display = 'none';
         emptyState.style.display = 'block';
     }
+}
+
+/**
+ * Calcula a média parcial seguindo as regras:
+ * - Média = (Av1 + Av2) / 2
+ * - Se Av1 preenchida, Av2 não preenchida, e Segunda Chamada preenchida,
+ *   então Segunda Chamada substitui Av2
+ */
+function calcularMediaParcial(av1, av2, segundaChamada) {
+    let nota1 = av1;
+    let nota2 = av2;
+    
+    // Se Av1 está preenchida, Av2 não está, e Segunda Chamada está preenchida,
+    // então Segunda Chamada substitui Av2
+    if (av1 !== null && av1 !== undefined && (av2 === null || av2 === undefined) && segundaChamada !== null && segundaChamada !== undefined) {
+        nota2 = segundaChamada;
+    }
+    
+    // Calcula média
+    if (nota1 !== null && nota1 !== undefined && nota2 !== null && nota2 !== undefined) {
+        return (nota1 + nota2) / 2.0;
+    } else if (nota1 !== null && nota1 !== undefined) {
+        return nota1;
+    } else if (nota2 !== null && nota2 !== undefined) {
+        return nota2;
+    }
+    
+    return null;
 }
 
 function voltarParaDisciplinas() {

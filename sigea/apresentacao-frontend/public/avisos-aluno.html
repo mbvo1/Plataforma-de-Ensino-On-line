@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEA - Avisos</title>
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/pages/avisos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -60,7 +62,7 @@
                 <i class="fas fa-envelope header-icon"></i>
                 <span class="header-title">SIGEA</span>
             </div>
-            <div class="header-right">
+            <div class="header-right" onclick="window.location.href='perfil-aluno.html'" style="cursor: pointer;">
                 <i class="fas fa-user-circle"></i>
                 <span id="user-name">Aluno - Usuário</span>
             </div>
@@ -68,14 +70,23 @@
 
         <!-- Content Area -->
         <div class="content-area">
-            <h1 class="page-title">Avisos</h1>
-            
-            <div class="avisos-container" id="avisos-list">
-                <p class="loading">Carregando avisos...</p>
+            <!-- Cabeçalho da página -->
+            <div class="page-header">
+                <div class="header-left-content">
+                    <h1 class="page-title">Avisos</h1>
+                </div>
+            </div>
+
+            <!-- Lista de Avisos Não Lidos -->
+            <div class="avisos-container" id="avisos-container">
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>Nenhum aviso não lido.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="/js/avisos-aluno.js"></script>
+    <script src="js/avisos-aluno.js"></script>
 </body>
 </html>

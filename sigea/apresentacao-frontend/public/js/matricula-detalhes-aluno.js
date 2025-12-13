@@ -37,6 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
     
     loadUserInfo();
     initializeMenuToggle();
+    verificarPeriodoInscricao();
     carregarSalasDisponiveis();
 });
 
@@ -288,7 +289,7 @@ function atualizarGrade() {
 // Limpar toda a grade
 function limparGrade() {
     const dias = ['seg', 'ter', 'qua', 'qui', 'sex'];
-    const horarios = ['0815', '0915', '1045', '1145', '1330', '1430'];
+    const horarios = ['0815', '0915', '1030', '1130', '1330', '1430'];
     
     dias.forEach(dia => {
         horarios.forEach(horario => {
@@ -326,8 +327,8 @@ function preencherHorarioNaGrade(sala) {
     const horariosOrdenados = [
         { id: '0815', inicio: '08:15', fim: '09:15' },
         { id: '0915', inicio: '09:15', fim: '10:15' },
-        { id: '1045', inicio: '10:45', fim: '11:45' },
-        { id: '1145', inicio: '11:45', fim: '12:45' },
+        { id: '1030', inicio: '10:30', fim: '11:30' },
+        { id: '1130', inicio: '11:30', fim: '12:30' },
         { id: '1330', inicio: '13:30', fim: '14:30' },
         { id: '1430', inicio: '14:30', fim: '15:30' }
     ];
@@ -385,9 +386,77 @@ function preencherHorarioNaGrade(sala) {
 }
 
 // Realizar matrícula
+// Verificar se está no período de inscrição
+async function verificarPeriodoInscricao() {
+    try {
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        if (!response.ok) {
+            console.error('Erro ao verificar período de inscrição');
+            return;
+        }
+        
+        const periodo = await response.json();
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        if (periodo.dataInicioInscricao && periodo.dataFimInscricao) {
+            const inicioInscricao = new Date(periodo.dataInicioInscricao);
+            const fimInscricao = new Date(periodo.dataFimInscricao);
+            inicioInscricao.setHours(0, 0, 0, 0);
+            fimInscricao.setHours(23, 59, 59, 999);
+            
+            if (hoje < inicioInscricao || hoje > fimInscricao) {
+                const btnMatricular = document.getElementById('btnMatricular');
+                if (btnMatricular) {
+                    btnMatricular.disabled = true;
+                    btnMatricular.style.opacity = '0.5';
+                    btnMatricular.style.cursor = 'not-allowed';
+                    
+                    const mensagem = document.getElementById('mensagem');
+                    if (mensagem) {
+                        const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
+                        const dataFim = fimInscricao.toLocaleDateString('pt-BR');
+                        mensagem.textContent = `Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`;
+                        mensagem.style.color = '#e74c3c';
+                        mensagem.style.fontWeight = 'bold';
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao verificar período de inscrição:', error);
+    }
+}
+
 async function realizarMatricula() {
     const usuarioId = localStorage.getItem('usuarioId');
     const btnMatricular = document.getElementById('btnMatricular');
+    
+    // Verificar período de inscrição antes de processar
+    try {
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        if (response.ok) {
+            const periodo = await response.json();
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            if (periodo.dataInicioInscricao && periodo.dataFimInscricao) {
+                const inicioInscricao = new Date(periodo.dataInicioInscricao);
+                const fimInscricao = new Date(periodo.dataFimInscricao);
+                inicioInscricao.setHours(0, 0, 0, 0);
+                fimInscricao.setHours(23, 59, 59, 999);
+                
+                if (hoje < inicioInscricao || hoje > fimInscricao) {
+                    const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
+                    const dataFim = fimInscricao.toLocaleDateString('pt-BR');
+                    exibirMensagem(`Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`, 'erro');
+                    return;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao verificar período de inscrição:', error);
+    }
     
     btnMatricular.disabled = true;
     btnMatricular.textContent = 'Processando...';

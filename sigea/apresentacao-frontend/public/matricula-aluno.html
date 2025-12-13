@@ -49,9 +49,15 @@
             white-space: nowrap;
         }
         
-        .btn-matricular:hover {
+        .btn-matricular:hover:not(:disabled) {
             background-color: #333;
             color: #fff;
+        }
+        
+        .btn-matricular:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
         
         .disciplinas-container {
@@ -198,7 +204,7 @@
                 <i class="fas fa-envelope header-icon"></i>
                 <span class="header-title">SIGEA</span>
             </div>
-            <div class="header-right">
+            <div class="header-right" onclick="window.location.href='perfil-aluno.html'" style="cursor: pointer;">
                 <i class="fas fa-user-circle"></i>
                 <span id="userName">Aluno - Usuário</span>
             </div>

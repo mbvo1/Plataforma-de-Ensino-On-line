@@ -19,6 +19,8 @@ import dev.com.sigea.infraestrutura.persistencia.RespostaEntity;
 import dev.com.sigea.infraestrutura.persistencia.RespostaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.SalaJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.MatriculaJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,12 +48,17 @@ public class ForunsController {
     private final TopicoRepository topicoRepository;
     private final UsuarioJpaRepository usuarioJpaRepository;
     private final RespostaJpaRepository respostaJpaRepository;
+    private final SalaJpaRepository salaJpaRepository;
+    private final MatriculaJpaRepository matriculaJpaRepository;
     
     public ForunsController(TopicoRepository topicoRepository, SalaRepository salaRepository, 
-                           UsuarioJpaRepository usuarioJpaRepository, RespostaJpaRepository respostaJpaRepository) {
+                           UsuarioJpaRepository usuarioJpaRepository, RespostaJpaRepository respostaJpaRepository,
+                           SalaJpaRepository salaJpaRepository, MatriculaJpaRepository matriculaJpaRepository) {
         this.topicoRepository = topicoRepository;
         this.usuarioJpaRepository = usuarioJpaRepository;
         this.respostaJpaRepository = respostaJpaRepository;
+        this.salaJpaRepository = salaJpaRepository;
+        this.matriculaJpaRepository = matriculaJpaRepository;
         
         // Cria serviço real e adiciona observers
         ForumServiceReal realService = new ForumServiceReal(topicoRepository);
@@ -59,7 +66,7 @@ public class ForunsController {
         realService.adicionarObserver(new MarcadorLeituraObserver());
         
         // Envolve com Proxy para controle de acesso
-        this.forumService = new ForumServiceProxy(realService, salaRepository);
+        this.forumService = new ForumServiceProxy(realService, salaRepository, salaJpaRepository, matriculaJpaRepository);
     }
     
     /**
@@ -67,36 +74,47 @@ public class ForunsController {
      * Proxy verifica matrícula, Observer notifica dashboard
      */
     @PostMapping("/topicos")
-    public ResponseEntity<TopicoResponse> criarTopico(@RequestBody CriarTopicoRequest request) {
-        Topico topico = forumService.criarTopico(
-            request.getDisciplinaId(),
-            request.getAutorId(),
-            request.getTitulo(),
-            request.getConteudo(),
-            request.getArquivoPath()
-        );
-        
-        return ResponseEntity.ok(toTopicoResponse(topico));
+    public ResponseEntity<?> criarTopico(@RequestBody CriarTopicoRequest request) {
+        try {
+            Topico topico = forumService.criarTopico(
+                request.getDisciplinaId(),
+                request.getAutorId(),
+                request.getTitulo(),
+                request.getConteudo(),
+                request.getArquivoPath()
+            );
+            
+            return ResponseEntity.ok(toTopicoResponse(topico));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("erro", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("erro", "Erro ao criar tópico: " + e.getMessage()));
+        }
     }
     
     /**
      * GET /api/foruns/topicos?disciplinaId=X&usuarioId=Y - Listar tópicos
      */
     @GetMapping("/topicos")
-    public ResponseEntity<List<TopicoResponse>> listarTopicos(
+    public ResponseEntity<?> listarTopicos(
             @RequestParam String disciplinaId,
             @RequestParam String usuarioId) {
-        
-        DisciplinaId discId = new DisciplinaId(disciplinaId);
-        UsuarioId usrId = new UsuarioId(usuarioId);
-        
-        List<Topico> topicos = forumService.listarTopicos(discId, usrId);
-        
-        List<TopicoResponse> responses = topicos.stream()
-            .map(this::toTopicoResponse)
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(responses);
+        try {
+            DisciplinaId discId = new DisciplinaId(disciplinaId);
+            UsuarioId usrId = new UsuarioId(usuarioId);
+            
+            List<Topico> topicos = forumService.listarTopicos(discId, usrId);
+            
+            List<TopicoResponse> responses = topicos.stream()
+                .map(this::toTopicoResponse)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(responses);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("erro", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("erro", "Erro ao listar tópicos: " + e.getMessage()));
+        }
     }
     
     /**
@@ -258,6 +276,15 @@ public class ForunsController {
             }
         } catch (Exception e) {
             response.setNomeAutor("Usuário " + topico.getAutorId().valor());
+        }
+        
+        // Conta o número de respostas do tópico
+        try {
+            Long topicoIdLong = Long.parseLong(topico.getId().valor());
+            long totalRespostas = respostaJpaRepository.countByTopicoId(topicoIdLong);
+            response.setTotalRespostas((int) totalRespostas);
+        } catch (Exception e) {
+            response.setTotalRespostas(0);
         }
         
         return response;

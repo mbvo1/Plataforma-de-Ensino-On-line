@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import dev.com.sigea.infraestrutura.persistencia.DisciplinaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.SalaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.TopicoJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.MatriculaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.TopicoEntity;
 import dev.com.sigea.infraestrutura.persistencia.TurmaAlunoEntity;
 import dev.com.sigea.infraestrutura.persistencia.TurmaAlunoJpaRepository;
@@ -53,6 +54,7 @@ public class ProfessorController {
     private final TopicoJpaRepository topicoJpaRepository;
     private final TurmaAlunoJpaRepository turmaAlunoJpaRepository;
     private final EnvioAtividadeJpaRepository envioAtividadeJpaRepository;
+    private final MatriculaJpaRepository matriculaJpaRepository;
 
     public ProfessorController(TurmaJpaRepository turmaJpaRepository, 
                                UsuarioJpaRepository usuarioJpaRepository,
@@ -62,7 +64,8 @@ public class ProfessorController {
                                SalaJpaRepository salaJpaRepository,
                                TopicoJpaRepository topicoJpaRepository,
                                TurmaAlunoJpaRepository turmaAlunoJpaRepository,
-                               EnvioAtividadeJpaRepository envioAtividadeJpaRepository) {
+                               EnvioAtividadeJpaRepository envioAtividadeJpaRepository,
+                               MatriculaJpaRepository matriculaJpaRepository) {
         this.turmaJpaRepository = turmaJpaRepository;
         this.usuarioJpaRepository = usuarioJpaRepository;
         this.avisoTurmaJpaRepository = avisoTurmaJpaRepository;
@@ -72,6 +75,7 @@ public class ProfessorController {
         this.topicoJpaRepository = topicoJpaRepository;
         this.turmaAlunoJpaRepository = turmaAlunoJpaRepository;
         this.envioAtividadeJpaRepository = envioAtividadeJpaRepository;
+        this.matriculaJpaRepository = matriculaJpaRepository;
     }
 
     @Value("${file.upload-dir:uploads}")
@@ -549,14 +553,16 @@ public class ProfessorController {
                     String nome = discOpt.map(d -> d.getNome()).orElse("Disciplina " + did);
                     String codigo = discOpt.map(d -> d.getCodigo()).orElse(null);
 
+                    // Conta alunos matriculados na sala (apenas matrículas ATIVAS)
+                    long alunosMatriculados = matriculaJpaRepository.countBySalaIdAndStatus(s.getId(), "ATIVA");
+
                     java.util.Map<String,Object> m = new java.util.HashMap<>();
                     m.put("disciplinaId", did);
                     m.put("nome", nome);
                     m.put("codigo", codigo);
                     m.put("salaId", s.getId());
                     m.put("identificador", s.getIdentificador());
-                    // alunos matriculados not implemented; default to 0
-                    m.put("alunosMatriculados", 0L);
+                    m.put("alunosMatriculados", alunosMatriculados);
 
                     result.add(m);
                 }

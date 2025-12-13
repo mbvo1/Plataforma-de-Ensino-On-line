@@ -55,8 +55,15 @@ function initializeMenuToggle() {
 }
 
 async function carregarDesempenho() {
-    const container = document.getElementById('desempenho-content');
+    const loadingElement = document.getElementById('loading');
+    const desempenhoContent = document.getElementById('desempenho-content');
+    const emptyState = document.getElementById('empty-state');
+    const tbody = document.getElementById('desempenho-tbody');
     const usuarioId = localStorage.getItem('usuarioId');
+    
+    loadingElement.style.display = 'block';
+    desempenhoContent.style.display = 'none';
+    emptyState.style.display = 'none';
     
     try {
         const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/desempenho`);
@@ -67,31 +74,62 @@ async function carregarDesempenho() {
         
         const desempenho = await response.json();
         
+        loadingElement.style.display = 'none';
+        
         if (!desempenho || desempenho.length === 0) {
-            container.innerHTML = '<p class="empty-state">Nenhuma nota registrada ainda.</p>';
+            emptyState.style.display = 'block';
             return;
         }
         
-        let html = '<table class="desempenho-table"><thead><tr><th>Disciplina</th><th>AV1</th><th>AV2</th><th>Média</th><th>Situação</th></tr></thead><tbody>';
+        // Limpa tbody
+        tbody.innerHTML = '';
         
+        // Preenche a tabela
         desempenho.forEach(d => {
-            const media = ((d.av1 || 0) + (d.av2 || 0)) / 2;
-            const situacao = media >= 7 ? 'Aprovado' : media >= 4 ? 'Recuperação' : 'Reprovado';
-            html += `<tr>
-                <td>${d.disciplina}</td>
-                <td>${d.av1 !== null ? d.av1.toFixed(1) : '-'}</td>
-                <td>${d.av2 !== null ? d.av2.toFixed(1) : '-'}</td>
-                <td>${media.toFixed(1)}</td>
-                <td class="situacao-${situacao.toLowerCase()}">${situacao}</td>
-            </tr>`;
+            const tr = document.createElement('tr');
+            
+            // Formata valores
+            const av1 = d.av1 !== null && d.av1 !== undefined ? d.av1.toFixed(2) : '—';
+            const av2 = d.av2 !== null && d.av2 !== undefined ? d.av2.toFixed(2) : '—';
+            const segundaChamada = d.segundaChamada !== null && d.segundaChamada !== undefined ? d.segundaChamada.toFixed(2) : '—';
+            const mediaParcial = d.mediaParcial !== null && d.mediaParcial !== undefined ? d.mediaParcial.toFixed(2) : '—';
+            const provaFinal = d.provaFinal !== null && d.provaFinal !== undefined ? d.provaFinal.toFixed(2) : '—';
+            const mediaFinal = d.mediaFinal !== null && d.mediaFinal !== undefined ? d.mediaFinal.toFixed(2) : '—';
+            const faltas = d.faltas !== null && d.faltas !== undefined ? d.faltas : 0;
+            
+            // Determina classe CSS para média final (aprovado/reprovado)
+            let mediaFinalClass = '';
+            if (d.mediaFinal !== null && d.mediaFinal !== undefined) {
+                if (d.mediaFinal >= 6) {
+                    mediaFinalClass = 'media-aprovado';
+                } else {
+                    mediaFinalClass = 'media-reprovado';
+                }
+            }
+            
+            tr.innerHTML = `
+                <td>${d.disciplinaNome}</td>
+                <td>${av1}</td>
+                <td>${av2}</td>
+                <td>${segundaChamada}</td>
+                <td>${mediaParcial}</td>
+                <td>${provaFinal}</td>
+                <td class="${mediaFinalClass}">${mediaFinal}</td>
+                <td>${faltas}</td>
+            `;
+            tbody.appendChild(tr);
         });
         
-        html += '</tbody></table>';
-        container.innerHTML = html;
+        desempenhoContent.style.display = 'block';
         
     } catch (error) {
         console.error('Erro ao carregar desempenho:', error);
-        container.innerHTML = '<p class="empty-state">Nenhuma nota registrada ainda.</p>';
+        loadingElement.style.display = 'none';
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Erro ao carregar desempenho. Tente novamente.</p>
+        `;
     }
 }
 

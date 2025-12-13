@@ -35,6 +35,7 @@ window.addEventListener('DOMContentLoaded', () => {
     
     loadUserInfo();
     initializeMenuToggle();
+    verificarPeriodoInscricao();
     carregarMatriculas();
 });
 
@@ -86,12 +87,18 @@ function renderizarMatriculas() {
     const subtitulo = document.getElementById('subtitulo');
     
     if (matriculas.length === 0) {
-        subtitulo.textContent = 'Nenhuma disciplina matriculada';
+        // Só atualiza o subtítulo se não houver mensagem de período de inscrição
+        if (!subtitulo.textContent.includes('período de inscrição')) {
+            subtitulo.textContent = 'Nenhuma disciplina matriculada';
+        }
         container.innerHTML = '<p class="mensagem-vazia">Você ainda não está matriculado em nenhuma disciplina. Clique em "Matricular disciplina" para se matricular.</p>';
         return;
     }
     
-    subtitulo.textContent = '';
+    // Só limpa o subtítulo se não houver mensagem de período de inscrição
+    if (!subtitulo.textContent.includes('período de inscrição')) {
+        subtitulo.textContent = '';
+    }
     
     // Atualizar botão para "Editar Matrícula"
     const btnMatricula = document.querySelector('.btn-matricular');
@@ -184,8 +191,76 @@ async function cancelarMatricula(matriculaId) {
     }
 }
 
+// Verificar se está no período de inscrição
+async function verificarPeriodoInscricao() {
+    try {
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        if (!response.ok) {
+            console.error('Erro ao verificar período de inscrição');
+            return;
+        }
+        
+        const periodo = await response.json();
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        if (periodo.dataInicioInscricao && periodo.dataFimInscricao) {
+            const inicioInscricao = new Date(periodo.dataInicioInscricao);
+            const fimInscricao = new Date(periodo.dataFimInscricao);
+            inicioInscricao.setHours(0, 0, 0, 0);
+            fimInscricao.setHours(23, 59, 59, 999);
+            
+            if (hoje < inicioInscricao || hoje > fimInscricao) {
+                const btnMatricular = document.querySelector('.btn-matricular');
+                if (btnMatricular) {
+                    btnMatricular.disabled = true;
+                    btnMatricular.style.opacity = '0.5';
+                    btnMatricular.style.cursor = 'not-allowed';
+                    
+                    const subtitulo = document.getElementById('subtitulo');
+                    if (subtitulo) {
+                        const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
+                        const dataFim = fimInscricao.toLocaleDateString('pt-BR');
+                        subtitulo.textContent = `Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`;
+                        subtitulo.style.color = '#e74c3c';
+                        subtitulo.style.fontWeight = 'bold';
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao verificar período de inscrição:', error);
+    }
+}
+
 // Abrir página de matrícula
-function abrirMatricula() {
+async function abrirMatricula() {
+    // Verificar período de inscrição antes de redirecionar
+    try {
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        if (response.ok) {
+            const periodo = await response.json();
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            if (periodo.dataInicioInscricao && periodo.dataFimInscricao) {
+                const inicioInscricao = new Date(periodo.dataInicioInscricao);
+                const fimInscricao = new Date(periodo.dataFimInscricao);
+                inicioInscricao.setHours(0, 0, 0, 0);
+                fimInscricao.setHours(23, 59, 59, 999);
+                
+                if (hoje < inicioInscricao || hoje > fimInscricao) {
+                    const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
+                    const dataFim = fimInscricao.toLocaleDateString('pt-BR');
+                    alert(`Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`);
+                    return;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao verificar período de inscrição:', error);
+    }
+    
     // Salvar matrículas atuais para pré-preencher na página de edição
     localStorage.setItem('matriculasAtuais', JSON.stringify(matriculas));
     window.location.href = 'matricula-detalhes-aluno.html';

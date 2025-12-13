@@ -1,38 +1,16 @@
-// Função para limpar dados do usuário
-function limparDadosUsuario() {
-    localStorage.removeItem('usuarioId');
-    localStorage.removeItem('usuarioNome');
-    localStorage.removeItem('usuarioEmail');
-    localStorage.removeItem('usuarioPerfil');
-}
-
-// Verifica se o login é válido
-function isLoginValido() {
+// Verificação de autenticação
+window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
-    return usuarioId && 
-           usuarioPerfil && 
-           usuarioId !== 'null' && 
-           usuarioId !== 'undefined' && 
-           usuarioId.trim() !== '' &&
-           usuarioPerfil !== 'null' && 
-           usuarioPerfil !== 'undefined' &&
-           usuarioPerfil.trim() !== '' &&
-           usuarioPerfil === 'ALUNO';
-}
-
-// Verifica autenticação ao carregar a página
-window.addEventListener('DOMContentLoaded', () => {
-    if (!isLoginValido()) {
-        limparDadosUsuario();
+    if (!usuarioId || usuarioPerfil !== 'ALUNO') {
+        alert('Você precisa fazer login como ALUNO para acessar esta página.');
         window.location.href = '/index.html';
         return;
     }
-    
+
     loadUserInfo();
-    initializeMenuToggle();
-    carregarForum();
+    carregarDisciplinas();
 });
 
 function loadUserInfo() {
@@ -43,62 +21,124 @@ function loadUserInfo() {
     }
 }
 
-function initializeMenuToggle() {
+function handleLogout() {
+    if (confirm('Deseja realmente sair?')) {
+        localStorage.removeItem('usuarioId');
+        localStorage.removeItem('usuarioNome');
+        localStorage.removeItem('usuarioEmail');
+        localStorage.removeItem('usuarioPerfil');
+        window.location.href = '/index.html';
+    }
+}
+
+// Toggle da sidebar
+document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
         });
     }
-}
+});
 
-async function carregarForum() {
-    const container = document.getElementById('forum-content');
+async function carregarDisciplinas() {
+    const loadingElement = document.getElementById('loading');
+    const gridElement = document.getElementById('forum-grid');
+    const noForumsElement = document.getElementById('no-forums');
     const usuarioId = localStorage.getItem('usuarioId');
-    
+
+    console.log('Carregando disciplinas para aluno ID:', usuarioId);
+
     try {
-        // Primeiro busca as disciplinas do aluno
-        const discResponse = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/disciplinas`);
+        loadingElement.style.display = 'block';
+        gridElement.style.display = 'none';
+        noForumsElement.style.display = 'none';
+
+        // Busca as disciplinas do aluno através do endpoint de matrículas
+        const url = `http://localhost:8080/api/aluno/${usuarioId}/matriculas`;
+        console.log('Fazendo requisição para:', url);
         
-        if (!discResponse.ok) {
-            throw new Error('Erro ao carregar disciplinas');
+        const response = await fetch(url);
+        
+        console.log('Status da resposta:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Erro na resposta:', errorText);
+            throw new Error('Erro ao carregar disciplinas: ' + response.status);
         }
+
+        const matriculas = await response.json();
+        console.log('Matrículas recebidas:', matriculas);
         
-        const disciplinas = await discResponse.json();
-        
-        if (!disciplinas || disciplinas.length === 0) {
-            container.innerHTML = '<p class="empty-state">Você precisa estar matriculado em disciplinas para acessar o fórum.</p>';
+        loadingElement.style.display = 'none';
+
+        if (!matriculas || matriculas.length === 0) {
+            noForumsElement.style.display = 'block';
             return;
         }
-        
-        container.innerHTML = '<h2>Selecione uma disciplina:</h2>';
-        
-        const listaDisciplinas = document.createElement('ul');
-        listaDisciplinas.className = 'disciplinas-forum-list';
-        
-        disciplinas.forEach(disc => {
-            const li = document.createElement('li');
-            li.className = 'disciplina-forum-item';
-            li.innerHTML = `<i class="fas fa-book"></i> ${disc.nome}`;
-            li.onclick = () => {
-                window.location.href = `forum-disciplina-aluno.html?disciplinaId=${disc.id}&disciplinaNome=${encodeURIComponent(disc.nome)}`;
-            };
-            listaDisciplinas.appendChild(li);
+
+        // Agrupa disciplinas por ID (remove duplicatas) - o endpoint retorna matrículas com disciplinaId
+        const disciplinasUnicas = new Map();
+        matriculas.forEach(matricula => {
+            const disciplinaId = matricula.disciplinaId;
+            if (disciplinaId && !disciplinasUnicas.has(disciplinaId)) {
+                // Cria objeto disciplina a partir da matrícula
+                disciplinasUnicas.set(disciplinaId, {
+                    id: disciplinaId,
+                    nome: matricula.disciplinaNome || `Disciplina ${disciplinaId}`,
+                    professorNome: matricula.professorNome || 'Professor'
+                });
+            }
         });
-        
-        container.appendChild(listaDisciplinas);
-        
+
+        // Renderiza os cards das disciplinas únicas
+        gridElement.style.display = 'grid';
+        gridElement.innerHTML = '';
+
+        disciplinasUnicas.forEach(disc => {
+            const card = criarCardDisciplina(disc);
+            gridElement.appendChild(card);
+        });
+
     } catch (error) {
-        console.error('Erro ao carregar fórum:', error);
-        container.innerHTML = '<p class="empty-state">Você precisa estar matriculado em disciplinas para acessar o fórum.</p>';
+        console.error('Erro ao carregar disciplinas:', error);
+        loadingElement.style.display = 'none';
+        noForumsElement.style.display = 'block';
+        noForumsElement.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Erro ao carregar fóruns.</p>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Tente novamente mais tarde.</p>
+        `;
     }
 }
 
-function handleLogout() {
-    if (confirm('Deseja realmente sair?')) {
-        localStorage.clear();
-        window.location.href = '/';
-    }
+function criarCardDisciplina(disc) {
+    const card = document.createElement('div');
+    card.className = 'forum-card';
+    card.onclick = () => abrirForum(disc.id, disc.nome);
+
+    // Busca nome do professor da disciplina (se disponível)
+    const professorNome = disc.professorNome || 'Professor';
+
+    card.innerHTML = `
+        <div class="forum-card-title">${disc.nome || 'Disciplina ' + disc.id}</div>
+        <div class="forum-card-professor">
+            <i class="fas fa-user"></i>
+            <span>${professorNome}</span>
+        </div>
+    `;
+
+    return card;
+}
+
+function abrirForum(disciplinaId, disciplinaNome) {
+    // Salva informações da disciplina para usar na próxima página
+    localStorage.setItem('forumDisciplinaId', disciplinaId);
+    localStorage.setItem('forumDisciplinaNome', disciplinaNome);
+    
+    // Redireciona para página de detalhes do fórum
+    window.location.href = `forum-detalhes-aluno.html?disciplinaId=${disciplinaId}`;
 }

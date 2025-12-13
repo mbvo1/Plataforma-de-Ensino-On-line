@@ -97,25 +97,159 @@ async function carregarDadosDashboard() {
 }
 
 function atualizarDashboard(dados) {
+    // Atualizar datas próximas
+    atualizarDatasProximas(dados.eventosProximos || []);
+    
     // Atualizar avisos
     const avisosCard = document.getElementById('avisos-card');
     if (avisosCard) {
         if (dados.avisosNaoLidos > 0) {
-            avisosCard.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">Você tem ${dados.avisosNaoLidos} avisos não lidos</span>`;
+            avisosCard.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">Você tem ${dados.avisosNaoLidos} aviso${dados.avisosNaoLidos > 1 ? 's' : ''} não lido${dados.avisosNaoLidos > 1 ? 's' : ''}</span>`;
         } else {
             avisosCard.innerHTML = `<span style="color: #27ae60;">Nenhum aviso novo</span>`;
         }
     }
     
+    // Atualizar desempenho
+    atualizarDesempenho(dados.notasResumo || []);
+    
     // Atualizar frequência
     const frequenciaContent = document.getElementById('frequencia-content');
     if (frequenciaContent) {
+        const frequenciaFormatada = dados.frequenciaPercentual.toFixed(1);
         frequenciaContent.innerHTML = `
             <p class="freq-title">Total</p>
             <p><strong>Faltas:</strong> ${dados.totalFaltas}</p>
-            <p><strong>Frequência:</strong> ${dados.frequenciaPercentual.toFixed(0)}%</p>
+            <p><strong>Frequência:</strong> ${frequenciaFormatada}%</p>
         `;
     }
+}
+
+function atualizarDatasProximas(eventos) {
+    const datasCard = document.querySelector('.info-card:first-child');
+    if (!datasCard) return;
+    
+    const cardSubtitle = datasCard.querySelector('.card-subtitle');
+    const cardEmpty = datasCard.querySelector('.card-empty');
+    
+    if (!eventos || eventos.length === 0) {
+        if (cardSubtitle) cardSubtitle.textContent = 'Esta semana';
+        if (cardEmpty) {
+            cardEmpty.textContent = 'Sem atividades esta semana';
+            cardEmpty.style.display = 'block';
+        }
+        return;
+    }
+    
+    if (cardSubtitle) cardSubtitle.textContent = 'Próximos 7 dias';
+    if (cardEmpty) cardEmpty.style.display = 'none';
+    
+    // Criar lista de eventos
+    const eventosList = document.createElement('div');
+    eventosList.style.marginTop = '0.5rem';
+    eventosList.style.fontSize = '0.875rem';
+    
+    eventos.slice(0, 5).forEach(evento => { // Mostra no máximo 5 eventos
+        const eventoItem = document.createElement('div');
+        eventoItem.style.marginBottom = '0.5rem';
+        eventoItem.style.padding = '0.5rem';
+        eventoItem.style.background = '#f5f5f5';
+        eventoItem.style.borderRadius = '4px';
+        
+        let tipoLabel = '';
+        if (evento.tipo === 'ATIVIDADE_TURMA') {
+            tipoLabel = '📋 Atividade';
+        } else if (evento.tipo === 'EVENTO_PROFESSOR') {
+            tipoLabel = '📅 Evento';
+        } else {
+            tipoLabel = '📅 Evento';
+        }
+        
+        eventoItem.innerHTML = `
+            <div style="font-weight: 600; color: #333;">${tipoLabel}: ${evento.titulo}</div>
+            <div style="color: #666; font-size: 0.8rem; margin-top: 0.25rem;">
+                ${evento.disciplinaNome ? evento.disciplinaNome + ' - ' : ''}${evento.data}
+            </div>
+        `;
+        
+        eventosList.appendChild(eventoItem);
+    });
+    
+    if (eventos.length > 5) {
+        const maisEventos = document.createElement('div');
+        maisEventos.style.marginTop = '0.5rem';
+        maisEventos.style.color = '#666';
+        maisEventos.style.fontSize = '0.8rem';
+        maisEventos.textContent = `+${eventos.length - 5} mais evento${eventos.length - 5 > 1 ? 's' : ''}`;
+        eventosList.appendChild(maisEventos);
+    }
+    
+    // Remove elementos antigos e adiciona a nova lista
+    const existingList = datasCard.querySelector('.eventos-list');
+    if (existingList) existingList.remove();
+    eventosList.className = 'eventos-list';
+    datasCard.appendChild(eventosList);
+}
+
+function atualizarDesempenho(notasResumo) {
+    const desempenhoCard = document.querySelectorAll('.info-card')[2]; // Terceiro card
+    if (!desempenhoCard) return;
+    
+    const cardEmpty = desempenhoCard.querySelector('.card-empty');
+    
+    if (!notasResumo || notasResumo.length === 0) {
+        if (cardEmpty) {
+            cardEmpty.textContent = 'Sem notas atribuídas';
+            cardEmpty.style.display = 'block';
+        }
+        return;
+    }
+    
+    if (cardEmpty) cardEmpty.style.display = 'none';
+    
+    // Criar lista de notas
+    const notasList = document.createElement('div');
+    notasList.style.marginTop = '0.5rem';
+    notasList.style.fontSize = '0.875rem';
+    
+    notasResumo.slice(0, 3).forEach(nota => { // Mostra no máximo 3 disciplinas
+        const notaItem = document.createElement('div');
+        notaItem.style.marginBottom = '0.5rem';
+        notaItem.style.padding = '0.5rem';
+        notaItem.style.background = '#f5f5f5';
+        notaItem.style.borderRadius = '4px';
+        
+        let notasTexto = '';
+        if (nota.av1 != null && nota.av2 != null) {
+            notasTexto = `AV1: ${nota.av1.toFixed(1)} | AV2: ${nota.av2.toFixed(1)} | Média: ${nota.mediaParcial.toFixed(1)}`;
+        } else if (nota.av1 != null) {
+            notasTexto = `AV1: ${nota.av1.toFixed(1)}`;
+        } else if (nota.av2 != null) {
+            notasTexto = `AV2: ${nota.av2.toFixed(1)}`;
+        }
+        
+        notaItem.innerHTML = `
+            <div style="font-weight: 600; color: #333;">${nota.disciplinaNome}</div>
+            <div style="color: #666; font-size: 0.8rem; margin-top: 0.25rem;">${notasTexto}</div>
+        `;
+        
+        notasList.appendChild(notaItem);
+    });
+    
+    if (notasResumo.length > 3) {
+        const maisNotas = document.createElement('div');
+        maisNotas.style.marginTop = '0.5rem';
+        maisNotas.style.color = '#666';
+        maisNotas.style.fontSize = '0.8rem';
+        maisNotas.textContent = `+${notasResumo.length - 3} mais disciplina${notasResumo.length - 3 > 1 ? 's' : ''}`;
+        notasList.appendChild(maisNotas);
+    }
+    
+    // Remove elementos antigos e adiciona a nova lista
+    const existingList = desempenhoCard.querySelector('.notas-list');
+    if (existingList) existingList.remove();
+    notasList.className = 'notas-list';
+    desempenhoCard.appendChild(notasList);
 }
 
 function handleLogout() {

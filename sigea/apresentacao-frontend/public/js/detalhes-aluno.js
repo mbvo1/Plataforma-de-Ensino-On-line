@@ -114,7 +114,19 @@ function exibirHistoricoDisciplinas(historico) {
     }
     
     const html = historico.map(item => {
-        const statusClass = item.status.toLowerCase().replace(' ', '-');
+        // Normaliza o nome da classe CSS (remove espaços e converte para minúsculas)
+        let statusClass = item.status.toLowerCase().replace(/\s+/g, '-');
+        
+        // Garante que os status conhecidos tenham as classes corretas
+        if (item.status === 'Aprovado') {
+            statusClass = 'aprovado';
+        } else if (item.status === 'Reprovado') {
+            statusClass = 'reprovado';
+        } else if (item.status === 'Cursando') {
+            statusClass = 'cursando';
+        } else if (item.status === 'Cancelada') {
+            statusClass = 'cancelada';
+        }
         
         return `
             <tr>

@@ -7,9 +7,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
-    if (!usuarioId || usuarioPerfil !== 'PROFESSOR') {
-        alert('Você precisa fazer login como PROFESSOR para acessar esta página.');
-        window.location.href = '/login-professor.html';
+    if (!usuarioId || usuarioPerfil !== 'ALUNO') {
+        alert('Você precisa fazer login como ALUNO para acessar esta página.');
+        window.location.href = '/index.html';
         return;
     }
 
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (!topicoId) {
         alert('Tópico não especificado.');
-        window.location.href = '/forum-professor.html';
+        window.location.href = '/forum-aluno.html';
         return;
     }
 
@@ -33,7 +33,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
     }
 }
 
@@ -43,15 +43,17 @@ function handleLogout() {
         localStorage.removeItem('usuarioNome');
         localStorage.removeItem('usuarioEmail');
         localStorage.removeItem('usuarioPerfil');
-        window.location.href = '/login-professor.html';
+        localStorage.removeItem('forumDisciplinaId');
+        localStorage.removeItem('forumDisciplinaNome');
+        window.location.href = '/index.html';
     }
 }
 
 function voltarParaForum() {
     if (disciplinaId) {
-        window.location.href = `/forum-detalhes-professor.html?disciplinaId=${disciplinaId}`;
+        window.location.href = `/forum-detalhes-aluno.html?disciplinaId=${disciplinaId}`;
     } else {
-        window.location.href = '/forum-professor.html';
+        window.location.href = '/forum-aluno.html';
     }
 }
 
@@ -264,3 +266,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+

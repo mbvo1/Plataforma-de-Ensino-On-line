@@ -12,6 +12,8 @@ import dev.com.sigea.infraestrutura.persistencia.AvisoEntity;
 import dev.com.sigea.infraestrutura.persistencia.AvisoJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.AvisoLeituraEntity;
 import dev.com.sigea.infraestrutura.persistencia.AvisoLeituraJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
+import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +38,14 @@ public class AvisosController {
     private final Map<String, String> escoposArmazenados = new HashMap<>();
     private final AvisoJpaRepository avisoJpaRepository;
     private final AvisoLeituraJpaRepository leituraJpaRepository;
+    private final UsuarioJpaRepository usuarioJpaRepository;
     
     public AvisosController(AvisoJpaRepository avisoJpaRepository, 
-                           AvisoLeituraJpaRepository leituraJpaRepository) {
+                           AvisoLeituraJpaRepository leituraJpaRepository,
+                           UsuarioJpaRepository usuarioJpaRepository) {
         this.avisoJpaRepository = avisoJpaRepository;
         this.leituraJpaRepository = leituraJpaRepository;
+        this.usuarioJpaRepository = usuarioJpaRepository;
         // Registra observers
         observers.add(new DashboardAlunoObserver());
         observers.add(new DashboardProfessorObserver());
@@ -238,13 +243,37 @@ public class AvisosController {
         // Busca IDs dos avisos já lidos pelo usuário
         List<Long> avisosLidos = leituraJpaRepository.findAvisosLidosByUsuarioId(usuarioIdLong);
         
-        // Busca todos os avisos e filtra os não lidos
+        // Busca perfil do usuário para filtrar por escopo
+        String perfilUsuario = "ADMIN"; // Default
+        Optional<UsuarioEntity> usuarioOpt = usuarioJpaRepository.findById(usuarioIdLong);
+        if (usuarioOpt.isPresent()) {
+            perfilUsuario = usuarioOpt.get().getPerfil();
+        }
+        
+        // Busca todos os avisos e filtra os não lidos e por escopo
         List<AvisoResponse> naoLidos = new ArrayList<>();
+        
+        // Torna perfilUsuario final para uso em lambda
+        final String perfilFinal = perfilUsuario;
         
         List<AvisoEntity> entities = avisoJpaRepository.findAll();
         entities.forEach(entity -> {
-            // Só adiciona se NÃO foi lido
-            if (!avisosLidos.contains(entity.getId())) {
+            // Verifica se o aviso é visível para o perfil do usuário
+            String alvoTipo = entity.getAlvoTipo() != null ? entity.getAlvoTipo().toUpperCase() : "GERAL";
+            boolean visivel = false;
+            
+            if ("GERAL".equals(alvoTipo) || "TODOS".equals(alvoTipo)) {
+                visivel = true; // Avisos gerais são visíveis para todos
+            } else if ("ALUNOS".equals(alvoTipo) && "ALUNO".equals(perfilFinal)) {
+                visivel = true; // Avisos para alunos são visíveis apenas para alunos
+            } else if ("PROFESSORES".equals(alvoTipo) && "PROFESSOR".equals(perfilFinal)) {
+                visivel = true; // Avisos para professores são visíveis apenas para professores
+            } else if ("ADMIN".equals(perfilFinal)) {
+                visivel = true; // Admin vê todos os avisos
+            }
+            
+            // Só adiciona se NÃO foi lido E é visível para o perfil
+            if (!avisosLidos.contains(entity.getId()) && visivel) {
                 AvisoResponse resp = new AvisoResponse();
                 resp.setId(String.valueOf(entity.getId()));
                 resp.setTitulo(entity.getTitulo());

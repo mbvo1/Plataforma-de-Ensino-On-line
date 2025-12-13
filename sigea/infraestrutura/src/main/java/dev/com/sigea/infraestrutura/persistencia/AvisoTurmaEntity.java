@@ -24,6 +24,9 @@ public class AvisoTurmaEntity {
     @Column(name = "arquivo_path")
     private String arquivoPath;
     
+    @Column(name = "arquivo_conteudo", columnDefinition = "LONGTEXT")
+    private String arquivoConteudo;
+    
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
     
@@ -79,6 +82,14 @@ public class AvisoTurmaEntity {
     
     public void setArquivoPath(String arquivoPath) {
         this.arquivoPath = arquivoPath;
+    }
+    
+    public String getArquivoConteudo() {
+        return arquivoConteudo;
+    }
+    
+    public void setArquivoConteudo(String arquivoConteudo) {
+        this.arquivoConteudo = arquivoConteudo;
     }
     
     public LocalDateTime getDataCriacao() {

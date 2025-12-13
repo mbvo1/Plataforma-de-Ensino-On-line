@@ -24,6 +24,56 @@
             word-break: break-word;
             overflow-wrap: break-word;
         }
+        
+        /* Estilos para links de download de arquivo */
+        .arquivo-download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #f0f4f8;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            color: #0969da;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+        
+        .arquivo-download-link:hover {
+            background-color: #e1e7ed;
+            border-color: #0969da;
+            text-decoration: underline;
+        }
+        
+        .arquivo-download-link i {
+            color: #0969da;
+        }
+        
+        .arquivo-sem-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .atividade-prazo {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #d35400;
+            font-size: 0.9rem;
+        }
+        
+        .atividade-card {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>

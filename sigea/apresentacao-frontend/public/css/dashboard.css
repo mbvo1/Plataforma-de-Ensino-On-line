@@ -1453,18 +1453,17 @@ body {
 
 .btn-criar-sala,
 .btn-entrar-sala {
-    flex: 1;
-    padding: 16px 24px;
-    font-size: 1.1rem;
+    padding: 10px 20px;
+    font-size: 0.95rem;
     font-weight: 600;
     border: none;
-    border-radius: 12px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -1522,6 +1521,16 @@ body {
 .empty-state-salas p {
     font-size: 1.2rem;
     font-weight: 500;
+}
+
+/* Estado vazio sem borda */
+.empty-state-no-border {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
 }
 
 /* Modal Criar Sala */

@@ -56,12 +56,22 @@ async function handleLogin(event) {
         
         const data = await response.json();
         
+        // Debug - ver o que o backend está retornando
+        console.log('DEBUG Login - Resposta do backend:', data);
+        
         if (response.ok) {
             // Salva dados do usuário no localStorage
             localStorage.setItem('usuarioId', data.usuarioId);
             localStorage.setItem('usuarioNome', data.nome);
             localStorage.setItem('usuarioEmail', data.email);
             localStorage.setItem('usuarioPerfil', data.perfil);
+            
+            console.log('DEBUG Login - Dados salvos no localStorage:', {
+                usuarioId: data.usuarioId,
+                usuarioNome: data.nome,
+                usuarioEmail: data.email,
+                usuarioPerfil: data.perfil
+            });
             
             window.location.href = '/dashboard-aluno.html';
         } else {
@@ -153,8 +163,48 @@ function showSuccess(elementId, message) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Verifica se já está logado e redireciona para o dashboard correto
     const usuarioId = localStorage.getItem('usuarioId');
-    if (usuarioId) {
-        window.location.href = '/dashboard-aluno.html';
+    const usuarioPerfil = localStorage.getItem('usuarioPerfil');
+    
+    // Verifica se os dados são válidos (não nulos, não undefined, não vazios)
+    const isValidLogin = usuarioId && 
+                         usuarioPerfil && 
+                         usuarioId !== 'null' && 
+                         usuarioId !== 'undefined' && 
+                         usuarioId.trim() !== '' &&
+                         usuarioPerfil !== 'null' && 
+                         usuarioPerfil !== 'undefined' &&
+                         usuarioPerfil.trim() !== '';
+    
+    if (isValidLogin) {
+        // Redireciona baseado no perfil do usuário
+        if (usuarioPerfil === 'ALUNO') {
+            window.location.href = '/dashboard-aluno.html';
+        } else if (usuarioPerfil === 'PROFESSOR') {
+            window.location.href = '/dashboard-professor.html';
+        } else if (usuarioPerfil === 'ADMINISTRADOR') {
+            window.location.href = '/dashboard-admin.html';
+        } else {
+            // Perfil inválido - limpa tudo
+            limparDadosUsuario();
+        }
+    } else {
+        // Dados inválidos - limpa tudo para garantir
+        limparDadosUsuario();
     }
 });
+
+// Função para limpar dados do usuário do localStorage
+function limparDadosUsuario() {
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('usuarioNome');
+    localStorage.removeItem('usuarioEmail');
+    localStorage.removeItem('usuarioPerfil');
+}
+
+// Função de logout que pode ser chamada de qualquer página
+function logout() {
+    limparDadosUsuario();
+    window.location.href = '/index.html';
+}

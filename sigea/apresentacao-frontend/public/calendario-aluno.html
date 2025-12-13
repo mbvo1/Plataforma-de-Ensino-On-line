@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGEA - Dashboard do Aluno</title>
+    <title>SIGEA - Calendário Acadêmico</title>
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -17,7 +17,7 @@
         </div>
         
         <nav class="sidebar-menu">
-            <a href="dashboard-aluno.html" class="menu-item active">
+            <a href="dashboard-aluno.html" class="menu-item">
                 <i class="fas fa-th-large"></i>
                 <span class="menu-text">Painel</span>
             </a>
@@ -29,7 +29,7 @@
                 <i class="fas fa-chart-line"></i>
                 <span class="menu-text">Desempenho</span>
             </a>
-            <a href="calendario-aluno.html" class="menu-item">
+            <a href="calendario-aluno.html" class="menu-item active">
                 <i class="fas fa-calendar-alt"></i>
                 <span class="menu-text">Calendário</span>
             </a>
@@ -68,37 +68,14 @@
 
         <!-- Content Area -->
         <div class="content-area">
-            <h1 class="welcome-title">Bem-vindo, "<span id="welcome-name">Usuário</span>" !</h1>
+            <h1 class="page-title">Calendário Acadêmico</h1>
             
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>Datas próximas</h3>
-                    <p class="card-subtitle">Esta semana</p>
-                    <p class="card-empty">Sem atividades esta semana</p>
-                </div>
-
-                <div class="info-card">
-                    <h3>Avisos</h3>
-                    <p class="card-content" id="avisos-card">Carregando...</p>
-                </div>
-
-                <div class="info-card">
-                    <h3>Desempenho</h3>
-                    <p class="card-empty">Sem notas atribuídas</p>
-                </div>
-
-                <div class="info-card">
-                    <h3>Frequência</h3>
-                    <div class="frequencia-content" id="frequencia-content">
-                        <p class="freq-title">Total</p>
-                        <p><strong>Faltas:</strong> 0</p>
-                        <p><strong>Frequência:</strong> 100%</p>
-                    </div>
-                </div>
+            <div class="calendario-container" id="calendario-content">
+                <p class="loading">Carregando calendário...</p>
             </div>
         </div>
     </div>
 
-    <script src="/js/dashboard-aluno.js?v=20251212"></script>
+    <script src="/js/calendario-aluno.js"></script>
 </body>
 </html>

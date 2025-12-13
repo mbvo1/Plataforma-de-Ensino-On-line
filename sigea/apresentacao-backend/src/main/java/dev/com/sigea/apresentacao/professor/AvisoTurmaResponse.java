@@ -6,17 +6,19 @@ public class AvisoTurmaResponse {
     private String professorNome;
     private String mensagem;
     private String arquivoPath;
+    private String arquivoUrl;
     private String dataPostagem;
     
     public AvisoTurmaResponse() {
     }
     
     public AvisoTurmaResponse(Long avisoId, String professorNome, String mensagem, 
-                              String arquivoPath, String dataPostagem) {
+                              String arquivoPath, String arquivoUrl, String dataPostagem) {
         this.avisoId = avisoId;
         this.professorNome = professorNome;
         this.mensagem = mensagem;
         this.arquivoPath = arquivoPath;
+        this.arquivoUrl = arquivoUrl;
         this.dataPostagem = dataPostagem;
     }
     
@@ -51,6 +53,14 @@ public class AvisoTurmaResponse {
     
     public void setArquivoPath(String arquivoPath) {
         this.arquivoPath = arquivoPath;
+    }
+    
+    public String getArquivoUrl() {
+        return arquivoUrl;
+    }
+    
+    public void setArquivoUrl(String arquivoUrl) {
+        this.arquivoUrl = arquivoUrl;
     }
     
     public String getDataPostagem() {

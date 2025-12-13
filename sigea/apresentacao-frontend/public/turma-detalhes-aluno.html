@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turma - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aviso-body p,
+        .atividade-descricao {
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-height: 40vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .aviso-arquivo, .arquivo-info, .btn-link {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* Estilos para links de arquivo do aluno */
+        .arquivo-link-aluno {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: #f0f4f8;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            color: #0969da;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .arquivo-link-aluno:hover {
+            background-color: #e1e7ed;
+            border-color: #0969da;
+            text-decoration: underline;
+        }
+        
+        .arquivo-link-aluno i {
+            color: #0969da;
+        }
+        
+        .arquivo-sem-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            color: #666;
+        }
+        
+        .atividade-card-aluno {
+            transition: all 0.2s ease;
+        }
+        
+        .atividade-card-aluno:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .atividade-prazo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #d73a49;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="dashboard-aluno.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-aluno.html" class="menu-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="desempenho-aluno.html" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Desempenho</span>
+            </a>
+            <a href="calendario-aluno.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-aluno.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="forum-aluno.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="matricula-aluno.html" class="menu-item">
+                <i class="fas fa-id-card"></i>
+                <span class="menu-text">Matrícula</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Aluno - Usuário</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Nome da Turma Centralizado -->
+            <div class="turma-header">
+                <h1 id="turmaNome">Carregando...</h1>
+            </div>
+
+            <!-- Container com Ações -->
+            <div class="turma-container">
+                <!-- Botão Voltar (Esquerda) -->
+                <div class="turma-codigo-wrapper">
+                    <div class="back-button-container">
+                        <a href="turmas-aluno.html" class="btn-back">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Área de Conteúdo (Centro) -->
+                <div class="turma-acoes">
+                    <!-- Lista de Atividades -->
+                    <div class="atividades-list" id="atividadesList"></div>
+                    
+                    <!-- Lista de Avisos -->
+                    <div class="avisos-list" id="avisosList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes Atividade -->
+    <div class="modal-overlay" id="modalDetalhesAtividade" style="display: none;">
+        <div class="modal-detalhes-atividade" style="max-width:900px; width:100%;">
+            <div class="modal-header-edit" style="justify-content:center;">
+                <h2 id="detalhesTitulo" style="text-align:center;">Atividade</h2>
+                <button class="btn-close-modal" id="btnFecharModalDetalhes" style="position:absolute; right:16px; top:12px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-edit" style="display:flex; gap:20px; align-items:flex-start;">
+                <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">
+                        <div id="detalhesProfessorTurma">Professor • Turma</div>
+                        <div id="detalhesDataPostagem">dd/mm/yyyy hh:mm</div>
+                    </div>
+
+                    <h3 style="margin-top:0; margin-bottom:8px; text-align:center;" id="detalhesTituloCentro"></h3>
+
+                    <div style="border-top:1px solid #ddd; padding-top:12px; margin-bottom:12px;">
+                        <strong>Descrição:</strong>
+                        <p id="detalhesDescricao" style="white-space:pre-wrap;"></p>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <a id="detalhesArquivoLink" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:inherit;">
+                            <i class="fas fa-paperclip"></i>
+                            <span id="detalhesArquivoNome">Arquivo anexado</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div style="width:180px;">
+                    <div style="margin-top:12px; font-size:12px; color:var(--text-secondary);">Prazo</div>
+                    <div id="detalhesPrazo" style="font-weight:bold;">--</div>
+                </div>
+            </div>
+            <div class="modal-footer-edit" style="margin-top:12px; display:flex; justify-content:flex-end;">
+                <button class="btn-cancelar-edit" id="btnFecharModalDetalhesFooter" type="button">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/turma-detalhes-aluno.js"></script>
+</body>
+</html>

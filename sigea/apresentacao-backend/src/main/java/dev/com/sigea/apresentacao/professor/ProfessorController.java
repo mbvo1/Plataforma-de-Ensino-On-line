@@ -31,6 +31,13 @@ import dev.com.sigea.infraestrutura.persistencia.DisciplinaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.SalaJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.TopicoJpaRepository;
 import dev.com.sigea.infraestrutura.persistencia.TopicoEntity;
+import dev.com.sigea.infraestrutura.persistencia.TurmaAlunoEntity;
+import dev.com.sigea.infraestrutura.persistencia.TurmaAlunoJpaRepository;
+import dev.com.sigea.infraestrutura.persistencia.EnvioAtividadeEntity;
+import dev.com.sigea.infraestrutura.persistencia.EnvioAtividadeJpaRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/professor")
@@ -44,6 +51,8 @@ public class ProfessorController {
     private final DisciplinaJpaRepository disciplinaJpaRepository;
     private final SalaJpaRepository salaJpaRepository;
     private final TopicoJpaRepository topicoJpaRepository;
+    private final TurmaAlunoJpaRepository turmaAlunoJpaRepository;
+    private final EnvioAtividadeJpaRepository envioAtividadeJpaRepository;
 
     public ProfessorController(TurmaJpaRepository turmaJpaRepository, 
                                UsuarioJpaRepository usuarioJpaRepository,
@@ -51,7 +60,9 @@ public class ProfessorController {
                                AtividadeTurmaJpaRepository atividadeTurmaJpaRepository,
                                DisciplinaJpaRepository disciplinaJpaRepository,
                                SalaJpaRepository salaJpaRepository,
-                               TopicoJpaRepository topicoJpaRepository) {
+                               TopicoJpaRepository topicoJpaRepository,
+                               TurmaAlunoJpaRepository turmaAlunoJpaRepository,
+                               EnvioAtividadeJpaRepository envioAtividadeJpaRepository) {
         this.turmaJpaRepository = turmaJpaRepository;
         this.usuarioJpaRepository = usuarioJpaRepository;
         this.avisoTurmaJpaRepository = avisoTurmaJpaRepository;
@@ -59,6 +70,8 @@ public class ProfessorController {
         this.disciplinaJpaRepository = disciplinaJpaRepository;
         this.salaJpaRepository = salaJpaRepository;
         this.topicoJpaRepository = topicoJpaRepository;
+        this.turmaAlunoJpaRepository = turmaAlunoJpaRepository;
+        this.envioAtividadeJpaRepository = envioAtividadeJpaRepository;
     }
 
     @Value("${file.upload-dir:uploads}")
@@ -94,6 +107,8 @@ public class ProfessorController {
             } else {
                 atividade.setPrazo(null);
             }
+            // Salva o conteúdo do arquivo em base64
+            atividade.setArquivoConteudo(request.getArquivoConteudo());
 
             AtividadeTurmaEntity salva = atividadeTurmaJpaRepository.save(atividade);
 
@@ -435,6 +450,7 @@ public class ProfessorController {
                 request.getMensagem(),
                 request.getArquivoPath()
             );
+            aviso.setArquivoConteudo(request.getArquivoConteudo());
             
             AvisoTurmaEntity avisoSalvo = avisoTurmaJpaRepository.save(aviso);
             
@@ -451,6 +467,7 @@ public class ProfessorController {
                 nomeProfessor,
                 avisoSalvo.getMensagem(),
                 avisoSalvo.getArquivoPath(),
+                avisoSalvo.getArquivoConteudo(),
                 dataFormatada
             );
             
@@ -487,11 +504,15 @@ public class ProfessorController {
                     String nomeProfessor = professor != null ? professor.getNome() : "Professor";
                     String dataFormatada = aviso.getDataCriacao().format(formatter);
                     
+                    // Retorna arquivoConteudo como arquivoUrl se disponível
+                    String arquivoUrl = aviso.getArquivoConteudo();
+                    
                     return new AvisoTurmaResponse(
                         aviso.getId(),
                         nomeProfessor,
                         aviso.getMensagem(),
                         aviso.getArquivoPath(),
+                        arquivoUrl,
                         dataFormatada
                     );
                 })
@@ -596,6 +617,7 @@ public class ProfessorController {
                 nomeProfessor,
                 avisoAtualizado.getMensagem(),
                 avisoAtualizado.getArquivoPath(),
+                avisoAtualizado.getArquivoConteudo(),
                 dataFormatada
             );
             
@@ -781,6 +803,220 @@ public class ProfessorController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Erro ao buscar mensagens: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * GET /api/professor/atividades/{atividadeId}/envios
+     * Lista todos os alunos da turma com status de envio da atividade
+     */
+    @GetMapping("/atividades/{atividadeId}/envios")
+    public ResponseEntity<?> listarEnviosAtividade(@PathVariable Long atividadeId) {
+        try {
+            // Busca a atividade
+            Optional<AtividadeTurmaEntity> atividadeOpt = atividadeTurmaJpaRepository.findById(atividadeId);
+            if (atividadeOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Atividade não encontrada"));
+            }
+            
+            AtividadeTurmaEntity atividade = atividadeOpt.get();
+            Long turmaId = atividade.getTurmaId();
+            
+            // Busca todos os alunos da turma
+            List<TurmaAlunoEntity> alunosTurma = turmaAlunoJpaRepository.findByTurmaId(turmaId);
+            
+            // Busca todos os envios da atividade
+            List<EnvioAtividadeEntity> envios = envioAtividadeJpaRepository.findByAtividadeId(atividadeId);
+            
+            // Mapa de alunoId -> envio para facilitar lookup
+            Map<Long, EnvioAtividadeEntity> enviosPorAluno = envios.stream()
+                .collect(Collectors.toMap(EnvioAtividadeEntity::getAlunoId, e -> e, (e1, e2) -> e1));
+            
+            // Monta a lista de respostas
+            List<Map<String, Object>> resultado = new ArrayList<>();
+            int entregues = 0;
+            int pendentes = 0;
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            
+            for (TurmaAlunoEntity alunoTurma : alunosTurma) {
+                Long alunoId = alunoTurma.getAlunoId();
+                
+                // Busca nome do aluno
+                String nomeAluno = usuarioJpaRepository.findById(alunoId)
+                    .map(UsuarioEntity::getNome)
+                    .orElse("Aluno " + alunoId);
+                
+                EnvioAtividadeEntity envio = enviosPorAluno.get(alunoId);
+                
+                Map<String, Object> alunoInfo = new java.util.HashMap<>();
+                alunoInfo.put("alunoId", alunoId);
+                alunoInfo.put("nomeAluno", nomeAluno);
+                
+                if (envio != null) {
+                    alunoInfo.put("status", "Entregue");
+                    alunoInfo.put("arquivoPath", envio.getArquivoPath());
+                    alunoInfo.put("arquivoConteudo", envio.getArquivoConteudo());
+                    alunoInfo.put("dataEnvio", envio.getDataEnvio() != null ? envio.getDataEnvio().format(formatter) : "");
+                    alunoInfo.put("nota", envio.getNota());
+                    alunoInfo.put("envioId", envio.getId());
+                    alunoInfo.put("statusEnvio", envio.getStatus());
+                    entregues++;
+                } else {
+                    alunoInfo.put("status", "Pendente");
+                    alunoInfo.put("arquivoPath", null);
+                    alunoInfo.put("arquivoConteudo", null);
+                    alunoInfo.put("dataEnvio", null);
+                    alunoInfo.put("nota", null);
+                    alunoInfo.put("envioId", null);
+                    alunoInfo.put("statusEnvio", null);
+                    pendentes++;
+                }
+                
+                resultado.add(alunoInfo);
+            }
+            
+            // Ordena por nome do aluno
+            resultado.sort((a, b) -> {
+                String nomeA = (String) a.get("nomeAluno");
+                String nomeB = (String) b.get("nomeAluno");
+                return nomeA.compareToIgnoreCase(nomeB);
+            });
+            
+            // Monta resposta final
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("atividadeId", atividadeId);
+            response.put("turmaId", turmaId);
+            response.put("entregues", entregues);
+            response.put("pendentes", pendentes);
+            response.put("alunos", resultado);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao buscar envios: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * PUT /api/professor/atividades/{atividadeId}/envios/{envioId}/nota
+     * Atribui nota a um envio de atividade
+     */
+    @PutMapping("/atividades/{atividadeId}/envios/{envioId}/nota")
+    public ResponseEntity<?> atribuirNota(
+            @PathVariable Long atividadeId,
+            @PathVariable Long envioId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            // Busca o envio
+            Optional<EnvioAtividadeEntity> envioOpt = envioAtividadeJpaRepository.findById(envioId);
+            if (envioOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Envio não encontrado"));
+            }
+            
+            EnvioAtividadeEntity envio = envioOpt.get();
+            
+            // Verifica se o envio é da atividade correta
+            if (!envio.getAtividadeId().equals(atividadeId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Envio não pertence a esta atividade"));
+            }
+            
+            // Atualiza a nota
+            Object notaObj = request.get("nota");
+            Double nota = null;
+            if (notaObj != null) {
+                if (notaObj instanceof Number) {
+                    nota = ((Number) notaObj).doubleValue();
+                } else if (notaObj instanceof String && !((String) notaObj).isEmpty()) {
+                    nota = Double.parseDouble((String) notaObj);
+                }
+            }
+            
+            envio.setNota(nota);
+            envio.setStatus("CORRIGIDO");
+            
+            // Atualiza feedback se fornecido
+            Object feedbackObj = request.get("feedback");
+            if (feedbackObj != null && feedbackObj instanceof String) {
+                envio.setFeedbackProfessor((String) feedbackObj);
+            }
+            
+            envioAtividadeJpaRepository.save(envio);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Nota atribuída com sucesso",
+                "envioId", envioId,
+                "nota", nota != null ? nota : "",
+                "status", envio.getStatus()
+            ));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao atribuir nota: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/professor/atividades/{atividadeId}/envios/salvar-notas
+     * Salva múltiplas notas de uma vez
+     */
+    @PostMapping("/atividades/{atividadeId}/envios/salvar-notas")
+    public ResponseEntity<?> salvarNotas(
+            @PathVariable Long atividadeId,
+            @RequestBody List<Map<String, Object>> notas) {
+        try {
+            int atualizados = 0;
+            
+            for (Map<String, Object> item : notas) {
+                Object envioIdObj = item.get("envioId");
+                Object notaObj = item.get("nota");
+                
+                if (envioIdObj == null) continue;
+                
+                Long envioId = ((Number) envioIdObj).longValue();
+                
+                Optional<EnvioAtividadeEntity> envioOpt = envioAtividadeJpaRepository.findById(envioId);
+                if (envioOpt.isEmpty()) continue;
+                
+                EnvioAtividadeEntity envio = envioOpt.get();
+                
+                // Verifica se o envio é da atividade correta
+                if (!envio.getAtividadeId().equals(atividadeId)) continue;
+                
+                // Atualiza a nota
+                Double nota = null;
+                if (notaObj != null) {
+                    if (notaObj instanceof Number) {
+                        nota = ((Number) notaObj).doubleValue();
+                    } else if (notaObj instanceof String && !((String) notaObj).isEmpty()) {
+                        try {
+                            nota = Double.parseDouble((String) notaObj);
+                        } catch (NumberFormatException e) {
+                            // ignora nota inválida
+                        }
+                    }
+                }
+                
+                if (nota != null) {
+                    envio.setNota(nota);
+                    envio.setStatus("CORRIGIDO");
+                    envioAtividadeJpaRepository.save(envio);
+                    atualizados++;
+                }
+            }
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Notas salvas com sucesso",
+                "atualizados", atualizados
+            ));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao salvar notas: " + e.getMessage()));
         }
     }
 }

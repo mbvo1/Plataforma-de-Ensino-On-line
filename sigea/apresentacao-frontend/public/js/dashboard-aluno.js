@@ -1,17 +1,83 @@
-// Verifica autenticação ao carregar a página
-window.addEventListener('DOMContentLoaded', () => {
+// Função para limpar dados do usuário
+function limparDadosUsuario() {
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('usuarioNome');
+    localStorage.removeItem('usuarioEmail');
+    localStorage.removeItem('usuarioPerfil');
+}
+
+// Verifica se o login é válido
+function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
-    if (!usuarioId || usuarioPerfil !== 'ALUNO') {
-        window.location.href = '/';
+    return usuarioId && 
+           usuarioPerfil && 
+           usuarioId !== 'null' && 
+           usuarioId !== 'undefined' && 
+           usuarioId.trim() !== '' &&
+           usuarioPerfil !== 'null' && 
+           usuarioPerfil !== 'undefined' &&
+           usuarioPerfil.trim() !== '' &&
+           usuarioPerfil === 'ALUNO';
+}
+
+// Verifica autenticação ao carregar a página
+window.addEventListener('DOMContentLoaded', () => {
+    if (!isLoginValido()) {
+        limparDadosUsuario();
+        window.location.href = '/index.html';
         return;
     }
     
     loadUserInfo();
-    initializeNavigation();
+    initializeMenuToggle();
     carregarDadosDashboard();
 });
+
+function loadUserInfo() {
+    const nome = localStorage.getItem('usuarioNome');
+    
+    // Debug - verificar o que está no localStorage
+    console.log('DEBUG loadUserInfo - usuarioNome:', nome);
+    console.log('DEBUG loadUserInfo - localStorage completo:', {
+        usuarioId: localStorage.getItem('usuarioId'),
+        usuarioNome: localStorage.getItem('usuarioNome'),
+        usuarioEmail: localStorage.getItem('usuarioEmail'),
+        usuarioPerfil: localStorage.getItem('usuarioPerfil')
+    });
+    
+    // Verifica se o nome é válido (não null, não undefined, não "null", não "undefined", não vazio)
+    const nomeValido = nome && 
+                       nome !== 'null' && 
+                       nome !== 'undefined' && 
+                       nome.trim() !== '';
+    
+    const nomeExibir = nomeValido ? nome : 'Usuário';
+    
+    // Atualiza o nome do usuário no header
+    const userNameElement = document.getElementById('user-name');
+    if (userNameElement) {
+        userNameElement.textContent = `Aluno - ${nomeExibir}`;
+    }
+    
+    // Atualiza o nome no título de boas-vindas
+    const welcomeNameElement = document.getElementById('welcome-name');
+    if (welcomeNameElement) {
+        welcomeNameElement.textContent = nomeExibir;
+    }
+}
+
+function initializeMenuToggle() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
+}
 
 async function carregarDadosDashboard() {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -31,70 +97,25 @@ async function carregarDadosDashboard() {
 }
 
 function atualizarDashboard(dados) {
-    // Atualizar título de boas-vindas
-    const welcomeTitle = document.querySelector('.welcome-title');
-    if (welcomeTitle) {
-        welcomeTitle.textContent = `Bem-vindo, "${dados.nomeAluno}"!`;
-    }
-    
     // Atualizar avisos
-    const avisosCard = document.querySelector('.info-card:nth-child(2) .card-content');
+    const avisosCard = document.getElementById('avisos-card');
     if (avisosCard) {
         if (dados.avisosNaoLidos > 0) {
-            avisosCard.innerHTML = `<p style="color: #e74c3c; font-weight: bold;">Você tem ${dados.avisosNaoLidos} avisos não lidos</p>`;
+            avisosCard.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">Você tem ${dados.avisosNaoLidos} avisos não lidos</span>`;
         } else {
-            avisosCard.innerHTML = `<p style="color: #27ae60;">Nenhum aviso novo</p>`;
+            avisosCard.innerHTML = `<span style="color: #27ae60;">Nenhum aviso novo</span>`;
         }
     }
     
     // Atualizar frequência
-    const frequenciaContent = document.querySelector('.frequencia-content');
+    const frequenciaContent = document.getElementById('frequencia-content');
     if (frequenciaContent) {
         frequenciaContent.innerHTML = `
             <p class="freq-title">Total</p>
-            <p>Faltas: ${dados.totalFaltas}</p>
-            <p>Frequência: ${dados.frequenciaPercentual.toFixed(0)}%</p>
+            <p><strong>Faltas:</strong> ${dados.totalFaltas}</p>
+            <p><strong>Frequência:</strong> ${dados.frequenciaPercentual.toFixed(0)}%</p>
         `;
     }
-}
-
-function loadUserInfo() {
-    const nome = localStorage.getItem('usuarioNome');
-    const perfil = localStorage.getItem('usuarioPerfil');
-    
-    // Atualiza o nome do usuário no header
-    const userNameElement = document.getElementById('user-name');
-    if (userNameElement) {
-        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
-    }
-}
-
-function initializeNavigation() {
-    const menuItems = document.querySelectorAll('.menu-item[data-section]');
-    
-    menuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            const sectionName = item.getAttribute('data-section');
-            
-            // Remove active class from all menu items
-            menuItems.forEach(mi => mi.classList.remove('active'));
-            
-            // Add active class to clicked item
-            item.classList.add('active');
-            
-            // Hide all sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.remove('active'));
-            
-            // Show selected section
-            const selectedSection = document.getElementById(`${sectionName}-section`);
-            if (selectedSection) {
-                selectedSection.classList.add('active');
-            }
-        });
-    });
 }
 
 function handleLogout() {
@@ -103,7 +124,6 @@ function handleLogout() {
         localStorage.removeItem('usuarioNome');
         localStorage.removeItem('usuarioEmail');
         localStorage.removeItem('usuarioPerfil');
-        
-        window.location.href = '/';
+        window.location.href = '/index.html';
     }
 }

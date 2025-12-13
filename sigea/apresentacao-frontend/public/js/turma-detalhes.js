@@ -141,7 +141,7 @@ document.getElementById('btnCancelarAviso').addEventListener('click', function()
     document.getElementById('btnAdicionarAviso').style.display = 'flex';
 });
 
-document.getElementById('btnPostarAviso').addEventListener('click', function() {
+document.getElementById('btnPostarAviso').addEventListener('click', async function() {
     const textoAviso = document.getElementById('textoAviso').value.trim();
     const professorId = localStorage.getItem('usuarioId');
     
@@ -153,8 +153,19 @@ document.getElementById('btnPostarAviso').addEventListener('click', function() {
     // Prepara os dados do aviso
     const avisoRequest = {
         mensagem: textoAviso,
-        arquivoPath: arquivoSelecionado ? arquivoSelecionado.name : null
+        arquivoPath: arquivoSelecionado ? arquivoSelecionado.name : null,
+        arquivoConteudo: null
     };
+    
+    // Se tiver arquivo, converte para base64
+    if (arquivoSelecionado) {
+        try {
+            const base64 = await fileToBase64(arquivoSelecionado);
+            avisoRequest.arquivoConteudo = base64;
+        } catch (e) {
+            console.error('Erro ao converter arquivo para base64:', e);
+        }
+    }
     
     // Envia para o backend
     fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/avisos?professorId=${professorId}`, {
@@ -164,8 +175,15 @@ document.getElementById('btnPostarAviso').addEventListener('click', function() {
         },
         body: JSON.stringify(avisoRequest)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao criar aviso');
+        }
+        return response.json();
+    })
     .then(aviso => {
+        console.log('Aviso criado:', aviso); // Debug
+        
         // Adiciona URL do arquivo local se foi anexado
         if (arquivoSelecionado) {
             aviso.arquivoUrl = URL.createObjectURL(arquivoSelecionado);
@@ -191,17 +209,52 @@ document.getElementById('btnPostarAviso').addEventListener('click', function() {
     });
 });
 
+// Função para converter arquivo em base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
 function adicionarAvisoNaLista(aviso, prepend = true) {
     const avisosList = document.getElementById('avisosList');
     
     const avisoCard = document.createElement('div');
     avisoCard.className = 'aviso-card';
+    
+    // Verifica se há arquivo válido
+    const arquivoUrl = aviso.arquivoUrl || null;
+    const temArquivoValido = arquivoUrl && (arquivoUrl.startsWith('data:') || arquivoUrl.startsWith('blob:') || arquivoUrl.startsWith('http') || arquivoUrl.startsWith('/'));
+    
+    // Constrói o HTML do arquivo
+    let arquivoHtml = '';
+    if (aviso.arquivoPath) {
+        if (temArquivoValido) {
+            arquivoHtml = `
+                <a href="${arquivoUrl}" class="aviso-arquivo arquivo-download-link" target="_blank" download="${aviso.arquivoPath}">
+                    <i class="fas fa-paperclip"></i>
+                    <span>${aviso.arquivoPath}</span>
+                </a>
+            `;
+        } else {
+            arquivoHtml = `
+                <div class="aviso-arquivo arquivo-sem-download">
+                    <i class="fas fa-paperclip"></i>
+                    <span>${aviso.arquivoPath}</span>
+                </div>
+            `;
+        }
+    }
+    
     avisoCard.innerHTML = `
         <div class="aviso-header">
             <div class="aviso-autor">
                 <i class="fas fa-user-circle"></i>
                 <div class="aviso-autor-info">
-                    <strong>"${aviso.professorNome}"</strong>
+                    <strong>${aviso.professorNome || 'Professor'}</strong>
                 </div>
             </div>
             <div style="position: relative;">
@@ -221,22 +274,11 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
             </div>
         </div>
         <div class="aviso-body">
-            <p>${aviso.mensagem}</p>
-            ${aviso.arquivoPath ? (function(){
-                const href = aviso.arquivoUrl || null;
-                const valid = href && (href.startsWith('data:') || href.startsWith('blob:') || href.startsWith('http') || href.startsWith('/'));
-                return valid ? `
-                    <a href="${href}" class="aviso-arquivo" target="_blank">
-                        <i class="fas fa-paperclip"></i>
-                        <span>${aviso.arquivoPath}</span>
-                    </a>
-                ` : `
-                    <div class="aviso-arquivo"><i class="fas fa-paperclip"></i><span>${aviso.arquivoPath}</span></div>
-                `;
-            })() : ''}
+            <p>${aviso.mensagem || ''}</p>
+            ${arquivoHtml}
         </div>
         <div class="aviso-footer">
-            <span class="aviso-data">${aviso.dataPostagem}</span>
+            <span class="aviso-data">${aviso.dataPostagem || ''}</span>
         </div>
     `;
     
@@ -549,45 +591,41 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
             titulo: titulo,
             descricao: descricao || null,
             arquivoPath: arquivoInput.files.length > 0 ? arquivoInput.files[0].name : null,
+            arquivoConteudo: null,
             prazo: prazoToSend
         };
+        
+        // Se tiver arquivo, converte para base64
+        if (arquivoInput.files.length > 0) {
+            try {
+                const base64 = await fileToBase64(arquivoInput.files[0]);
+                body.arquivoConteudo = base64;
+            } catch (e) {
+                console.error('Erro ao converter arquivo para base64:', e);
+            }
+        }
 
         let resp;
         let criado;
-        if (arquivoInput.files.length > 0) {
-            // send multipart to persist file on server
-            const form = new FormData();
-            form.append('titulo', titulo);
-            if (descricao) form.append('descricao', descricao);
-            if (prazoToSend) form.append('prazo', prazoToSend);
-            form.append('professorId', usuarioId);
-            form.append('arquivo', arquivoInput.files[0]);
+        
+        // Sempre usa o endpoint JSON (com base64 no corpo)
+        resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades?professorId=${usuarioId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
 
-            resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades/upload`, {
-                method: 'POST',
-                body: form
-            });
+        if (!resp.ok) { const err = await resp.json().catch(()=>({})); throw new Error(err.message || 'Erro ao criar atividade'); }
 
-            if (!resp.ok) { const err = await resp.json().catch(()=>({})); throw new Error(err.message || 'Erro ao criar atividade (upload)'); }
-
-            criado = await resp.json();
-
-            // if backend returned arquivoUrl, store it in sessionStorage for immediate use
-            if (criado.arquivoUrl) {
-                try { sessionStorage.setItem(`atividadeArquivo_${criado.atividadeId}`, criado.arquivoUrl); } catch(_) {}
-                atividadeArquivoBlobMap.set(criado.atividadeId, criado.arquivoUrl);
-            }
-        } else {
-            resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades?professorId=${usuarioId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            if (!resp.ok) { const err = await resp.json().catch(()=>({})); throw new Error(err.message || 'Erro ao criar atividade'); }
-
-            criado = await resp.json();
+        criado = await resp.json();
+        
+        // Salva a URL base64 do arquivo no sessionStorage para uso imediato
+        if (body.arquivoConteudo) {
+            try { sessionStorage.setItem(`atividadeArquivo_${criado.atividadeId}`, body.arquivoConteudo); } catch(_) {}
+            atividadeArquivoBlobMap.set(criado.atividadeId, body.arquivoConteudo);
+            criado.arquivoUrl = body.arquivoConteudo;
         }
+        
         alert('Atividade criada com sucesso!');
         // adicionar diretamente na lista (como feito para avisos) para tornar o link clicável
         adicionarAtividadeNaLista(criado, true);
@@ -630,6 +668,8 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
 
     const card = document.createElement('div');
     card.className = 'aviso-card atividade-card';
+    card.style.cursor = 'pointer';
+    
     // determine attachment href: prefer sessionStorage data URL, then in-memory map, then server URL
     let arquivoHref = null;
     try {
@@ -640,17 +680,38 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
     } catch (e) { arquivoHref = atv.arquivoUrl || null; }
 
     const isValidArquivoHref = arquivoHref && (arquivoHref.startsWith('data:') || arquivoHref.startsWith('http') || arquivoHref.startsWith('/'));
+    
+    // Constrói o HTML do arquivo
+    let arquivoHtml = '';
+    if (atv.arquivoPath) {
+        if (isValidArquivoHref) {
+            arquivoHtml = `
+                <a href="${arquivoHref}" class="aviso-arquivo arquivo-download-link" target="_blank" download="${atv.arquivoPath}" onclick="event.stopPropagation();">
+                    <i class="fas fa-paperclip"></i>
+                    <span>${atv.arquivoPath}</span>
+                </a>
+            `;
+        } else {
+            arquivoHtml = `
+                <div class="aviso-arquivo arquivo-sem-download" onclick="event.stopPropagation();">
+                    <i class="fas fa-paperclip"></i>
+                    <span>${atv.arquivoPath}</span>
+                </div>
+            `;
+        }
+    }
 
     card.innerHTML = `
         <div class="aviso-header">
             <div class="aviso-autor">
-                <i class="fas fa-folder"></i>
+                <i class="fas fa-folder" style="color: var(--primary-color);"></i>
                 <div class="aviso-autor-info">
-                    <div class="aviso-titulo">"${atv.professorNome || 'Professor'}": ${atv.titulo}</div>
+                    <div class="aviso-titulo"><strong>${atv.titulo}</strong></div>
+                    <small style="color: var(--text-secondary);">${atv.professorNome || 'Professor'}</small>
                 </div>
             </div>
             <div style="position: relative;">
-                <button class="btn-menu-aviso" data-atividade-id="${atv.atividadeId}">
+                <button class="btn-menu-aviso" data-atividade-id="${atv.atividadeId}" onclick="event.stopPropagation();">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
                 <div class="menu-dropdown-aviso">
@@ -667,17 +728,11 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
         </div>
         <div class="aviso-body">
             <p>${atv.descricao || ''}</p>
-            ${atv.arquivoPath ? (
-                isValidArquivoHref ? `
-                    <a href="${arquivoHref}" class="aviso-arquivo" target="_blank"><i class="fas fa-paperclip"></i> <span>${atv.arquivoPath}</span></a>
-                ` : `
-                    <div class="aviso-arquivo"><i class="fas fa-paperclip"></i> <span>${atv.arquivoPath}</span></div>
-                `
-            ) : ''}
+            ${arquivoHtml}
         </div>
         <div class="aviso-footer">
             <div class="aviso-destinatarios">
-                ${atv.prazo ? `<span class="atividade-prazo">Prazo: ${atv.prazo}</span>` : ''}
+                ${atv.prazo ? `<span class="atividade-prazo"><i class="fas fa-clock"></i> Prazo: ${atv.prazo}</span>` : ''}
             </div>
             <div class="aviso-data">${atv.dataCriacao || ''}</div>
         </div>

@@ -78,22 +78,7 @@ public class AtividadesAlunoController {
         return ResponseEntity.ok(materiais);
     }
     
-    /**
-     * GET /api/aluno/turmas/{id}/atividades - Ver atividades da turma
-     */
-    @GetMapping("/turmas/{turmaId}/atividades")
-    public ResponseEntity<List<Map<String, Object>>> listarAtividades(@PathVariable String turmaId) {
-        List<Map<String, Object>> atividades = new ArrayList<>();
-        
-        Map<String, Object> atividade = new HashMap<>();
-        atividade.put("id", "ATV-001");
-        atividade.put("titulo", "Exercício 1");
-        atividade.put("prazo", LocalDateTime.now().plusDays(7).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        atividade.put("status", "PENDENTE");
-        atividades.add(atividade);
-        
-        return ResponseEntity.ok(atividades);
-    }
+    // Endpoint de atividades movido para AlunoTurmasController para usar dados reais do banco
     
     /**
      * POST /api/aluno/atividades/enviar - Enviar atividade

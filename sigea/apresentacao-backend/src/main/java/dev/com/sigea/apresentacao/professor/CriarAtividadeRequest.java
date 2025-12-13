@@ -6,6 +6,7 @@ public class CriarAtividadeRequest {
     private String titulo;
     private String descricao;
     private String arquivoPath;
+    private String arquivoConteudo;
     private LocalDateTime prazo;
 
     public CriarAtividadeRequest() {}
@@ -17,6 +18,8 @@ public class CriarAtividadeRequest {
     public void setDescricao(String descricao) { this.descricao = descricao; }
     public String getArquivoPath() { return arquivoPath; }
     public void setArquivoPath(String arquivoPath) { this.arquivoPath = arquivoPath; }
+    public String getArquivoConteudo() { return arquivoConteudo; }
+    public void setArquivoConteudo(String arquivoConteudo) { this.arquivoConteudo = arquivoConteudo; }
     public LocalDateTime getPrazo() { return prazo; }
     public void setPrazo(LocalDateTime prazo) { this.prazo = prazo; }
 }

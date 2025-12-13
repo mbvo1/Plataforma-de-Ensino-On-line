@@ -22,6 +22,311 @@
             word-break: break-word;
             overflow-wrap: break-word;
         }
+        
+        /* Estilos para link de download do arquivo */
+        .arquivo-download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #f0f4f8;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            color: #0969da;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .arquivo-download-link:hover {
+            background-color: #e1e7ed;
+            border-color: #0969da;
+            text-decoration: underline;
+        }
+        
+        .arquivo-download-link i {
+            color: #0969da;
+        }
+        
+        .arquivo-sem-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            color: #666;
+        }
+        
+        /* Estilos para o box de entregues/pendentes clicável */
+        .entregues-pendentes-box {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+        }
+        
+        .entregues-pendentes-box:hover {
+            border-color: #0969da;
+            background-color: #f0f7ff;
+            box-shadow: 0 2px 8px rgba(9, 105, 218, 0.15);
+        }
+        
+        /* Modal de Envios */
+        .modal-envios {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-envios.active {
+            display: flex;
+        }
+        
+        .modal-envios-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-envios-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #f8f9fa;
+        }
+        
+        .modal-envios-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .modal-envios-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+        
+        .modal-envios-close:hover {
+            color: #333;
+        }
+        
+        .modal-envios-summary {
+            display: flex;
+            gap: 20px;
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .summary-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .summary-card.entregues {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .summary-card.pendentes {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+        }
+        
+        .summary-card i {
+            font-size: 24px;
+        }
+        
+        .summary-card.entregues i {
+            color: #28a745;
+        }
+        
+        .summary-card.pendentes i {
+            color: #ffc107;
+        }
+        
+        .summary-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .summary-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .modal-envios-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .envios-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .envios-table th,
+        .envios-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .envios-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+        
+        .envios-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.entregue {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.corrigido {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .btn-download-envio {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background-color: #0969da;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        
+        .btn-download-envio:hover {
+            background-color: #0550ae;
+        }
+        
+        .input-nota {
+            width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .input-nota:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.2);
+        }
+        
+        .modal-envios-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-salvar-notas {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .btn-salvar-notas:hover {
+            background-color: #218838;
+        }
+        
+        .btn-fechar-modal {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .btn-fechar-modal:hover {
+            background-color: #5a6268;
+        }
+        
+        .sem-envio {
+            color: #999;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +415,7 @@
                                 <div id="detDescricao" style="white-space:pre-wrap; margin-bottom:12px;"></div>
 
                                 <div id="detArquivoContainer" style="margin-bottom:12px;">
-                                    <a id="detArquivoLink" href="#" target="_blank" class="btn-link">
+                                    <a id="detArquivoLink" href="#" target="_blank" class="arquivo-download-link">
                                         <i class="fas fa-paperclip"></i>
                                         <span id="detArquivoNome">Arquivo</span>
                                     </a>
@@ -120,12 +425,15 @@
                             </div>
 
                             <div style="width:220px;">
-                                <div style="border:1px solid #ccc; padding:12px; text-align:center; cursor:default;">
+                                <div class="entregues-pendentes-box" id="boxEnvios" onclick="abrirModalEnvios()" title="Clique para ver detalhes dos envios">
                                     <div style="font-size:12px;color:var(--text-secondary);">Entregues</div>
                                     <div id="detEntregues" style="font-weight:bold; font-size:18px;">0</div>
                                     <div style="height:8px;"></div>
                                     <div style="font-size:12px;color:var(--text-secondary);">Pendentes</div>
                                     <div id="detPendentes" style="font-weight:bold; font-size:18px;">0</div>
+                                    <div style="margin-top:8px;font-size:11px;color:#0969da;">
+                                        <i class="fas fa-eye"></i> Ver detalhes
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -137,8 +445,255 @@
         </div>
     </div>
 
+    <!-- Modal de Envios -->
+    <div class="modal-envios" id="modalEnvios">
+        <div class="modal-envios-content">
+            <div class="modal-envios-header">
+                <h2><i class="fas fa-folder"></i> <span id="modalTituloAtividade">Atividade</span></h2>
+                <button class="modal-envios-close" onclick="fecharModalEnvios()">&times;</button>
+            </div>
+            
+            <div class="modal-envios-summary">
+                <div class="summary-card entregues">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="summary-info">
+                        <span class="summary-label">Entregues</span>
+                        <span class="summary-value" id="modalEntregues">0</span>
+                    </div>
+                </div>
+                <div class="summary-card pendentes">
+                    <i class="fas fa-clock"></i>
+                    <div class="summary-info">
+                        <span class="summary-label">Pendentes</span>
+                        <span class="summary-value" id="modalPendentes">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-envios-body">
+                <table class="envios-table">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Status</th>
+                            <th>Envio</th>
+                            <th>Atribuir Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaEnvios">
+                        <!-- Preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="modal-envios-footer">
+                <button class="btn-fechar-modal" onclick="fecharModalEnvios()">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+                <button class="btn-salvar-notas" onclick="salvarNotas()">
+                    <i class="fas fa-save"></i> Salvar Notas
+                </button>
+            </div>
+        </div>
+    </div>
+
 <script>
-// read atividade data from sessionStorage and render
+// Variáveis globais
+let atividadeAtual = null;
+let enviosData = null;
+
+// Função para logout
+function handleLogout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = 'login-professor.html';
+}
+
+// Função para abrir o modal de envios
+async function abrirModalEnvios() {
+    if (!atividadeAtual || !atividadeAtual.atividadeId) {
+        alert('Atividade não encontrada');
+        return;
+    }
+    
+    document.getElementById('modalEnvios').classList.add('active');
+    document.getElementById('modalTituloAtividade').textContent = atividadeAtual.titulo || 'Atividade';
+    
+    // Buscar dados dos envios da API
+    await carregarEnvios();
+}
+
+// Função para fechar o modal
+function fecharModalEnvios() {
+    document.getElementById('modalEnvios').classList.remove('active');
+}
+
+// Função para carregar envios da API
+async function carregarEnvios() {
+    if (!atividadeAtual || !atividadeAtual.atividadeId) return;
+    
+    try {
+        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios`);
+        
+        if (!response.ok) {
+            throw new Error('Erro ao buscar envios');
+        }
+        
+        enviosData = await response.json();
+        
+        // Atualizar contadores no modal
+        document.getElementById('modalEntregues').textContent = enviosData.entregues || 0;
+        document.getElementById('modalPendentes').textContent = enviosData.pendentes || 0;
+        
+        // Atualizar contadores na página principal
+        document.getElementById('detEntregues').textContent = enviosData.entregues || 0;
+        document.getElementById('detPendentes').textContent = enviosData.pendentes || 0;
+        
+        // Preencher tabela
+        renderizarTabelaEnvios(enviosData.alunos || []);
+        
+    } catch (error) {
+        console.error('Erro ao carregar envios:', error);
+        document.getElementById('tabelaEnvios').innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center;color:#dc3545;">
+                    Erro ao carregar envios: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Função para renderizar a tabela de envios
+function renderizarTabelaEnvios(alunos) {
+    const tbody = document.getElementById('tabelaEnvios');
+    
+    if (!alunos || alunos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center;color:#666;">
+                    Nenhum aluno encontrado nesta turma
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = alunos.map(aluno => {
+        const isEntregue = aluno.status === 'Entregue';
+        const isCorrigido = aluno.statusEnvio === 'CORRIGIDO';
+        
+        // Status badge
+        let statusBadge = '';
+        if (isCorrigido) {
+            statusBadge = `<span class="status-badge corrigido"><i class="fas fa-check-double"></i> Corrigido</span>`;
+        } else if (isEntregue) {
+            statusBadge = `<span class="status-badge entregue"><i class="fas fa-check"></i> Entregue</span>`;
+        } else {
+            statusBadge = `<span class="status-badge pendente"><i class="fas fa-clock"></i> Pendente</span>`;
+        }
+        
+        // Botão de download
+        let downloadBtn = '';
+        if (isEntregue && aluno.arquivoPath) {
+            if (aluno.arquivoConteudo && aluno.arquivoConteudo.startsWith('data:')) {
+                downloadBtn = `
+                    <a href="${aluno.arquivoConteudo}" 
+                       download="${aluno.arquivoPath}" 
+                       class="btn-download-envio"
+                       style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background-color:#0969da;color:white;border-radius:4px;text-decoration:none;font-size:12px;cursor:pointer;">
+                        <i class="fas fa-download"></i> ${aluno.arquivoPath}
+                    </a>
+                `;
+            } else {
+                downloadBtn = `<span style="color:#999;font-style:italic;">${aluno.arquivoPath} (sem arquivo)</span>`;
+            }
+        } else if (!isEntregue) {
+            downloadBtn = `<span class="sem-envio">—</span>`;
+        }
+        
+        // Input de nota
+        let notaInput = '';
+        if (isEntregue) {
+            const notaValue = aluno.nota !== null && aluno.nota !== undefined ? aluno.nota : '';
+            notaInput = `
+                <input type="number" 
+                       class="input-nota" 
+                       data-envio-id="${aluno.envioId}"
+                       value="${notaValue}"
+                       min="0" 
+                       max="10" 
+                       step="0.1"
+                       placeholder="0-10">
+            `;
+        } else {
+            notaInput = `<span class="sem-envio">—</span>`;
+        }
+        
+        return `
+            <tr>
+                <td>
+                    <strong>${aluno.nomeAluno}</strong>
+                    ${isEntregue ? `<br><small style="color:#666;">Enviado em: ${aluno.dataEnvio || '—'}</small>` : ''}
+                </td>
+                <td>${statusBadge}</td>
+                <td>${downloadBtn}</td>
+                <td>${notaInput}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Função para salvar as notas
+async function salvarNotas() {
+    // Coletar todas as notas dos inputs
+    const inputs = document.querySelectorAll('.input-nota');
+    const notas = [];
+    
+    inputs.forEach(input => {
+        const envioId = input.dataset.envioId;
+        const nota = input.value.trim();
+        
+        if (envioId && nota !== '') {
+            notas.push({
+                envioId: parseInt(envioId),
+                nota: parseFloat(nota)
+            });
+        }
+    });
+    
+    if (notas.length === 0) {
+        alert('Nenhuma nota para salvar.');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios/salvar-notas`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(notas)
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Erro ao salvar notas');
+        }
+        
+        alert(`Notas salvas com sucesso! (${result.atualizados} atualizadas)`);
+        
+        // Recarregar envios para atualizar status
+        await carregarEnvios();
+        
+    } catch (error) {
+        console.error('Erro ao salvar notas:', error);
+        alert('Erro ao salvar notas: ' + error.message);
+    }
+}
+
+// Inicialização da página
 (function(){
     const userName = localStorage.getItem('usuarioNome');
     if (userName) document.getElementById('userName').textContent = `Professor - ${userName}`;
@@ -158,6 +713,8 @@
         document.getElementById('detTituloTopo').textContent = 'Atividade não encontrada';
         return;
     }
+
+    atividadeAtual = atv;
 
     document.getElementById('detTituloTopo').textContent = atv.titulo || '';
     document.getElementById('detTituloCentro').textContent = atv.titulo || '';
@@ -185,20 +742,56 @@
         if (isValidHref) {
             const link = document.getElementById('detArquivoLink');
             link.href = href;
+            link.setAttribute('download', atv.arquivoPath);
             document.getElementById('detArquivoNome').textContent = atv.arquivoPath;
             link.target = '_blank';
         } else {
-            // no usable href available in-session — hide the link to avoid 404 error
-            document.getElementById('detArquivoContainer').style.display = 'none';
+            // Mostra o nome do arquivo mas sem link
+            document.getElementById('detArquivoContainer').innerHTML = `
+                <div class="arquivo-sem-download">
+                    <i class="fas fa-paperclip"></i>
+                    <span>${atv.arquivoPath}</span>
+                </div>
+            `;
         }
     } else {
         document.getElementById('detArquivoContainer').style.display = 'none';
     }
 
-    // placeholders
-    document.getElementById('detEntregues').textContent = '0';
-    document.getElementById('detPendentes').textContent = '0';
+    // Carregar contadores de entregues/pendentes
+    carregarContadores();
 })();
+
+// Função para carregar contadores iniciais
+async function carregarContadores() {
+    if (!atividadeAtual || !atividadeAtual.atividadeId) return;
+    
+    try {
+        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('detEntregues').textContent = data.entregues || 0;
+            document.getElementById('detPendentes').textContent = data.pendentes || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar contadores:', error);
+    }
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('modalEnvios').addEventListener('click', function(e) {
+    if (e.target === this) {
+        fecharModalEnvios();
+    }
+});
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        fecharModalEnvios();
+    }
+});
 </script>
 </body>
 </html>

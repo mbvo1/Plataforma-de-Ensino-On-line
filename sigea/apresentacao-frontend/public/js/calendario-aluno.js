@@ -1,0 +1,108 @@
+// Função para limpar dados do usuário
+function limparDadosUsuario() {
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('usuarioNome');
+    localStorage.removeItem('usuarioEmail');
+    localStorage.removeItem('usuarioPerfil');
+}
+
+// Verifica se o login é válido
+function isLoginValido() {
+    const usuarioId = localStorage.getItem('usuarioId');
+    const usuarioPerfil = localStorage.getItem('usuarioPerfil');
+    
+    return usuarioId && 
+           usuarioPerfil && 
+           usuarioId !== 'null' && 
+           usuarioId !== 'undefined' && 
+           usuarioId.trim() !== '' &&
+           usuarioPerfil !== 'null' && 
+           usuarioPerfil !== 'undefined' &&
+           usuarioPerfil.trim() !== '' &&
+           usuarioPerfil === 'ALUNO';
+}
+
+// Verifica autenticação ao carregar a página
+window.addEventListener('DOMContentLoaded', () => {
+    if (!isLoginValido()) {
+        limparDadosUsuario();
+        window.location.href = '/index.html';
+        return;
+    }
+    
+    loadUserInfo();
+    initializeMenuToggle();
+    carregarCalendario();
+});
+
+function loadUserInfo() {
+    const nome = localStorage.getItem('usuarioNome');
+    const userNameElement = document.getElementById('user-name');
+    if (userNameElement) {
+        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+    }
+}
+
+function initializeMenuToggle() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
+}
+
+async function carregarCalendario() {
+    const container = document.getElementById('calendario-content');
+    
+    try {
+        const response = await fetch('http://localhost:8080/api/calendario/eventos');
+        
+        if (!response.ok) {
+            throw new Error('Erro ao carregar calendário');
+        }
+        
+        const eventos = await response.json();
+        
+        if (!eventos || eventos.length === 0) {
+            container.innerHTML = '<p class="empty-state">Nenhum evento próximo no calendário.</p>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        eventos.forEach(evento => {
+            const card = document.createElement('div');
+            card.className = 'evento-card';
+            card.innerHTML = `
+                <div class="evento-data">${formatarData(evento.data)}</div>
+                <div class="evento-info">
+                    <h3>${evento.titulo}</h3>
+                    <p>${evento.descricao || ''}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+        
+    } catch (error) {
+        console.error('Erro ao carregar calendário:', error);
+        container.innerHTML = '<p class="empty-state">Nenhum evento próximo no calendário.</p>';
+    }
+}
+
+function formatarData(dataStr) {
+    const data = new Date(dataStr);
+    return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+function handleLogout() {
+    if (confirm('Deseja realmente sair?')) {
+        localStorage.clear();
+        window.location.href = '/';
+    }
+}

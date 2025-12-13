@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividade - SIGEA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #detDescricao {
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-height: 48vh;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        #detArquivoContainer .btn-link {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .envio-box {
+            border: 1px solid #ccc;
+            padding: 16px;
+            text-align: center;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .envio-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .envio-status-value {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        .envio-status-value.nao-enviado {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .envio-status-value.enviado {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .envio-status-value.atrasado {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .btn-selecionar-arquivo {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: #666;
+        }
+        .btn-selecionar-arquivo:hover {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+        .btn-selecionar-arquivo.arquivo-selecionado {
+            border-color: #4caf50;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .btn-enviar {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-enviar:hover:not(:disabled) {
+            background: #4f46e5;
+        }
+        .btn-enviar:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .arquivo-selecionado-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        .data-envio-info {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        /* Estilos para link de download do arquivo */
+        .arquivo-download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #f0f4f8;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            color: #0969da;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .arquivo-download-link:hover {
+            background-color: #e1e7ed;
+            border-color: #0969da;
+            text-decoration: underline;
+        }
+        
+        .arquivo-download-link i {
+            color: #0969da;
+        }
+        
+        .arquivo-sem-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            color: #666;
+        }
+        
+        .arquivo-sem-download small {
+            color: #999;
+            font-size: 11px;
+        }
+        
+        .btn-cancelar {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            background: #fff;
+            color: #c62828;
+            border: 1px solid #c62828;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-cancelar:hover {
+            background: #ffebee;
+        }
+        
+        .prazo-expirado {
+            color: #c62828;
+            font-weight: bold;
+        }
+        
+        .envio-bloqueado {
+            background: #ffebee;
+            border-color: #c62828;
+        }
+        
+        .envio-bloqueado-msg {
+            color: #c62828;
+            font-size: 12px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        /* Estilos para exibição da nota */
+        .nota-container {
+            margin-top: 12px;
+            padding: 12px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border: 1px solid #90caf9;
+        }
+        
+        .nota-label {
+            font-size: 12px;
+            color: #1565c0;
+            margin-bottom: 4px;
+        }
+        
+        .nota-valor {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1565c0;
+        }
+        
+        .nota-status-corrigido {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+        
+        .nota-status-corrigido .nota-label,
+        .nota-status-corrigido .nota-valor {
+            color: #2e7d32;
+        }
+        
+        .feedback-container {
+            margin-top: 8px;
+            padding: 8px;
+            background: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .feedback-label {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard-aluno.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="turmas-aluno.html" class="menu-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="menu-text">Turmas</span>
+            </a>
+            <a href="desempenho-aluno.html" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Desempenho</span>
+            </a>
+            <a href="calendario-aluno.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário</span>
+            </a>
+            <a href="avisos-aluno.html" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="forum-aluno.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Fórum</span>
+            </a>
+            <a href="matricula-aluno.html" class="menu-item">
+                <i class="fas fa-id-card"></i>
+                <span class="menu-text">Matrícula</span>
+            </a>
+            <a href="#" class="menu-item" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Aluno - Usuário</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="turma-header">
+                <h1 id="pageTitulo">Atividade</h1>
+            </div>
+
+            <div class="turma-container">
+                <div class="turma-codigo-wrapper">
+                    <div class="back-button-container">
+                        <a href="javascript:history.back()" class="btn-back">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="turma-acoes" style="padding:16px;">
+                    <div class="atividade-detalhe-card" style="background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:18px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                <i class="fas fa-folder" style="font-size:22px"></i>
+                                <div>
+                                    <div id="detTituloTopo" style="font-weight:700; font-size:20px;"></div>
+                                    <div id="detSubInfo" style="font-size:13px; color:var(--text-secondary);">Professor • Turma</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="margin:12px 0;">
+
+                        <div style="display:flex; gap:20px;">
+                            <div style="flex:1">
+                                <h2 id="detTituloCentro" style="text-align:center; margin:0 0 12px 0;"></h2>
+                                <div id="detDescricao" style="white-space:pre-wrap; margin-bottom:12px;"></div>
+
+                                <div id="detArquivoContainer" style="margin-bottom:12px;">
+                                    <a id="detArquivoLink" href="#" target="_blank" class="arquivo-download-link">
+                                        <i class="fas fa-paperclip"></i>
+                                        <span id="detArquivoNome">Arquivo</span>
+                                    </a>
+                                </div>
+
+                                <div style="font-size:13px; color:var(--text-secondary);">Prazo: <span id="detPrazo">--</span></div>
+                            </div>
+
+                            <!-- Box de Envio do Aluno -->
+                            <div style="width:220px;">
+                                <div class="envio-box" id="envioBox">
+                                    <div class="envio-status">Status:</div>
+                                    <div class="envio-status-value nao-enviado" id="envioStatus">Não enviado</div>
+                                    
+                                    <div id="prazoExpiradoMsg" class="envio-bloqueado-msg" style="display:none;">
+                                        <i class="fas fa-exclamation-triangle"></i> Prazo expirado
+                                    </div>
+                                    
+                                    <div id="arquivoSelecionadoInfo" class="arquivo-selecionado-info" style="display:none;"></div>
+                                    
+                                    <label class="btn-selecionar-arquivo" id="btnSelecionarArquivo">
+                                        <i class="fas fa-upload"></i> Selecione seu arquivo
+                                        <input type="file" id="inputArquivo" style="display:none;">
+                                    </label>
+                                    
+                                    <button class="btn-enviar" id="btnEnviar" disabled>Enviar</button>
+                                    
+                                    <button class="btn-cancelar" id="btnCancelar" style="display:none;">
+                                        <i class="fas fa-times"></i> Cancelar Envio
+                                    </button>
+                                    
+                                    <!-- Container para exibir nota e feedback -->
+                                    <div id="notaContainer" class="nota-container" style="display:none;">
+                                        <div class="nota-label">Sua Nota:</div>
+                                        <div class="nota-valor" id="notaValor">--</div>
+                                        <div id="feedbackContainer" class="feedback-container" style="display:none;">
+                                            <div class="feedback-label">Feedback do Professor:</div>
+                                            <div id="feedbackTexto"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="data-envio-info" id="dataEnvioInfo" style="display:none;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:16px; text-align:right; font-size:12px; color:var(--text-secondary);">Postado em: <span id="detDataPostagem">--</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/atividade-detalhes-aluno.js"></script>
+</body>
+</html>

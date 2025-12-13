@@ -27,6 +27,9 @@ public class AtividadeTurmaEntity {
     @Column(name = "arquivo_path")
     private String arquivoPath;
 
+    @Column(name = "arquivo_conteudo", columnDefinition = "LONGTEXT")
+    private String arquivoConteudo;
+
     @Column(name = "prazo", nullable = true)
     private LocalDateTime prazo;
 
@@ -60,6 +63,8 @@ public class AtividadeTurmaEntity {
     public void setDescricao(String descricao) { this.descricao = descricao; }
     public String getArquivoPath() { return arquivoPath; }
     public void setArquivoPath(String arquivoPath) { this.arquivoPath = arquivoPath; }
+    public String getArquivoConteudo() { return arquivoConteudo; }
+    public void setArquivoConteudo(String arquivoConteudo) { this.arquivoConteudo = arquivoConteudo; }
     public LocalDateTime getPrazo() { return prazo; }
     public void setPrazo(LocalDateTime prazo) { this.prazo = prazo; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }

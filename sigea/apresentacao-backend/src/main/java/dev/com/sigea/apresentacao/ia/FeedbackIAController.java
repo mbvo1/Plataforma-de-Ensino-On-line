@@ -63,8 +63,17 @@ public class FeedbackIAController {
     }
 
     private String extrairTextoDaResposta(String jsonBruto) throws Exception {
+        System.out.println("=== RESPOSTA BRUTA DO GEMINI ===");
+        System.out.println(jsonBruto);
+        System.out.println("================================");
+
         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
         com.fasterxml.jackson.databind.JsonNode raiz = mapper.readTree(jsonBruto);
+
+        if (raiz.has("error")) {
+            throw new RuntimeException("Erro retornado pela API do Gemini: " + raiz.path("error").path("message").asText());
+        }
+
         return raiz.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
     }
 

@@ -17,3 +17,8 @@ target/
 .nb-gradle/
 .DS_Store
 Thumbs.db
+.env
+*.env
+apresentacao-backend/uploads/
+*.mv.db
+*.trace.db

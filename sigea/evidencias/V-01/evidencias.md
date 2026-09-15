@@ -36,3 +36,20 @@ nenhuma criptografia real na aplicacao.
 - Evidencia: antes.png - coluna senha_hash com 4 senhas legiveis
 - Impacto observado: senha real de admin, professor e dois alunos
   visivel sem nenhum esforco de decodificacao
+
+  ## Depois da correção
+- Código corrigido: Senha.java (Argon2PasswordEncoder), 
+  AutenticacaoService.java, UsuarioService.java, PerfilAlunoController.java
+- Justificativa técnica: Argon2id é uma KDF (função de derivação de chave)
+  deliberadamente lenta e cara em memória, ao contrário de um hash rápido
+  como SHA-256 - isso encarece ataques de força bruta mesmo se o banco
+  vazar por completo. Salt aleatório por senha impede ataques de rainbow
+  table.
+- Mecanismo de proteção utilizado: Argon2id (salt 16 bytes, hash 32 bytes,
+  memória 16 MB, 2 iterações - parametros padrao do Spring Security 5.8)
+
+## Reteste
+- Consulta direta ao banco: senha_hash agora ilegivel
+  (depois-hash-ilegivel.png)
+- Login com senha original continua funcionando (depois-login-funcionando.png)
+- Resultado: Ataque → Correção → Dado protegido, uso legítimo preservado

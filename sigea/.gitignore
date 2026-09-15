@@ -18,5 +18,7 @@ target/
 .DS_Store
 Thumbs.db
 .env
+*.env
+apresentacao-backend/uploads/
 *.mv.db
 *.trace.db

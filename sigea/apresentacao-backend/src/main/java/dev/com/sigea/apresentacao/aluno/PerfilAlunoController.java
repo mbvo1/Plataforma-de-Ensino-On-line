@@ -133,7 +133,6 @@ public class PerfilAlunoController {
             // Mitigacao V-01: senha agora passa por Argon2id, nao mais
             // pelo prefixo "HASH_" em texto claro.
             if (request.getSenha() != null && !request.getSenha().trim().isEmpty()) {
-            if (request.getSenha() != null && !request.getSenha().trim().isEmpty()) {
                 String senhaHash = Senha.criarNova(request.getSenha().trim()).getSenhaHash();
                 usuario.setSenhaHash(senhaHash);
             }

@@ -17,7 +17,11 @@ public class UsuarioEntity {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
     
-    @Column(name = "cpf", unique = true, length = 14)
+    // Mitigacao V-07: CPF cifrado em repouso (AES-256-GCM, nonce
+    // deterministico). Ver CpfCryptoConverter para o porque do nonce nao
+    // ser aleatorio.
+    @Convert(converter = CpfCryptoConverter.class)
+    @Column(name = "cpf", unique = true, length = 255)
     private String cpf;
     
     @Column(name = "senha_hash", nullable = false, length = 255)

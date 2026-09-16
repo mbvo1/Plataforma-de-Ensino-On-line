@@ -366,6 +366,16 @@ distinção no relatório, porque é o erro conceitual central deste projeto.
 
 ## V-07 — Dados pessoais sem proteção criptográfica em repouso
 
+> **Status:** corrigida na branch `fix/V-07-cifragem-cpf`. Validação
+> dinâmica completa (CPF em claro confirmado + fix + round-trip cifrado
+> reteste) em
+> [`evidencias/v07/exploracao-V-07-cifragem-cpf.md`](evidencias/v07/exploracao-V-07-cifragem-cpf.md).
+> CPF passa a ser cifrado com AES-256-GCM (nonce determinístico, para não
+> quebrar a busca por CPF nem a constraint UNIQUE). Linhas gravadas antes
+> do fix continuam legíveis em texto claro até serem salvas de novo (sem
+> migração em lote nesta correção). E-mail permanece em claro, como o
+> próprio inventário já previa como opção aceitável.
+
 - **Severidade:** Alta
 - **Categoria (PDF):** Exposição indevida de dados / Ausência de criptografia
 - **OWASP:** Falhas criptográficas

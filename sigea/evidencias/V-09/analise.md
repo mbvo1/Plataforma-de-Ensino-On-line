@@ -14,8 +14,20 @@ claro via System.out.println a cada novo cadastro
 Dado pessoal persistido sem controle de acesso, retenção ou expurgo -
 viola o princípio de minimização da LGPD
 
+## Probabilidade
+Baixa - exige acesso ao console/log do servidor, que já não fica mais
+exposto publicamente após a correção da V-04
+
+## Risco
+Médio
+
 ## Categoria (PDF da disciplina)
 Exposição indevida de dados
+
+## Justificativa da seleção
+Complementa a análise de proteção de dados pessoais exigida pela LGPD -
+mesmo não sendo a falha mais crítica isoladamente, mostra um padrão
+recorrente de descuido com dado sensível em toda a aplicação
 
 ## Observação sobre o ciclo desta vulnerabilidade
 Diferente das demais, esta não foi atacada isoladamente em runtime: ao
@@ -35,3 +47,19 @@ inseguro (arquivo diff-removido.txt).
 - Nenhuma chamada de log imprime dado pessoal na rota de registro
 - A remoção ocorreu durante a reescrita do controller para a V-02, sem
   necessidade de intervenção adicional
+
+## Achado complementar (fora do escopo original da V-09)
+Durante a investigação desta vulnerabilidade, foram encontradas duas
+novas ocorrências do padrão de senha insegura já corrigido na V-01,
+em UsuariosAdminController.java:
+- criarProfessor(): usava "HASH_senha123" como literal
+- resetarSenhaProfessor(): gravava "senha123" sem nenhum hash, com
+  comentário no próprio código reconhecendo o problema
+Ambas corrigidas nesta mesma branch, usando Senha.criarNova() (Argon2id),
+consistente com a correção já aplicada na V-01.
+
+## Reteste do achado complementar
+- Professor criado via POST /api/admin/professores
+- senha_hash gravado: $argon2id$v=19$... (não mais HASH_senha123)
+- Evidência: reteste-hash-argon2.png
+- Resultado: Correção confirmada

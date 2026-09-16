@@ -248,6 +248,13 @@ via variável de ambiente.
 
 ## V-05 — Upload de arquivos sem qualquer validação
 
+> **Status:** corrigida na branch `fix/V-05-upload-inseguro`. Validação
+> dinâmica completa (ataque real + evidência + fix + reteste) em
+> [`exploracao-V-05-upload-inseguro.md`](exploracao-V-05-upload-inseguro.md) —
+> inclui uma correção de escopo: o endpoint já não é público (efeito
+> colateral do fix de V-02), e o "achado não confirmado em runtime" sobre
+> `/uploads/` ser servido estaticamente foi confirmado como verdadeiro.
+
 - **Severidade:** Alta
 - **Categoria (PDF):** Upload inseguro de arquivos
 - **OWASP:** Design inseguro / Falhas de integridade

@@ -318,13 +318,15 @@ public class UsuariosAdminController {
             return ResponseEntity.badRequest().body(Map.of("message", "Email já cadastrado"));
         }
         
-        // Cria novo professor com senha padrão "senha123" (com hash Argon2id)
+        // V-10: senha provisoria unica e aleatoria, nao mais fixa/compartilhada
+        String senhaProvisoria = gerarSenhaProvisoria();
+
         UsuarioEntity novoProfessor = new UsuarioEntity(
             null,
             request.getNome(),
             request.getEmail(),
             request.getCpf(),
-            Senha.criarNova("senha123").getSenhaHash(), // Senha provisoria com Argon2id
+            Senha.criarNova(senhaProvisoria).getSenhaHash(), // Senha provisoria unica com Argon2id
             "PROFESSOR",
             "ATIVO"
         );
@@ -335,7 +337,8 @@ public class UsuariosAdminController {
             professorSalvo.getId(),
             professorSalvo.getNome(),
             professorSalvo.getEmail(),
-            professorSalvo.getStatus()
+            professorSalvo.getStatus(),
+            senhaProvisoria
         );
         
         return ResponseEntity.ok(response);
@@ -380,7 +383,7 @@ public class UsuariosAdminController {
     }
     
     @PatchMapping("/professores/{id}/resetar-senha")
-    public ResponseEntity<Void> resetarSenhaProfessor(@PathVariable Long id) {
+    public ResponseEntity<?> resetarSenhaProfessor(@PathVariable Long id) {
         Optional<UsuarioEntity> professorOpt = usuarioJpaRepository.findById(id);
         
         if (professorOpt.isEmpty() || !"PROFESSOR".equals(professorOpt.get().getPerfil())) {
@@ -388,10 +391,13 @@ public class UsuariosAdminController {
         }
         
         UsuarioEntity professor = professorOpt.get();
-        professor.setSenhaHash(Senha.criarNova("senha123").getSenhaHash());
+
+        // V-10: senha provisoria unica e aleatoria, nao mais fixa/compartilhada
+        String senhaProvisoria = gerarSenhaProvisoria();
+        professor.setSenhaHash(Senha.criarNova(senhaProvisoria).getSenhaHash());
         usuarioJpaRepository.save(professor);
         
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Map.of("senhaProvisoria", senhaProvisoria));
     }
     
     @PatchMapping("/professores/{id}/desativar-antigo")
@@ -958,5 +964,11 @@ public class UsuariosAdminController {
         }
         
         return null;
+    }
+
+    // V-10: gera senha provisoria aleatoria e unica, em vez de valor
+    // fixo compartilhado entre todas as contas
+    private String gerarSenhaProvisoria() {
+        return "Temp" + UUID.randomUUID().toString().substring(0, 8);
     }
 }

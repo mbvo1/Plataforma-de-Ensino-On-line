@@ -35,21 +35,13 @@ diferente das demais que são falhas de acesso/configuração no servidor
 - Código vulnerável: atividade-detalhes.html, função
   renderizarTabelaEnvios(), interpolação direta de aluno.nomeAluno
   dentro de template string atribuída a innerHTML
-- Evidência: antes-alerta.png
-- Impacto observado: alerta disparado no navegador do professor ao
-  abrir a lista de entregas de uma atividade real
-
-  ## Antes da correção
-- Código vulnerável: atividade-detalhes.html, função
-  renderizarTabelaEnvios(), interpolação direta de aluno.nomeAluno
-  dentro de template string atribuída a innerHTML
 - Evidência: antes-alerta.png (alerta disparado ao abrir o modal de
   entregas), antes-tabela-icone-quebrado.png (a tabela renderizada,
   mostrando o ícone de imagem quebrada no lugar do nome do aluno)
 - Impacto observado: alerta disparado no navegador do professor ao
   abrir a lista de entregas de uma atividade real
 
-  ## Depois da correção
+## Depois da correção
 - Código corrigido: atividade-detalhes.html, adicionada função
   escapeHtml() e aplicada em aluno.nomeAluno dentro de
   renderizarTabelaEnvios()
@@ -62,8 +54,9 @@ diferente das demais que são falhas de acesso/configuração no servidor
   interpolação de dado do usuário em innerHTML
 
 ## Reteste
-- Mesmo payload da Tentativa de ataque original, reenviado contra a
+- Mesmo payload da tentativa de ataque original, reenviado contra a
   versão corrigida
-- Resultado: o payload aparece como texto literal na tabela, nenhum
-  script executado (depois.png)
-- Resultado: Ataque → Correção → Ataque bloqueado (confirmado)
+- Resultado: o payload aparece como texto literal na tabela, sem
+  nenhum script executado (depois.png)
+- Conclusão: Ataque → Correção → Script neutralizado, exibido como
+  texto inofensivo (confirmado)

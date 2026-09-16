@@ -21,7 +21,6 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api/aluno")
-@CrossOrigin(origins = "*")
 public class AlunoMatriculaController {
 
     private final MatriculaJpaRepository matriculaRepository;

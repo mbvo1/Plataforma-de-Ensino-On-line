@@ -5,12 +5,21 @@ public class AlunoResponse {
     private String nome;
     private String email;
     private String status;
+    private String senhaProvisoria;
 
     public AlunoResponse(Long id, String nome, String email, String status) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.status = status;
+    }
+
+    public AlunoResponse(Long id, String nome, String email, String status, String senhaProvisoria) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.status = status;
+        this.senhaProvisoria = senhaProvisoria;
     }
 
     // Getters
@@ -30,6 +39,10 @@ public class AlunoResponse {
         return status;
     }
 
+    public String getSenhaProvisoria() {
+        return senhaProvisoria;
+    }
+
     // Setters
     public void setId(Long id) {
         this.id = id;
@@ -45,5 +58,9 @@ public class AlunoResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setSenhaProvisoria(String senhaProvisoria) {
+        this.senhaProvisoria = senhaProvisoria;
     }
 }

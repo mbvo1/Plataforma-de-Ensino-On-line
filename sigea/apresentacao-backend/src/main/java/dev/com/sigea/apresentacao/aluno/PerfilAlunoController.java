@@ -1,5 +1,6 @@
 package dev.com.sigea.apresentacao.aluno;
 
+import dev.com.sigea.dominio.usuario.Senha;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
 import org.springframework.http.HttpStatus;
@@ -129,8 +130,11 @@ public class PerfilAlunoController {
                 }
             }
 
+            // Mitigacao V-01: senha agora passa por Argon2id, nao mais
+            // pelo prefixo "HASH_" em texto claro.
             if (request.getSenha() != null && !request.getSenha().trim().isEmpty()) {
-                String senhaHash = "HASH_" + request.getSenha().trim();
+            if (request.getSenha() != null && !request.getSenha().trim().isEmpty()) {
+                String senhaHash = Senha.criarNova(request.getSenha().trim()).getSenhaHash();
                 usuario.setSenhaHash(senhaHash);
             }
 

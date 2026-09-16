@@ -14,7 +14,7 @@ public class UsuarioService {
         }
 
         UsuarioId novoId = usuarioRepository.proximoId();
-        Senha senha = new Senha("HASH_" + senhaTexto); 
+        Senha senha = Senha.criarNova(senhaTexto);
         Usuario novoUsuario = new Usuario(novoId, nome, email, cpf, senha, perfil);
         usuarioRepository.salvar(novoUsuario);
 

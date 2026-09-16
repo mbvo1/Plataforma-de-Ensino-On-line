@@ -41,3 +41,19 @@ restricao de origem)
   forjada e inexistente
 - Impacto observado: qualquer origem, real ou inventada, e liberada
   pelo servidor
+
+  ## Depois da correção
+- Código corrigido: removida a anotação @CrossOrigin(origins = "*")
+  dos 15 controllers que a possuíam
+- Justificativa técnica: o frontend é servido pelo mesmo domínio da API
+  (mesma origem), então nenhuma configuração de CORS é necessária -
+  o navegador já permite chamadas same-origin por padrão. Adicionar CORS
+  aberto era desnecessário e ampliava a superfície de ataque sem
+  benefício algum.
+- Mecanismo de proteção utilizado: remoção da funcionalidade
+  desnecessária (mesmo princípio da V-04 - menor superfície de ataque)
+
+## Reteste
+- Requisição com origem forjada: cabeçalhos Access-Control-Allow-Origin
+  e Vary: Origin ausentes na resposta (depois.png)
+- Resultado: Ataque → Correção → Comportamento CORS removido (confirmado)

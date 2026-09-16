@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/aluno")
-@CrossOrigin(origins = "*")
 public class AlunoTurmasController {
 
     private final TurmaJpaRepository turmaRepository;

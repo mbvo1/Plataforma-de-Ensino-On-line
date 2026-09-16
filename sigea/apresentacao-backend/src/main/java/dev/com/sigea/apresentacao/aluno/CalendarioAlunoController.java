@@ -15,7 +15,6 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api/aluno")
-@CrossOrigin(origins = "*")
 public class CalendarioAlunoController {
     
     private final EventoJpaRepository eventoRepository;

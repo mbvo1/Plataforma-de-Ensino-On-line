@@ -42,7 +42,6 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/professor")
-@CrossOrigin(origins = "*")
 public class ProfessorController {
     
     private final TurmaJpaRepository turmaJpaRepository;

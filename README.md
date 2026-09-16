@@ -137,6 +137,7 @@ mvn test
 * Luis Felipe Arruda
 * Marcelo Bresani
 * Marcelo Henrique
+* Rodrigo Nunes
 
 ---
 

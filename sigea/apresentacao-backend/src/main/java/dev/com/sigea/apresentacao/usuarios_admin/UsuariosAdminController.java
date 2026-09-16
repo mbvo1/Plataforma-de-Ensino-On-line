@@ -6,6 +6,7 @@ import dev.com.sigea.apresentacao.usuarios_admin.strategy.*;
 import dev.com.sigea.infraestrutura.persistencia.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")
+@PreAuthorize("hasRole('ADMINISTRADOR')") // V-06: nenhum endpoint aqui era restrito por papel
 public class UsuariosAdminController {
     
     private final Map<String, UsuarioResponse> usuarios = new HashMap<>();

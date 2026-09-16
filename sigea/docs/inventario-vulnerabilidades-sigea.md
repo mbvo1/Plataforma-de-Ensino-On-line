@@ -307,6 +307,15 @@ autenticação.
 
 ## V-06 — Ausência de controle de acesso baseado em papel
 
+> **Status:** parcialmente corrigida na branch `fix/V-06-rbac`. Validação
+> dinâmica completa (ataque real + evidência + fix + reteste) em
+> [`evidencias/v06/exploracao-V-06-rbac.md`](evidencias/v06/exploracao-V-06-rbac.md).
+> O fix cobre `UsuariosAdminController` (achado confirmado por um colega de
+> equipe, fora deste repositório, ao investigar V-09). `DisciplinasPeriodosController`
+> e `NotasController` continuam com o mesmo problema e ficam para um PR
+> separado, porque exigem regras de papel diferentes (não é só "exigir
+> ADMINISTRADOR" para todo mundo).
+
 - **Severidade:** Alta
 - **Categoria (PDF):** Controle de acesso inadequado
 - **OWASP:** Controle de acesso quebrado; API — autorização quebrada em nível de função

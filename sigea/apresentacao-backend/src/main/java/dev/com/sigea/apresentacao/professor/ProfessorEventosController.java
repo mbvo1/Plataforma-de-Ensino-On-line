@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/professor/eventos")
-@CrossOrigin(origins = "*")
 public class ProfessorEventosController {
 
     private final EventoProfessorJpaRepository repo;

@@ -17,7 +17,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "*")
 public class UsuariosAdminController {
     
     private final Map<String, UsuarioResponse> usuarios = new HashMap<>();

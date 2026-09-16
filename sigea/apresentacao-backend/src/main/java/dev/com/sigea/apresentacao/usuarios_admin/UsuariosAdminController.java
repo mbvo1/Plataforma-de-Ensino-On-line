@@ -3,13 +3,13 @@ package dev.com.sigea.apresentacao.usuarios_admin;
 import dev.com.sigea.apresentacao.usuarios_admin.dto.*;
 import dev.com.sigea.apresentacao.usuarios_admin.factory.UsuarioFactory;
 import dev.com.sigea.apresentacao.usuarios_admin.strategy.*;
+import dev.com.sigea.dominio.usuario.Senha;
 import dev.com.sigea.infraestrutura.persistencia.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
 
 /**
  * Funcionalidade 07: Usuários (Admin)
@@ -17,7 +17,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "*")
 public class UsuariosAdminController {
     
     private final Map<String, UsuarioResponse> usuarios = new HashMap<>();
@@ -323,7 +322,7 @@ public class UsuariosAdminController {
             request.getNome(),
             request.getEmail(),
             request.getCpf(),
-            "HASH_senha123", // Senha padrão com hash (consistente com AutenticacaoService)
+            Senha.criarNova("senha123").getSenhaHash(), // Senha provisoria com Argon2id, // Senha padrão com hash (consistente com AutenticacaoService)
             "PROFESSOR",
             "ATIVO"
         );
@@ -387,7 +386,7 @@ public class UsuariosAdminController {
         }
         
         UsuarioEntity professor = professorOpt.get();
-        professor.setSenhaHash("senha123"); // Senha padrão (em produção, usar hash BCrypt)
+        professor.setSenhaHash(Senha.criarNova("senha123").getSenhaHash());
         usuarioJpaRepository.save(professor);
         
         return ResponseEntity.ok().build();

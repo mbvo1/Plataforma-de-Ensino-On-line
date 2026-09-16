@@ -27,7 +27,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll() // V-04 ainda nao corrigida
-                .requestMatchers("/", "/*.html", "/*.css", "/*.js").permitAll()
+                .requestMatchers("/", "/*.html", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // necessario para o h2-console funcionar

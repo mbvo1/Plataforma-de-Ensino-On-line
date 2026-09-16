@@ -564,6 +564,16 @@ async function carregarEnvios() {
     }
 }
 
+// Mitigacao V-13 (XSS): converte caracteres HTML perigosos em texto
+// literal antes de inserir no innerHTML. Nunca confiar em dado vindo
+// do usuario (como o nome do aluno) sem passar por esta funcao.
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Função para renderizar a tabela de envios
 function renderizarTabelaEnvios(alunos) {
     const tbody = document.getElementById('tabelaEnvios');
@@ -633,7 +643,7 @@ function renderizarTabelaEnvios(alunos) {
         return `
             <tr>
                 <td>
-                    <strong>${aluno.nomeAluno}</strong>
+                  <strong>${escapeHtml(aluno.nomeAluno)}</strong>
                     ${isEntregue ? `<br><small style="color:#666;">Enviado em: ${aluno.dataEnvio || '—'}</small>` : ''}
                 </td>
                 <td>${statusBadge}</td>

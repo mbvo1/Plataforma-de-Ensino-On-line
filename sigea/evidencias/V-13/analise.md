@@ -48,3 +48,22 @@ diferente das demais que são falhas de acesso/configuração no servidor
   mostrando o ícone de imagem quebrada no lugar do nome do aluno)
 - Impacto observado: alerta disparado no navegador do professor ao
   abrir a lista de entregas de uma atividade real
+
+  ## Depois da correção
+- Código corrigido: atividade-detalhes.html, adicionada função
+  escapeHtml() e aplicada em aluno.nomeAluno dentro de
+  renderizarTabelaEnvios()
+- Justificativa técnica: sanitização de saída (output encoding) - a
+  técnica usada (atribuir a textContent e ler de volta via innerHTML)
+  converte automaticamente caracteres HTML especiais em suas entidades
+  equivalentes, impedindo que o navegador interprete a string como
+  marcação executável
+- Mecanismo de proteção utilizado: escape de HTML antes de qualquer
+  interpolação de dado do usuário em innerHTML
+
+## Reteste
+- Mesmo payload da Tentativa de ataque original, reenviado contra a
+  versão corrigida
+- Resultado: o payload aparece como texto literal na tabela, nenhum
+  script executado (depois.png)
+- Resultado: Ataque → Correção → Ataque bloqueado (confirmado)

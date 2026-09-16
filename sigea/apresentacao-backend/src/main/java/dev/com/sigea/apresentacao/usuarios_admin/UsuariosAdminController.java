@@ -7,6 +7,7 @@ import dev.com.sigea.dominio.usuario.Senha;
 import dev.com.sigea.infraestrutura.persistencia.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMINISTRADOR')") // V-06: nenhum endpoint aqui era restrito por papel
 public class UsuariosAdminController {
     
     private final Map<String, UsuarioResponse> usuarios = new HashMap<>();
@@ -316,13 +318,13 @@ public class UsuariosAdminController {
             return ResponseEntity.badRequest().body(Map.of("message", "Email já cadastrado"));
         }
         
-        // Cria novo professor com senha padrão "senha123" (com hash)
+        // Cria novo professor com senha padrão "senha123" (com hash Argon2id)
         UsuarioEntity novoProfessor = new UsuarioEntity(
             null,
             request.getNome(),
             request.getEmail(),
             request.getCpf(),
-            Senha.criarNova("senha123").getSenhaHash(), // Senha provisoria com Argon2id, // Senha padrão com hash (consistente com AutenticacaoService)
+            Senha.criarNova("senha123").getSenhaHash(), // Senha provisoria com Argon2id
             "PROFESSOR",
             "ATIVO"
         );
@@ -958,4 +960,3 @@ public class UsuariosAdminController {
         return null;
     }
 }
-

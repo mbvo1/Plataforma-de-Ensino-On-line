@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.iml
+
+# Maven
+sigea/target/
+sigea/**/target/
+sigea/.mvn/
+sigea/mvnw
+sigea/mvnw.cmd
+
+# Documentation
+README.md
+padroes.md
+docs/
+
+# Evidences
+evidencias/
+
+# CML
+sigea.cml
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

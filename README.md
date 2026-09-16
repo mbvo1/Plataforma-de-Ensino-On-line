@@ -10,14 +10,62 @@ O objetivo principal é fornecer à comunidade acadêmica — administradores, p
 
 ## ⚙️ Como Rodar o Projeto
 
-### Pré-requisitos
+### Opção 1: Usando Docker (Recomendado)
+
+#### Pré-requisitos
+
+* **Docker** e **Docker Compose** instalados
+
+#### Passo a Passo
+
+1. **Construir e iniciar o container:**
+
+```bash
+docker-compose up --build
+```
+
+2. **Acessar a Aplicação:**
+
+Após iniciar, você poderá acessar:
+
+* **Frontend**: `http://localhost:8080` - Aluno, `http://localhost:8080/login-professor.html` - Professor, `http://localhost:8080/login-admin.html` - Admin
+  * Obs: login de Admin - E-mail: admin@sigea.com, CPF: 00000000000, Senha: admin123
+* **API REST**: `http://localhost:8080/api`
+* **Console H2 Database**: `http://localhost:8080/h2-console`
+  - JDBC URL: `jdbc:h2:file:/app/sigea`
+  - Username: `sa`
+  - Password: (deixe em branco)
+
+3. **Parar o container:**
+
+```bash
+docker-compose down
+```
+
+4. **Reiniciar o container:**
+
+```bash
+docker-compose restart
+```
+
+#### Observações
+
+* O banco de dados H2 e os arquivos enviados são persistidos em volumes Docker
+* O ambiente Docker é isolado e não interfere com seu sistema local
+* A primeira execução pode demorar devido ao download das dependências Maven
+
+---
+
+### Opção 2: Execução Local (Sem Docker)
+
+#### Pré-requisitos
 
 * **JDK 17** (ou superior)
 * **Apache Maven** 3.8 (ou superior)
 
-### Passo a Passo
+#### Passo a Passo
 
-#### 1. Compilar o Projeto
+##### 1. Compilar o Projeto
 
 Navegue até a pasta raiz do projeto (`sigea/`) e execute:
 
@@ -33,7 +81,7 @@ Este comando irá:
 
 Ao final da execução, o build deve ser concluído com **`BUILD SUCCESS`**, indicando que todas as 18 especificações de teste passaram.
 
-#### 2. Executar a Aplicação
+##### 2. Executar a Aplicação
 
 Após a compilação bem-sucedida, execute o backend Spring Boot:
 
@@ -48,19 +96,19 @@ Ou, alternativamente, execute diretamente o JAR gerado:
 java -jar apresentacao-backend/target/sigea-apresentacao-backend-1.0.0-SNAPSHOT.jar
 ```
 
-#### 3. Acessar a Aplicação
+##### 3. Acessar a Aplicação
 
 Após iniciar a aplicação, você poderá acessar:
 
-* **Frontend**: `http://localhost:8080` - Aluno,  `http://localhost:8080(http://localhost:8080/login-professor.html)` - Professor, `http://localhost:8080(http://localhost:8080/login-admin.html)` - Admin
-Obs: login de Admin : E-mail: admin@sigea.com, Cpf: 00000000000, Senha: admin123
+* **Frontend**: `http://localhost:8080` - Aluno, `http://localhost:8080/login-professor.html` - Professor, `http://localhost:8080/login-admin.html` - Admin
+  * Obs: login de Admin - E-mail: admin@sigea.com, CPF: 00000000000, Senha: admin123
 * **API REST**: `http://localhost:8080/api`
 * **Console H2 Database**: `http://localhost:8080/h2-console`
   - JDBC URL: `jdbc:h2:file:./sigea`
   - Username: `sa`
   - Password: (deixe em branco)
 
-#### 4. Executar Apenas os Testes
+##### 4. Executar Apenas os Testes
 
 Para executar apenas os testes sem recompilar tudo:
 
@@ -69,7 +117,7 @@ cd sigea
 mvn test
 ```
 
-### Observações
+#### Observações
 
 * O banco de dados H2 é criado automaticamente na primeira execução
 * As migrações do Flyway são executadas automaticamente ao iniciar a aplicação

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  sigea-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sigea-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - sigea-uploads:/app/uploads
+      - sigea-db:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/app/sigea
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_H2_CONSOLE_ENABLED=true
+      - SPRING_JPA_SHOW_SQL=true
+      - JWT_SECRET=sigea-secret-key-2024-super-secret-jwt-token-key
+      - GEMINI_API_KEY=your-gemini-api-key-here
+    restart: unless-stopped
+
+volumes:
+  sigea-uploads:
+    driver: local
+  sigea-db:
+    driver: local

@@ -3,6 +3,7 @@ package dev.com.sigea.apresentacao.usuarios_admin;
 import dev.com.sigea.apresentacao.usuarios_admin.dto.*;
 import dev.com.sigea.apresentacao.usuarios_admin.factory.UsuarioFactory;
 import dev.com.sigea.apresentacao.usuarios_admin.strategy.*;
+import dev.com.sigea.dominio.usuario.Senha;
 import dev.com.sigea.infraestrutura.persistencia.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
 
 /**
  * Funcionalidade 07: Usuários (Admin)
@@ -18,7 +18,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "*")
 @PreAuthorize("hasRole('ADMINISTRADOR')") // V-06: nenhum endpoint aqui era restrito por papel
 public class UsuariosAdminController {
     
@@ -319,13 +318,13 @@ public class UsuariosAdminController {
             return ResponseEntity.badRequest().body(Map.of("message", "Email já cadastrado"));
         }
         
-        // Cria novo professor com senha padrão "senha123" (com hash)
+        // Cria novo professor com senha padrão "senha123" (com hash Argon2id)
         UsuarioEntity novoProfessor = new UsuarioEntity(
             null,
             request.getNome(),
             request.getEmail(),
             request.getCpf(),
-            "HASH_senha123", // Senha padrão com hash (consistente com AutenticacaoService)
+            Senha.criarNova("senha123").getSenhaHash(), // Senha provisoria com Argon2id
             "PROFESSOR",
             "ATIVO"
         );
@@ -389,7 +388,7 @@ public class UsuariosAdminController {
         }
         
         UsuarioEntity professor = professorOpt.get();
-        professor.setSenhaHash("senha123"); // Senha padrão (em produção, usar hash BCrypt)
+        professor.setSenhaHash(Senha.criarNova("senha123").getSenhaHash());
         usuarioJpaRepository.save(professor);
         
         return ResponseEntity.ok().build();
@@ -961,4 +960,3 @@ public class UsuariosAdminController {
         return null;
     }
 }
-

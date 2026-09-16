@@ -11,7 +11,6 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api/notas")
-@CrossOrigin(origins = "*")
 public class NotasController {
     
     private final AvaliacaoJpaRepository avaliacaoRepository;

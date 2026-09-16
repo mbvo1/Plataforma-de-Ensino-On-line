@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/professor")
-@CrossOrigin(origins = "*")
 public class PerfilProfessorController {
     
     private final UsuarioJpaRepository usuarioJpaRepository;

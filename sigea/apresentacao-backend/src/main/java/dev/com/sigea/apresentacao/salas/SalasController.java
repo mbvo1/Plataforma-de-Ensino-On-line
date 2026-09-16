@@ -13,7 +13,6 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/salas")
-@CrossOrigin(origins = "*")
 public class SalasController {
     
     private final SalaJpaRepository salaJpaRepository;

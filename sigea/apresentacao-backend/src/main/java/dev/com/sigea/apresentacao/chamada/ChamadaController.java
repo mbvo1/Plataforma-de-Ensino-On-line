@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/chamadas")
-@CrossOrigin(origins = "*")
 public class ChamadaController {
     
     private final ChamadaJpaRepository chamadaRepository;

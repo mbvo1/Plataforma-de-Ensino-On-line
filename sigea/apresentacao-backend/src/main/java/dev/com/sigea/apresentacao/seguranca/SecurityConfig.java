@@ -28,8 +28,8 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll() // V-04: rota so existe se spring.h2.console.enabled=true
-                .requestMatchers("/", "/*.html", "/*.css", "/*.js").permitAll()
+                .requestMatchers("/h2-console/**").permitAll() // V-04 ainda nao corrigida
+                .requestMatchers("/", "/*.html", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // necessario para o h2-console funcionar

@@ -17,3 +17,5 @@ target/
 .nb-gradle/
 .DS_Store
 Thumbs.db
+# Segredos locais (nao versionar)
+.env

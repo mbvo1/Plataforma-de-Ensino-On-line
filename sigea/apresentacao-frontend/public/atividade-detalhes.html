@@ -612,19 +612,27 @@ function renderizarTabelaEnvios(alunos) {
             downloadBtn = `<span class="sem-envio">—</span>`;
         }
         
-        // Input de nota
+        // Input de nota + acao de feedback automatico por IA
         let notaInput = '';
         if (isEntregue) {
             const notaValue = aluno.nota !== null && aluno.nota !== undefined ? aluno.nota : '';
             notaInput = `
-                <input type="number" 
-                       class="input-nota" 
+                <input type="number"
+                       class="input-nota"
                        data-envio-id="${aluno.envioId}"
                        value="${notaValue}"
-                       min="0" 
-                       max="10" 
+                       min="0"
+                       max="10"
                        step="0.1"
                        placeholder="0-10">
+                <button type="button"
+                        class="btn-feedback-ia"
+                        data-envio-id="${aluno.envioId}"
+                        onclick="gerarFeedbackIA(${aluno.envioId}, this)"
+                        style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:6px 12px;background-color:#6f42c1;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">
+                    <i class="fas fa-robot"></i> Gerar Feedback IA
+                </button>
+                <div id="feedbackIA_${aluno.envioId}" class="feedback-ia-resultado" style="display:none;margin-top:8px;padding:10px;border-radius:6px;background:#f6f0ff;border:1px solid #d7c4f5;font-size:12px;line-height:1.5;text-align:left;max-width:340px;"></div>
             `;
         } else {
             notaInput = `<span class="sem-envio">—</span>`;
@@ -642,6 +650,66 @@ function renderizarTabelaEnvios(alunos) {
             </tr>
         `;
     }).join('');
+}
+
+// Função para gerar feedback automático via IA (feedback-ia)
+// ATENCAO (demonstracao de seguranca): este fluxo chama a IA e a nota
+// sugerida e aplicada automaticamente ao envio, sem revisao humana. E o
+// alvo da demonstracao de prompt injection.
+async function gerarFeedbackIA(envioId, botao) {
+    if (!atividadeAtual || !atividadeAtual.atividadeId) {
+        alert('Atividade não encontrada');
+        return;
+    }
+
+    const painel = document.getElementById(`feedbackIA_${envioId}`);
+    const textoOriginal = botao.innerHTML;
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisando com IA...';
+
+    try {
+        const response = await fetch(`/api/atividades/${atividadeAtual.atividadeId}/envios/${envioId}/feedback-ia`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.erro || 'Erro ao gerar feedback com IA');
+        }
+
+        // Reflete a nota sugerida (e ja persistida) no input correspondente
+        const inputNota = document.querySelector(`.input-nota[data-envio-id="${envioId}"]`);
+        if (inputNota && result.notaSugerida !== null && result.notaSugerida !== undefined) {
+            inputNota.value = result.notaSugerida;
+        }
+
+        if (painel) {
+            painel.style.display = 'block';
+            const nota = (result.notaSugerida !== null && result.notaSugerida !== undefined)
+                ? result.notaSugerida : 'N/A';
+            painel.innerHTML = `
+                <div style="font-weight:600;color:#6f42c1;margin-bottom:4px;">
+                    <i class="fas fa-robot"></i> Nota sugerida pela IA: ${nota}
+                </div>
+                <div style="white-space:pre-wrap;color:#333;">${(result.feedback || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                <div style="margin-top:6px;color:#8a6d3b;font-style:italic;">Nota aplicada automaticamente ao envio.</div>
+            `;
+        }
+
+    } catch (error) {
+        console.error('Erro ao gerar feedback IA:', error);
+        if (painel) {
+            painel.style.display = 'block';
+            painel.style.background = '#fdecea';
+            painel.style.borderColor = '#f5c2c0';
+            painel.innerHTML = `<span style="color:#c0392b;">Erro ao gerar feedback: ${error.message}</span>`;
+        }
+    } finally {
+        botao.disabled = false;
+        botao.innerHTML = textoOriginal;
+    }
 }
 
 // Função para salvar as notas

@@ -1,3 +1,12 @@
+// Mitigacao V-13 (XSS): converte caracteres HTML perigosos em texto
+// literal antes de inserir no innerHTML.
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Verifica autenticação ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -15,14 +24,18 @@ window.addEventListener('DOMContentLoaded', () => {
 async function carregarDadosDashboard() {
     try {
         // Carregar estatísticas
-        const statsResponse = await fetch('http://localhost:8080/api/dashboard/stats');
+        const statsResponse = await fetch('http://localhost:8080/api/dashboard/stats', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
         if (statsResponse.ok) {
             const stats = await statsResponse.json();
             atualizarEstatisticas(stats);
         }
         
         // Carregar últimos usuários
-        const usuariosResponse = await fetch('http://localhost:8080/api/dashboard/ultimos-usuarios');
+        const usuariosResponse = await fetch('http://localhost:8080/api/dashboard/ultimos-usuarios', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
         if (usuariosResponse.ok) {
             const usuarios = await usuariosResponse.json();
             exibirUltimosUsuarios(usuarios);
@@ -47,15 +60,15 @@ function exibirUltimosUsuarios(usuarios) {
         return;
     }
     
-    const html = usuarios.map(usuario => `
-        <div class="user-item">
-            <i class="fas ${usuario.perfil === 'PROFESSOR' ? 'fa-chalkboard-teacher' : 'fa-user-graduate'}"></i>
-            <div class="user-info">
-                <span class="user-name">${usuario.nome}</span>
-                <span class="user-type">${usuario.perfil === 'PROFESSOR' ? 'Professor' : 'Aluno'}</span>
-            </div>
+   const html = usuarios.map(usuario => `
+    <div class="user-item">
+        <i class="fas ${usuario.perfil === 'PROFESSOR' ? 'fa-chalkboard-teacher' : 'fa-user-graduate'}"></i>
+        <div class="user-info">
+            <span class="user-name">${escapeHtml(usuario.nome)}</span>
+            <span class="user-type">${usuario.perfil === 'PROFESSOR' ? 'Professor' : 'Aluno'}</span>
         </div>
-    `).join('');
+    </div>
+`).join('');
     
     container.innerHTML = html;
 }

@@ -1,5 +1,12 @@
 // chamada-professor.js
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 const usuarioId = localStorage.getItem('usuarioId');
 document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
 
@@ -69,7 +76,8 @@ async function carregarChamada() {
     
     try {
         const response = await fetch(
-            `http://localhost:8080/api/chamadas/sala/${salaId}/data/${data}?professorId=${usuarioId}`
+            `http://localhost:8080/api/chamadas/sala/${salaId}/data/${data}?professorId=${usuarioId}`,
+            { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
         );
         
         if (!response.ok) {
@@ -98,7 +106,7 @@ async function carregarChamada() {
             const totalFaltas = faltasTotais[aluno.matriculaId] || 0;
             
             tr.innerHTML = `
-                <td>${aluno.nome}</td>
+                <td>${escapeHtml(aluno.nome)}</td>
                 <td>
                     <input type="checkbox" 
                            class="checkbox-falta" 
@@ -140,7 +148,8 @@ async function carregarFaltasTotais() {
     try {
         // Busca alunos da sala para obter total de faltas
         const response = await fetch(
-            `http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`
+            `http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`,
+            { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
         );
         
         if (response.ok) {
@@ -200,7 +209,8 @@ async function salvarChamada() {
             {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({
                     alunos: alunosRequest

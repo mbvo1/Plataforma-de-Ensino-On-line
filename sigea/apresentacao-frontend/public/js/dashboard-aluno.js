@@ -83,7 +83,11 @@ async function carregarDadosDashboard() {
     const usuarioId = localStorage.getItem('usuarioId');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/dashboard/aluno/${usuarioId}`);
+        const response = await fetch(`http://localhost:8080/api/dashboard/aluno/${usuarioId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
         
         if (response.ok) {
             const dados = await response.json();

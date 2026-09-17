@@ -46,8 +46,8 @@ async function carregarAvisos() {
             ? `http://localhost:8080/api/avisos/historico?usuarioId=${usuarioId}`
             : `http://localhost:8080/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
             
-        const response = await fetch(endpoint);
-        
+        const response = await fetch(endpoint, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+
         if (!response.ok) {
             throw new Error('Erro ao carregar avisos');
         }
@@ -203,7 +203,7 @@ async function criarAviso(event) {
     try {
         const response = await fetch('http://localhost:8080/api/avisos', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(novoAviso)
         });
         
@@ -242,7 +242,7 @@ async function marcarComoLido(avisoId) {
     try {
         const response = await fetch('http://localhost:8080/api/avisos/marcar-lido', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify({ avisoId, usuarioId })
         });
         
@@ -268,7 +268,8 @@ async function excluirAviso(id) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/avisos/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (response.ok) {

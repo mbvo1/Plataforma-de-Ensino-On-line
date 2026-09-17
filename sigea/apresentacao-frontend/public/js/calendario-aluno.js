@@ -187,7 +187,7 @@ function parseData(dataString) {
 function getEventosNaData(data) { return eventos.filter(evento => { const dataEvento = parseData(evento.data || evento.dataEvento); if (!dataEvento) return false; return dataEvento.toDateString() === data.toDateString(); }); }
 
 async function carregarPeriodos() {
-    try { const response = await fetch('http://localhost:8080/api/periodos'); if (!response.ok) throw new Error('Erro ao carregar períodos'); periodos = await response.json(); renderizarCalendario(); } catch (error) { console.error('Erro ao carregar períodos:', error); }
+    try { const response = await fetch('http://localhost:8080/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); if (!response.ok) throw new Error('Erro ao carregar períodos'); periodos = await response.json(); renderizarCalendario(); } catch (error) { console.error('Erro ao carregar períodos:', error); }
 }
 
 // Carrega eventos do aluno (institucionais + eventos de professores das disciplinas matriculadas)
@@ -196,7 +196,7 @@ async function carregarEventos() {
         const usuarioId = parseInt(localStorage.getItem('usuarioId'));
         
         // Busca eventos do aluno através do endpoint específico
-        const responseEventos = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/eventos`);
+        const responseEventos = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/eventos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!responseEventos.ok) throw new Error('Erro ao carregar eventos');
         const eventosAluno = await responseEventos.json();
 
@@ -218,7 +218,7 @@ async function carregarEventos() {
 
         // Tenta adicionar período letivo automático
         try {
-            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual');
+            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (responsePeriodos.ok) {
                 const periodo = await responsePeriodos.json();
                 if (periodo && periodo.dataInicio) {

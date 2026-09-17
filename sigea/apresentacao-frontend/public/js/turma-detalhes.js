@@ -24,6 +24,13 @@ document.getElementById('menuToggle').addEventListener('click', function() {
     document.getElementById('sidebar').classList.toggle('collapsed');
 });
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Logout
 function handleLogout() {
     localStorage.clear();
@@ -33,7 +40,7 @@ function handleLogout() {
 // Carrega dados da turma
 async function carregarTurma() {
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}`);
+        const response = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar turma');
@@ -60,7 +67,7 @@ async function carregarTurma() {
 // Carrega avisos da turma
 async function carregarAvisos() {
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/avisos`);
+        const response = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/avisos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar avisos');
@@ -171,7 +178,8 @@ document.getElementById('btnPostarAviso').addEventListener('click', async functi
     fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/avisos?professorId=${professorId}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(avisoRequest)
     })
@@ -254,7 +262,7 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
             <div class="aviso-autor">
                 <i class="fas fa-user-circle"></i>
                 <div class="aviso-autor-info">
-                    <strong>${aviso.professorNome || 'Professor'}</strong>
+                    <strong>${escapeHtml(aviso.professorNome || 'Professor')}</strong>
                 </div>
             </div>
             <div style="position: relative;">
@@ -327,7 +335,7 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
         try {
             const resp = await fetch(
                 `http://localhost:8080/api/professor/turmas/${turmaId}/avisos/${aviso.avisoId}?professorId=${usuarioId}`,
-                { method: 'DELETE' }
+                { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
             );
 
             if (!resp.ok) {
@@ -457,7 +465,8 @@ document.getElementById('btnSalvarEditar').addEventListener('click', async funct
             {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({
                     mensagem: mensagem,
@@ -611,7 +620,7 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
         // Sempre usa o endpoint JSON (com base64 no corpo)
         resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades?professorId=${usuarioId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
         });
 
@@ -640,7 +649,7 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
 // Carrega atividades da turma e renderiza
 async function carregarAtividades() {
     try {
-        const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades`);
+        const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!resp.ok) throw new Error('Erro ao carregar atividades');
         const atividades = await resp.json();
 
@@ -707,7 +716,7 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
                 <i class="fas fa-folder" style="color: var(--primary-color);"></i>
                 <div class="aviso-autor-info">
                     <div class="aviso-titulo"><strong>${atv.titulo}</strong></div>
-                    <small style="color: var(--text-secondary);">${atv.professorNome || 'Professor'}</small>
+                    <small style="color: var(--text-secondary);">${escapeHtml(atv.professorNome || 'Professor')}</small>
                 </div>
             </div>
             <div style="position: relative;">
@@ -800,7 +809,7 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
         const confirmar = confirm('Tem certeza que deseja excluir esta atividade?');
         if (!confirmar) return;
         try {
-            const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades/${atv.atividadeId}?professorId=${usuarioId}`, { method: 'DELETE' });
+            const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades/${atv.atividadeId}?professorId=${usuarioId}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) {
                 const err = await resp.json().catch(()=>({}));
                 throw new Error(err.message || 'Erro ao excluir atividade');
@@ -947,7 +956,7 @@ document.getElementById('btnSalvarAtividadeEditar').addEventListener('click', as
 
         const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades/${atividadeEmEdicao.atividadeId}?professorId=${usuarioId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
         });
 

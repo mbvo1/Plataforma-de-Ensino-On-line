@@ -66,7 +66,7 @@ async function carregarSalasDisponiveis() {
     
     try {
         // Carregar salas disponíveis
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/salas-disponiveis`);
+        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/salas-disponiveis`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) {
             throw new Error('Erro ao carregar salas');
         }
@@ -74,7 +74,7 @@ async function carregarSalasDisponiveis() {
         salasDisponiveis = await response.json();
         
         // Carregar também as matrículas existentes do aluno
-        const matriculasResponse = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`);
+        const matriculasResponse = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         let matriculasExistentes = [];
         if (matriculasResponse.ok) {
             matriculasExistentes = await matriculasResponse.json();
@@ -105,7 +105,7 @@ async function preencherComMatriculasExistentes(matriculasExistentes) {
         if (select) {
             // Buscar todas as salas da disciplina matriculada
             try {
-                const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/disciplinas/${matricula.disciplinaId}/salas`);
+                const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/disciplinas/${matricula.disciplinaId}/salas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
                 if (response.ok) {
                     const data = await response.json();
                     const salasDaDisciplina = data.salas || [];
@@ -389,7 +389,7 @@ function preencherHorarioNaGrade(sala) {
 // Verificar se está no período de inscrição
 async function verificarPeriodoInscricao() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) {
             console.error('Erro ao verificar período de inscrição');
             return;
@@ -434,7 +434,7 @@ async function realizarMatricula() {
     
     // Verificar período de inscrição antes de processar
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (response.ok) {
             const periodo = await response.json();
             const hoje = new Date();
@@ -488,7 +488,8 @@ async function realizarMatricula() {
     for (const matricula of matriculasParaCancelar) {
         try {
             const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas/${matricula.matriculaId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
             
             if (response.ok) {
@@ -511,7 +512,8 @@ async function realizarMatricula() {
             const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matricular`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({ salaId: sala.id })
             });

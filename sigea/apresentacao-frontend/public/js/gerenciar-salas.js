@@ -1,3 +1,10 @@
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Variáveis globais
 let disciplinaId = null;
 let disciplinaNome = '';
@@ -38,8 +45,10 @@ function loadUserInfo() {
 
 async function carregarDisciplina() {
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar disciplina');
         }
@@ -56,8 +65,10 @@ async function carregarDisciplina() {
 
 async function carregarSalas() {
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/salas`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/salas`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar salas');
         }
@@ -100,7 +111,7 @@ function exibirSalas(salas) {
         return `
         <tr>
             <td>${sala.identificador}</td>
-            <td>${sala.professorNome}</td>
+            <td>${escapeHtml(sala.professorNome)}</td>
             <td>${diasFormatados}</td>
             <td>${horario}</td>
             <td>${sala.vagasOcupadas} / ${sala.limiteVagas}</td>
@@ -162,12 +173,14 @@ function fecharModalAdicionarSala() {
 
 async function carregarProfessores() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/professores');
-        
+        const response = await fetch('http://localhost:8080/api/admin/professores', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao carregar professores');
         }
-        
+
         const professores = await response.json();
         const select = document.getElementById('input-professor');
         
@@ -240,7 +253,8 @@ async function salvarSala(event) {
         const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/salas`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(salaData)
         });
@@ -262,8 +276,10 @@ async function salvarSala(event) {
 async function editarSala(salaId) {
     try {
         // Busca os dados da sala
-        const response = await fetch(`http://localhost:8080/api/admin/salas/${salaId}`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/salas/${salaId}`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar dados da sala');
         }
@@ -310,12 +326,14 @@ function fecharModalEditarSala() {
 
 async function carregarProfessoresEdit() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/professores');
-        
+        const response = await fetch('http://localhost:8080/api/admin/professores', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao carregar professores');
         }
-        
+
         const professores = await response.json();
         const select = document.getElementById('edit-professor');
         
@@ -388,7 +406,8 @@ async function atualizarSala(event) {
         const response = await fetch(`http://localhost:8080/api/admin/salas/${salaId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(salaData)
         });
@@ -416,7 +435,8 @@ function toggleStatusSala(salaId, statusAtual) {
     }
     
     fetch(`http://localhost:8080/api/admin/salas/${salaId}/${acao}`, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
     })
     .then(response => {
         if (!response.ok) {
@@ -437,7 +457,8 @@ function excluirSala(salaId) {
     }
     
     fetch(`http://localhost:8080/api/admin/salas/${salaId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
     })
     .then(response => {
         if (!response.ok) {

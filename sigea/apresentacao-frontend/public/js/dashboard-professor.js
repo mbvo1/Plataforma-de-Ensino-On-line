@@ -52,7 +52,11 @@ async function carregarTurmas(professorId) {
     if (!container) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`);
+        const response = await fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar turmas');
@@ -89,7 +93,11 @@ async function carregarDisciplinas(professorId) {
     if (!container) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/disciplinas?professorId=${professorId}`);
+        const response = await fetch(`http://localhost:8080/api/professor/disciplinas?professorId=${professorId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar disciplinas');
@@ -135,7 +143,11 @@ async function carregarAulasHoje(professorId, hoje) {
         const diasSemana = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
         const diaAtual = diasSemana[hoje.getDay()];
         
-        const response = await fetch(`http://localhost:8080/api/professor/aulas-hoje?professorId=${professorId}&diaSemana=${diaAtual}`);
+        const response = await fetch(`http://localhost:8080/api/professor/aulas-hoje?professorId=${professorId}&diaSemana=${diaAtual}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar aulas');
@@ -169,7 +181,11 @@ async function carregarMensagensNovas(professorId) {
     if (!container) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/forum/mensagens-novas?professorId=${professorId}`);
+        const response = await fetch(`http://localhost:8080/api/professor/forum/mensagens-novas?professorId=${professorId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar mensagens');

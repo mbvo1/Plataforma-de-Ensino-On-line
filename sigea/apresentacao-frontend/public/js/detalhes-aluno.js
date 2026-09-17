@@ -1,5 +1,12 @@
 let alunoAtual = null;
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Verifica autenticação ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -37,8 +44,10 @@ function loadUserInfo() {
 
 async function carregarDetalhesAluno(alunoId) {
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoId}`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoId}`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar detalhes do aluno');
         }
@@ -61,7 +70,7 @@ function exibirDetalhesAluno(aluno) {
     
     tbody.innerHTML = `
         <tr>
-            <td>${aluno.nome}</td>
+            <td>${escapeHtml(aluno.nome)}</td>
             <td>${aluno.email}</td>
             <td>
                 <span class="status-badge ${statusClass}">${statusFormatado}</span>
@@ -90,8 +99,10 @@ function atualizarBotaoStatus(status) {
 async function carregarHistoricoDisciplinas(alunoId) {
     try {
         // Busca dados reais do banco de dados
-        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoId}/historico`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoId}/historico`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar histórico de disciplinas');
         }
@@ -130,7 +141,7 @@ function exibirHistoricoDisciplinas(historico) {
         
         return `
             <tr>
-                <td>${item.nomeDisciplina || item.disciplina}</td>
+                <td>${escapeHtml(item.nomeDisciplina || item.disciplina)}</td>
                 <td>${item.periodoLetivo}</td>
                 <td>
                     <span class="status-badge ${statusClass}">${item.status}</span>
@@ -152,7 +163,8 @@ async function cancelarMatricula(matriculaId) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/matriculas/${matriculaId}/cancelar`, {
-            method: 'PATCH'
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
@@ -180,7 +192,8 @@ async function desativarAluno() {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoAtual.id}/desativar`, {
-            method: 'PATCH'
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
@@ -207,7 +220,8 @@ async function ativarAluno() {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoAtual.id}/ativar`, {
-            method: 'PATCH'
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {

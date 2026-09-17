@@ -1,3 +1,10 @@
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Função para limpar dados do usuário
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
@@ -67,7 +74,7 @@ async function carregarTurmas() {
     const container = document.getElementById('turmas-container');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas`);
+        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (response.ok) {
             const turmas = await response.json();
@@ -85,10 +92,10 @@ async function carregarTurmas() {
                         ${turmas.map(turma => `
                             <div class="sala-card">
                                 <div class="sala-header">
-                                    <h3>${turma.titulo || turma.nomeTurma}</h3>
+                                    <h3>${escapeHtml(turma.titulo || turma.nomeTurma)}</h3>
                                 </div>
                                 <div class="sala-info">
-                                    <p><i class="fas fa-user-tie"></i> Professor: <strong>${turma.nomeProfessor}</strong></p>
+                                    <p><i class="fas fa-user-tie"></i> Professor: <strong>${escapeHtml(turma.nomeProfessor)}</strong></p>
                                 </div>
                                 <div class="sala-actions">
                                     <button class="btn-acessar" onclick="acessarTurma(${turma.turmaId || turma.id})">
@@ -144,7 +151,7 @@ async function entrarNaSala(event) {
     try {
         const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas/entrar`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify({ codigoAcesso: codigo })
         });
         

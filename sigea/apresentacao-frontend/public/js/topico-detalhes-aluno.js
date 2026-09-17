@@ -29,6 +29,13 @@ window.addEventListener('DOMContentLoaded', () => {
     carregarComentarios();
 });
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
@@ -63,7 +70,7 @@ async function carregarTopico() {
     const usuarioId = localStorage.getItem('usuarioId');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`);
+        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
 
         if (!response.ok) {
             throw new Error('Erro ao carregar tópico');
@@ -111,7 +118,7 @@ async function carregarComentarios() {
     const usuarioId = localStorage.getItem('usuarioId');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}/respostas`);
+        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}/respostas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
 
         if (!response.ok) {
             if (response.status === 404) {
@@ -156,8 +163,8 @@ function criarCardComentario(comentario) {
         ${isAutor ? `<button class="btn-excluir-comentario" onclick="excluirComentario(${comentario.id})" title="Excluir comentário">
             <i class="fas fa-times"></i>
         </button>` : ''}
-        <div class="comentario-autor">Por: "${nomeAutor}"</div>
-        <div class="comentario-conteudo">${comentario.conteudo}</div>
+        <div class="comentario-autor">Por: "${escapeHtml(nomeAutor)}"</div>
+        <div class="comentario-conteudo">${escapeHtml(comentario.conteudo)}</div>
         <div class="comentario-footer">
             <span>${dataComentario}</span>
             <button class="btn-comentar" onclick="toggleNovoComentario()">
@@ -179,7 +186,8 @@ async function excluirComentario(comentarioId) {
 
     try {
         const response = await fetch(`http://localhost:8080/api/foruns/respostas/${comentarioId}?usuarioId=${usuarioId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!response.ok) {
@@ -226,7 +234,8 @@ async function publicarComentario() {
         const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}/respostas`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify({
                 autorId: usuarioId,

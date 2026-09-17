@@ -1,5 +1,12 @@
 // disciplina-detalhes-professor.js
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 const usuarioId = localStorage.getItem('usuarioId');
 document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
 
@@ -33,7 +40,7 @@ async function carregarAlunos() {
 
     try {
         // Busca notas completas dos alunos da sala
-        const response = await fetch(`http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`);
+        const response = await fetch(`http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar notas');
@@ -54,7 +61,7 @@ async function carregarAlunos() {
         alunos.sort((a, b) => a.nome.localeCompare(b.nome));
 
         // Busca faltas de todos os alunos de uma vez
-        const faltasResponse = await fetch(`http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`);
+        const faltasResponse = await fetch(`http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         const alunosComFaltas = faltasResponse.ok ? await faltasResponse.json() : [];
         const faltasMap = new Map();
         alunosComFaltas.forEach(a => {
@@ -95,7 +102,7 @@ async function carregarAlunos() {
             }
             
             tr.innerHTML = `
-                <td>${aluno.nome}</td>
+                <td>${escapeHtml(aluno.nome)}</td>
                 <td>${av1}</td>
                 <td>${av2}</td>
                 <td>${segundaChamada}</td>

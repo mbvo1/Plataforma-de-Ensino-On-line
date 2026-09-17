@@ -1,3 +1,10 @@
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Função para limpar dados do usuário
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
@@ -78,7 +85,7 @@ async function carregarTurma() {
     
     try {
         // Busca a turma específica do aluno
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas/${turmaId}`);
+        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas/${turmaId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar turma');
@@ -105,7 +112,7 @@ async function carregarTurma() {
 // Carrega avisos da turma
 async function carregarAvisos() {
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/turmas/${turmaId}/avisos`);
+        const response = await fetch(`http://localhost:8080/api/aluno/turmas/${turmaId}/avisos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar avisos');
@@ -154,16 +161,16 @@ function adicionarAvisoNaLista(aviso) {
     if (aviso.arquivoPath) {
         if (temArquivoValido) {
             arquivoHtml = `
-                <a href="${arquivoUrl}" class="aviso-arquivo arquivo-link-aluno" target="_blank" download="${aviso.arquivoPath}">
+                <a href="${arquivoUrl}" class="aviso-arquivo arquivo-link-aluno" target="_blank" download="${escapeHtml(aviso.arquivoPath)}">
                     <i class="fas fa-paperclip"></i>
-                    <span>${aviso.arquivoPath}</span>
+                    <span>${escapeHtml(aviso.arquivoPath)}</span>
                 </a>
             `;
         } else {
             arquivoHtml = `
                 <div class="aviso-arquivo arquivo-sem-link">
                     <i class="fas fa-paperclip"></i>
-                    <span>${aviso.arquivoPath}</span>
+                    <span>${escapeHtml(aviso.arquivoPath)}</span>
                 </div>
             `;
         }
@@ -174,7 +181,7 @@ function adicionarAvisoNaLista(aviso) {
             <div class="aviso-autor">
                 <i class="fas fa-user-circle"></i>
                 <div class="aviso-autor-info">
-                    <strong>${aviso.professorNome || 'Professor'}</strong>
+                    <strong>${escapeHtml(aviso.professorNome || 'Professor')}</strong>
                 </div>
             </div>
         </div>
@@ -193,7 +200,7 @@ function adicionarAvisoNaLista(aviso) {
 // Carrega atividades da turma
 async function carregarAtividades() {
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/turmas/${turmaId}/atividades`);
+        const response = await fetch(`http://localhost:8080/api/aluno/turmas/${turmaId}/atividades`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar atividades');
@@ -244,16 +251,16 @@ function adicionarAtividadeNaLista(atv) {
     if (atv.arquivoPath) {
         if (temArquivoValido) {
             arquivoHtml = `
-                <a href="${arquivoUrl}" class="aviso-arquivo arquivo-link-aluno" target="_blank" download="${atv.arquivoPath}">
+                <a href="${arquivoUrl}" class="aviso-arquivo arquivo-link-aluno" target="_blank" download="${escapeHtml(atv.arquivoPath)}">
                     <i class="fas fa-paperclip"></i>
-                    <span>${atv.arquivoPath}</span>
+                    <span>${escapeHtml(atv.arquivoPath)}</span>
                 </a>
             `;
         } else {
             arquivoHtml = `
                 <div class="aviso-arquivo arquivo-sem-link">
                     <i class="fas fa-paperclip"></i>
-                    <span>${atv.arquivoPath}</span>
+                    <span>${escapeHtml(atv.arquivoPath)}</span>
                 </div>
             `;
         }
@@ -265,7 +272,7 @@ function adicionarAtividadeNaLista(atv) {
                 <i class="fas fa-folder" style="color: var(--primary-color);"></i>
                 <div class="aviso-autor-info">
                     <div class="aviso-titulo"><strong>${atv.titulo}</strong></div>
-                    <small style="color: var(--text-secondary);">${atv.professorNome || 'Professor'}</small>
+                    <small style="color: var(--text-secondary);">${escapeHtml(atv.professorNome || 'Professor')}</small>
                 </div>
             </div>
         </div>

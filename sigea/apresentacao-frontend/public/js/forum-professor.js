@@ -63,8 +63,12 @@ async function carregarDisciplinas() {
         const url = `http://localhost:8080/api/professor/salas?professorId=${usuarioId}`;
         console.log('Fazendo requisição para:', url);
         
-        const response = await fetch(url);
-        
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+
         console.log('Status da resposta:', response.status);
         
         if (!response.ok) {

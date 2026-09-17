@@ -43,6 +43,13 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
@@ -90,7 +97,11 @@ async function carregarTopicos() {
         const url = `http://localhost:8080/api/foruns/topicos?disciplinaId=${disciplinaId}&usuarioId=${usuarioId}`;
         console.log('URL da requisição:', url);
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
         console.log('Status da resposta:', response.status);
         console.log('Response OK?', response.ok);
         
@@ -171,16 +182,16 @@ function criarCardTopico(topico) {
     card.innerHTML = `
         <div class="topico-header">
             <div style="flex: 1;">
-                <div class="topico-titulo">${topico.titulo}${anexoIcon}</div>
+                <div class="topico-titulo">${escapeHtml(topico.titulo)}${anexoIcon}</div>
                 <div class="topico-autor">
                     <i class="fas fa-user"></i>
-                    Por: ${nomeAutor}
+                    Por: ${escapeHtml(nomeAutor)}
                 </div>
             </div>
             ${btnExcluir}
         </div>
         <div class="topico-conteudo" onclick="abrirTopicoDetalhes('${topico.id}')">
-            ${topico.conteudo.substring(0, 200)}${topico.conteudo.length > 200 ? '...' : ''}
+            ${escapeHtml(topico.conteudo.substring(0, 200))}${topico.conteudo.length > 200 ? '...' : ''}
         </div>
         <div class="topico-footer" onclick="abrirTopicoDetalhes('${topico.id}')">
             <div class="topico-data">
@@ -250,6 +261,9 @@ async function handleNovoTopico(event) {
 
             const uploadResponse = await fetch('http://localhost:8080/api/upload', {
                 method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
                 body: formData
             });
 
@@ -266,7 +280,8 @@ async function handleNovoTopico(event) {
         const response = await fetch('http://localhost:8080/api/foruns/topicos', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify({
                 disciplinaId: disciplinaId,
@@ -308,7 +323,10 @@ async function excluirTopico(event, topicoId) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
         });
         
         if (!response.ok) {

@@ -2,6 +2,13 @@
 let todasDisciplinas = [];
 let periodoAtual = null;
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Verifica autenticação ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -36,8 +43,10 @@ function loadUserInfo() {
 
 async function carregarPeriodoAtual() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
-        
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar período atual');
         }
@@ -69,8 +78,10 @@ function exibirPeriodoAtual(periodo) {
 
 async function carregarDisciplinas() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/disciplinas');
-        
+        const response = await fetch('http://localhost:8080/api/admin/disciplinas', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             // Se for 404 ou outro erro, mostra mensagem de nenhuma disciplina
             todasDisciplinas = [];
@@ -104,7 +115,7 @@ function exibirDisciplinas(disciplinas) {
         <tr>
             <td>${disciplina.codigo}</td>
             <td>${disciplina.periodo}</td>
-            <td>${disciplina.nome}</td>
+            <td>${escapeHtml(disciplina.nome)}</td>
             <td>${disciplina.salasOfertadas}</td>
             <td>
                 <span class="status-badge ${statusClass}">${statusFormatado}</span>
@@ -184,7 +195,8 @@ function confirmarCriarPeriodo(event) {
     fetch('http://localhost:8080/api/admin/periodos', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(novoPeriodo)
     })
@@ -282,7 +294,7 @@ function exibirPreRequisitosSelecionados() {
         const tag = document.createElement('div');
         tag.className = 'tag-item';
         tag.innerHTML = `
-            <span>${disciplina.nome}</span>
+            <span>${escapeHtml(disciplina.nome)}</span>
             <button type="button" onclick="removerPreRequisito(${disciplina.id})">&times;</button>
         `;
         container.appendChild(tag);
@@ -311,7 +323,8 @@ async function salvarDisciplina(event) {
         const response = await fetch('http://localhost:8080/api/admin/disciplinas', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(disciplinaData)
         });
@@ -337,8 +350,10 @@ let preRequisitosEditados = [];
 async function editarDisciplina(disciplinaId) {
     try {
         // Busca os dados da disciplina
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar dados da disciplina');
         }
@@ -406,7 +421,7 @@ function exibirPreRequisitosEditados() {
         const tag = document.createElement('div');
         tag.className = 'tag-item';
         tag.innerHTML = `
-            <span>${disciplina.nome}</span>
+            <span>${escapeHtml(disciplina.nome)}</span>
             <button type="button" onclick="removerPreRequisitoEdit(${disciplina.id})">&times;</button>
         `;
         container.appendChild(tag);
@@ -436,7 +451,8 @@ async function atualizarDisciplina(event) {
         const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(disciplinaData)
         });
@@ -469,7 +485,8 @@ async function toggleStatusDisciplina(disciplinaId, statusAtual) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/${acao}`, {
-            method: 'PATCH'
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
@@ -491,7 +508,8 @@ async function excluirDisciplina(disciplinaId) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
@@ -538,8 +556,10 @@ function fecharSelectorPeriodo() {
 
 async function carregarTodosPeriodos() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos');
-        
+        const response = await fetch('http://localhost:8080/api/admin/periodos', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar períodos');
         }
@@ -567,7 +587,7 @@ function exibirListaPeriodos(periodos) {
         return `
         <div class="periodo-item" onclick="selecionarPeriodo(${periodo.id})">
             <div class="periodo-item-header">
-                <span class="periodo-item-nome">${periodo.nome}</span>
+                <span class="periodo-item-nome">${escapeHtml(periodo.nome)}</span>
                 <span class="periodo-status ${statusClass}">${statusFormatado}</span>
             </div>
             <div class="periodo-item-datas">
@@ -584,18 +604,22 @@ async function selecionarPeriodo(periodoId) {
     periodoSelecionadoId = periodoId;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/periodos/${periodoId}/disciplinas`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/periodos/${periodoId}/disciplinas`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar disciplinas do período');
         }
-        
+
         const disciplinas = await response.json();
         todasDisciplinas = disciplinas;
         exibirDisciplinas(disciplinas);
-        
+
         // Atualiza indicador visual do período selecionado
-        const responsePeriodo = await fetch('http://localhost:8080/api/admin/periodos');
+        const responsePeriodo = await fetch('http://localhost:8080/api/admin/periodos', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
         const periodos = await responsePeriodo.json();
         const periodoSelecionado = periodos.find(p => p.id === periodoId);
         

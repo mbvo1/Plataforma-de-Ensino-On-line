@@ -13,6 +13,13 @@ window.addEventListener('DOMContentLoaded', () => {
     carregarDisciplinas();
 });
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
@@ -60,8 +67,12 @@ async function carregarDisciplinas() {
         const url = `http://localhost:8080/api/aluno/${usuarioId}/matriculas`;
         console.log('Fazendo requisição para:', url);
         
-        const response = await fetch(url);
-        
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+
         console.log('Status da resposta:', response.status);
         
         if (!response.ok) {
@@ -124,10 +135,10 @@ function criarCardDisciplina(disc) {
     const professorNome = disc.professorNome || 'Professor';
 
     card.innerHTML = `
-        <div class="forum-card-title">${disc.nome || 'Disciplina ' + disc.id}</div>
+        <div class="forum-card-title">${escapeHtml(disc.nome || 'Disciplina ' + disc.id)}</div>
         <div class="forum-card-professor">
             <i class="fas fa-user"></i>
-            <span>${professorNome}</span>
+            <span>${escapeHtml(professorNome)}</span>
         </div>
     `;
 

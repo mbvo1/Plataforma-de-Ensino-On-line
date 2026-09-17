@@ -1,3 +1,10 @@
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Função para limpar dados do usuário
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
@@ -103,7 +110,7 @@ function carregarAtividade() {
             arquivoContainer.innerHTML = `
                 <div class="arquivo-sem-download">
                     <i class="fas fa-paperclip"></i>
-                    <span>${atividadeAtual.arquivoPath}</span>
+                    <span>${escapeHtml(atividadeAtual.arquivoPath)}</span>
                     <small>(arquivo não disponível para download)</small>
                 </div>
             `;
@@ -163,8 +170,12 @@ async function verificarStatusEnvio() {
     const atividadeId = atividadeAtual.atividadeId;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/envio`);
-        
+        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/envio`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+
         if (response.ok) {
             const data = await response.json();
             atualizarStatusEnvio(data);
@@ -293,7 +304,10 @@ async function cancelarEnvio() {
     
     try {
         const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/envio`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
         });
         
         if (response.ok) {
@@ -358,6 +372,9 @@ async function enviarAtividade() {
     try {
         const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/enviar`, {
             method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
             body: formData
         });
         

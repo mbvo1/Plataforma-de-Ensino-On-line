@@ -1,3 +1,10 @@
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Verifica autenticação ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -26,7 +33,7 @@ function loadUserInfo() {
 function carregarSalas() {
     const professorId = localStorage.getItem('usuarioId');
     
-    fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`)
+    fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
         .then(response => response.json())
         .then(turmas => {
             const container = document.getElementById('salas-container');
@@ -47,7 +54,7 @@ function carregarSalas() {
                                     <h3>${turma.titulo}</h3>
                                 </div>
                                 <div class="sala-info">
-                                    <p><i class="fas fa-user-tie"></i> Criado por: <strong>${turma.nomeProfessor}</strong></p>
+                                    <p><i class="fas fa-user-tie"></i> Criado por: <strong>${escapeHtml(turma.nomeProfessor)}</strong></p>
                                 </div>
                                 <div class="sala-actions">
                                     <button class="btn-acessar" onclick="acessarSala(${turma.turmaId})">
@@ -103,7 +110,7 @@ async function salvarSala(event) {
     try {
         const response = await fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(turmaData)
         });
         

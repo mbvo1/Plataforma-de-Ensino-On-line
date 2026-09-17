@@ -305,7 +305,7 @@ function getEventosNaData(data) {
 // Carrega períodos letivos
 async function carregarPeriodos() {
     try {
-        const response = await fetch('http://localhost:8080/api/periodos');
+        const response = await fetch('http://localhost:8080/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) throw new Error('Erro ao carregar períodos');
         periodos = await response.json();
         renderizarCalendario();
@@ -318,7 +318,7 @@ async function carregarPeriodos() {
 async function carregarEventos() {
     try {
         // Carrega eventos do calendário
-        const responseEventos = await fetch('http://localhost:8080/api/eventos');
+        const responseEventos = await fetch('http://localhost:8080/api/eventos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!responseEventos.ok) throw new Error('Erro ao carregar eventos');
         eventos = await responseEventos.json();
         
@@ -335,7 +335,7 @@ async function carregarEventos() {
         
         // Carrega períodos letivos ativos
         try {
-            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual');
+            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (responsePeriodos.ok) {
                 const periodo = await responsePeriodos.json();
                 console.log('Período letivo atual:', periodo);
@@ -406,7 +406,8 @@ async function excluirEvento(eventoId) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) throw new Error('Erro ao excluir evento');
@@ -498,7 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch('http://localhost:8080/api/eventos', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({
                         titulo,

@@ -1,6 +1,13 @@
 // Array para armazenar todos os alunos
 let todosAlunos = [];
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Verifica autenticação ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -27,8 +34,10 @@ function loadUserInfo() {
 async function carregarAlunos() {
     try {
         // Busca dados reais do banco de dados
-        const response = await fetch('http://localhost:8080/api/admin/alunos');
-        
+        const response = await fetch('http://localhost:8080/api/admin/alunos', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar alunos');
         }
@@ -57,7 +66,7 @@ function exibirAlunos(alunos) {
         
         return `
         <tr>
-            <td>${aluno.nome}</td>
+            <td>${escapeHtml(aluno.nome)}</td>
             <td>${aluno.email}</td>
             <td>
                 <span class="status-badge ${statusClass}">${statusFormatado}</span>

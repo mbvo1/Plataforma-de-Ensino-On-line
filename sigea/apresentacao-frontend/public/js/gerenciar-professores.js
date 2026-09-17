@@ -1,6 +1,13 @@
 // Array para armazenar todos os professores
 let todosProfessores = [];
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Verifica autenticação ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -31,8 +38,10 @@ function loadUserInfo() {
 async function carregarProfessores() {
     try {
         // Busca dados reais do banco de dados
-        const response = await fetch('http://localhost:8080/api/admin/professores');
-        
+        const response = await fetch('http://localhost:8080/api/admin/professores', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar professores');
         }
@@ -61,7 +70,7 @@ function exibirProfessores(professores) {
         
         return `
         <tr>
-            <td>${professor.nome}</td>
+            <td>${escapeHtml(professor.nome)}</td>
             <td>${professor.email}</td>
             <td>
                 <span class="status-badge ${statusClass}">${statusFormatado}</span>
@@ -104,8 +113,10 @@ function filtrarProfessores() {
 async function editarProfessor(professorId) {
     try {
         // Busca os dados do professor
-        const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}`);
-        
+        const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar dados do professor');
         }
@@ -146,7 +157,8 @@ async function salvarEdicao(event) {
         const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(professorData)
         });
@@ -176,7 +188,8 @@ async function resetarSenha() {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}/resetar-senha`, {
-            method: 'PATCH'
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
@@ -200,7 +213,8 @@ async function toggleStatusProfessor(professorId, statusAtual) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}/${acao}`, {
-            method: 'PATCH'
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
@@ -254,7 +268,8 @@ async function salvarProfessor(event) {
         const response = await fetch('http://localhost:8080/api/admin/professores', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(professorData)
         });

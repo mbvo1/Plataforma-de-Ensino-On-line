@@ -1,6 +1,13 @@
 // Estado global
 let matriculas = [];
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Função para limpar dados do usuário
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
@@ -65,7 +72,7 @@ async function carregarMatriculas() {
     const container = document.getElementById('disciplinasContainer');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`);
+        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar matrículas');
@@ -117,11 +124,11 @@ function renderizarMatriculas() {
         
         return `
             <div class="disciplina-card">
-                <div class="disciplina-titulo">${disciplinaNome} - ${salaIdentificador}</div>
+                <div class="disciplina-titulo">${escapeHtml(disciplinaNome)} - ${salaIdentificador}</div>
                 <div class="disciplina-info">
                     <div class="disciplina-detalhe">Dias: ${diasHorario.diasTexto}</div>
                     <div class="disciplina-detalhe">Horário: ${diasHorario.horario}</div>
-                    <div class="disciplina-detalhe">Professor: "${professorNome}"</div>
+                    <div class="disciplina-detalhe">Professor: "${escapeHtml(professorNome)}"</div>
                 </div>
             </div>
         `;
@@ -176,7 +183,8 @@ async function cancelarMatricula(matriculaId) {
     
     try {
         const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas/${matriculaId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (response.ok) {
@@ -194,7 +202,7 @@ async function cancelarMatricula(matriculaId) {
 // Verificar se está no período de inscrição
 async function verificarPeriodoInscricao() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) {
             console.error('Erro ao verificar período de inscrição');
             return;
@@ -237,7 +245,7 @@ async function verificarPeriodoInscricao() {
 async function abrirMatricula() {
     // Verificar período de inscrição antes de redirecionar
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual');
+        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (response.ok) {
             const periodo = await response.json();
             const hoje = new Date();

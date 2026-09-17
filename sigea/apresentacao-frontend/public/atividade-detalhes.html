@@ -533,8 +533,8 @@ async function carregarEnvios() {
     if (!atividadeAtual || !atividadeAtual.atividadeId) return;
     
     try {
-        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios`);
-        
+        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+
         if (!response.ok) {
             throw new Error('Erro ao buscar envios');
         }
@@ -608,15 +608,15 @@ function renderizarTabelaEnvios(alunos) {
         if (isEntregue && aluno.arquivoPath) {
             if (aluno.arquivoConteudo && aluno.arquivoConteudo.startsWith('data:')) {
                 downloadBtn = `
-                    <a href="${aluno.arquivoConteudo}" 
-                       download="${aluno.arquivoPath}" 
+                    <a href="${aluno.arquivoConteudo}"
+                       download="${escapeHtml(aluno.arquivoPath)}"
                        class="btn-download-envio"
                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background-color:#0969da;color:white;border-radius:4px;text-decoration:none;font-size:12px;cursor:pointer;">
-                        <i class="fas fa-download"></i> ${aluno.arquivoPath}
+                        <i class="fas fa-download"></i> ${escapeHtml(aluno.arquivoPath)}
                     </a>
                 `;
             } else {
-                downloadBtn = `<span style="color:#999;font-style:italic;">${aluno.arquivoPath} (sem arquivo)</span>`;
+                downloadBtn = `<span style="color:#999;font-style:italic;">${escapeHtml(aluno.arquivoPath)} (sem arquivo)</span>`;
             }
         } else if (!isEntregue) {
             downloadBtn = `<span class="sem-envio">—</span>`;
@@ -681,7 +681,8 @@ async function salvarNotas() {
         const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios/salvar-notas`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(notas)
         });
@@ -777,8 +778,8 @@ async function carregarContadores() {
     if (!atividadeAtual || !atividadeAtual.atividadeId) return;
     
     try {
-        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios`);
-        
+        const response = await fetch(`/api/professor/atividades/${atividadeAtual.atividadeId}/envios`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+
         if (response.ok) {
             const data = await response.json();
             document.getElementById('detEntregues').textContent = data.entregues || 0;

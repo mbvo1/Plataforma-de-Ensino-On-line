@@ -65,7 +65,8 @@ async function handleLogin(event) {
             localStorage.setItem('usuarioNome', data.nome);
             localStorage.setItem('usuarioEmail', data.email);
             localStorage.setItem('usuarioPerfil', data.perfil);
-            
+            localStorage.setItem('token', data.token);
+
             console.log('DEBUG Login - Dados salvos no localStorage:', {
                 usuarioId: data.usuarioId,
                 usuarioNome: data.nome,
@@ -201,6 +202,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioNome');
     localStorage.removeItem('usuarioEmail');
     localStorage.removeItem('usuarioPerfil');
+    localStorage.removeItem('token');
 }
 
 // Função de logout que pode ser chamada de qualquer página

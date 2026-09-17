@@ -33,7 +33,7 @@ async function carregarAvisos() {
 
     try {
         const endpoint = `http://localhost:8080/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
-        const response = await fetch(endpoint);
+        const response = await fetch(endpoint, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) throw new Error('Erro ao carregar avisos');
         const avisos = await response.json();
 
@@ -107,7 +107,7 @@ async function marcarComoLido(avisoId) {
     try {
         const response = await fetch('http://localhost:8080/api/avisos/marcar-lido', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify({ avisoId, usuarioId })
         });
         if (response.ok) {

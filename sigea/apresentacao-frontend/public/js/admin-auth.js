@@ -46,7 +46,8 @@ async function handleAdminLogin(event) {
             localStorage.setItem('usuarioNome', data.nome);
             localStorage.setItem('usuarioEmail', data.email);
             localStorage.setItem('usuarioPerfil', data.perfil);
-            
+            localStorage.setItem('token', data.token);
+
             // Redirecionar para dashboard do admin
             window.location.href = '/dashboard-admin.html';
         } else {

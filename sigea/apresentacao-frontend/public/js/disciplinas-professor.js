@@ -1,4 +1,11 @@
 // disciplinas-professor.js
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 const usuarioId = localStorage.getItem('usuarioId');
 document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
 
@@ -9,7 +16,7 @@ async function carregarDisciplinas() {
     // Try to fetch from backend; fallback to mock list
     try {
         if (!usuarioId) throw new Error('No user');
-        const resp = await fetch(`http://localhost:8080/api/professor/disciplinas?professorId=${usuarioId}`);
+        const resp = await fetch(`http://localhost:8080/api/professor/disciplinas?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!resp.ok) throw new Error('no-api');
         const list = await resp.json();
         if (!Array.isArray(list) || list.length === 0) {
@@ -38,7 +45,7 @@ function renderDisciplina(d) {
     const identificador = d.identificador || d.identificador || '';
     const alunosCount = d.alunos ?? d.alunosMatriculados ?? 0;
     card.innerHTML = `
-        <div class="disciplina-left">${d.nome}: ${identificador}</div>
+        <div class="disciplina-left">${escapeHtml(d.nome)}: ${identificador}</div>
         <div class="disciplina-right">Alunos : <strong>${alunosCount}</strong></div>
     `;
     card.addEventListener('click', () => {

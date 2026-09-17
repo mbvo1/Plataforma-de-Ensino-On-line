@@ -1,3 +1,10 @@
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // Função para limpar dados do usuário
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
@@ -66,8 +73,10 @@ async function carregarDesempenho() {
     emptyState.style.display = 'none';
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/desempenho`);
-        
+        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/desempenho`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+
         if (!response.ok) {
             throw new Error('Erro ao carregar desempenho');
         }
@@ -108,7 +117,7 @@ async function carregarDesempenho() {
             }
             
             tr.innerHTML = `
-                <td>${d.disciplinaNome}</td>
+                <td>${escapeHtml(d.disciplinaNome)}</td>
                 <td>${av1}</td>
                 <td>${av2}</td>
                 <td>${segundaChamada}</td>

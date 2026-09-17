@@ -1,5 +1,12 @@
 // notas-professor.js
 
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 const usuarioId = localStorage.getItem('usuarioId');
 document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
 
@@ -41,7 +48,8 @@ async function carregarNotas() {
     
     try {
         const response = await fetch(
-            `http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`
+            `http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`,
+            { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
         );
         
         if (!response.ok) {
@@ -68,7 +76,7 @@ async function carregarNotas() {
             const finalNota = aluno.final !== null && aluno.final !== undefined ? aluno.final : '';
             
             tr.innerHTML = `
-                <td>${aluno.nome}</td>
+                <td>${escapeHtml(aluno.nome)}</td>
                 <td>
                     <input type="number" 
                            class="input-nota" 
@@ -289,7 +297,8 @@ async function salvarNotas() {
             {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({
                     alunos: alunosRequest

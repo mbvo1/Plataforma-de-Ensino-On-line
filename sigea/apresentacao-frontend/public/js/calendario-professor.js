@@ -183,14 +183,14 @@ function parseData(dataString) {
 function getEventosNaData(data) { return eventos.filter(evento => { const dataEvento = parseData(evento.data || evento.dataEvento); if (!dataEvento) return false; return dataEvento.toDateString() === data.toDateString(); }); }
 
 async function carregarPeriodos() {
-    try { const response = await fetch('http://localhost:8080/api/periodos'); if (!response.ok) throw new Error('Erro ao carregar períodos'); periodos = await response.json(); renderizarCalendario(); } catch (error) { console.error('Erro ao carregar períodos:', error); }
+    try { const response = await fetch('http://localhost:8080/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); if (!response.ok) throw new Error('Erro ao carregar períodos'); periodos = await response.json(); renderizarCalendario(); } catch (error) { console.error('Erro ao carregar períodos:', error); }
 }
 
 // Carrega eventos e filtra para o professor atual
 async function carregarEventos() {
     try {
         // Load institutional/global events
-        const responseEventos = await fetch('http://localhost:8080/api/eventos');
+        const responseEventos = await fetch('http://localhost:8080/api/eventos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!responseEventos.ok) throw new Error('Erro ao carregar eventos');
         const all = await responseEventos.json();
 
@@ -198,7 +198,7 @@ async function carregarEventos() {
         const usuarioId = parseInt(localStorage.getItem('usuarioId'));
         let profEvents = [];
         try {
-            const r2 = await fetch(`http://localhost:8080/api/professor/eventos?professorId=${usuarioId}`);
+            const r2 = await fetch(`http://localhost:8080/api/professor/eventos?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (r2.ok) profEvents = await r2.json();
         } catch (err) { /* ignore */ }
 
@@ -228,7 +228,7 @@ async function carregarEventos() {
 
         // Tenta adicionar período letivo automático (mesma lógica do admin)
         try {
-            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual');
+            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (responsePeriodos.ok) {
                 const periodo = await responsePeriodos.json();
                 if (periodo && periodo.dataInicio) {
@@ -263,13 +263,15 @@ async function excluirEvento(eventoId) {
         let response;
         if (isProfessorEvent) {
             // Delete from professor events table
-            response = await fetch(`http://localhost:8080/api/professor/eventos/${eventoId}?professorId=${usuarioId}`, { 
-                method: 'DELETE' 
+            response = await fetch(`http://localhost:8080/api/professor/eventos/${eventoId}?professorId=${usuarioId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
         } else {
             // Delete from institutional events table
-            response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, { 
-                method: 'DELETE' 
+            response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
         }
         
@@ -325,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Create professor-specific event (won't appear as turmas' events)
                 const payload = { titulo, descricao: null, dataEvento: dataEvento, professorId: parseInt(usuarioId) };
                 const response = await fetch('http://localhost:8080/api/professor/eventos', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     body: JSON.stringify(payload)
                 });
                 if (!response.ok) throw new Error('Erro ao criar evento do professor');

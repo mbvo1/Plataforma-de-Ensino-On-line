@@ -31,7 +31,8 @@ async function handleProfessorLogin(event) {
             localStorage.setItem('usuarioNome', data.nome);
             localStorage.setItem('usuarioEmail', data.email);
             localStorage.setItem('usuarioPerfil', data.perfil);
-            
+            localStorage.setItem('token', data.token);
+
             // Redirecionar para dashboard do professor
             window.location.href = 'dashboard-professor.html';
         } else {

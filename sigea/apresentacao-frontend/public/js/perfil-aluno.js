@@ -61,7 +61,7 @@ async function carregarPerfil() {
     form.style.display = 'none';
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/perfil`);
+        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/perfil`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar perfil');
@@ -117,7 +117,8 @@ document.getElementById('perfil-form').addEventListener('submit', async (e) => {
         const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/perfil`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify(dados)
         });

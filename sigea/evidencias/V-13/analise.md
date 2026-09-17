@@ -60,3 +60,22 @@ diferente das demais que são falhas de acesso/configuração no servidor
   nenhum script executado (depois.png)
 - Conclusão: Ataque → Correção → Script neutralizado, exibido como
   texto inofensivo (confirmado)
+
+ ## Achado complementar (fora do escopo original da V-13)
+Durante testes posteriores à correção original (que cobriu apenas
+atividade-detalhes.html), identificou-se uma segunda ocorrência do
+mesmo padrão de XSS armazenado, em admin-dashboard.js (linha 54), no
+painel "Últimos Usuários Cadastrados" do dashboard de administrador -
+o mesmo campo usuario.nome, renderizado sem escape em um arquivo
+diferente, não coberto pela auditoria original.
+
+## Reteste do achado complementar
+- Código corrigido: admin-dashboard.js, aplicada a mesma função
+  escapeHtml() já usada em atividade-detalhes.html
+- Payload disparava alerta antes da correção; após a correção, aparece
+  como texto literal no painel (depois-dashboard-admin.png)
+- Conclusão: XSS armazenado pode se manifestar em qualquer ponto de
+  exibição do dado contaminado - corrigir um único ponto de saída não
+  elimina o risco enquanto o dado malicioso permanecer no banco. O
+  ideal é combinar sanitização na entrada (impedir o cadastro do
+  payload) com escape em toda saída (defesa em profundidade).

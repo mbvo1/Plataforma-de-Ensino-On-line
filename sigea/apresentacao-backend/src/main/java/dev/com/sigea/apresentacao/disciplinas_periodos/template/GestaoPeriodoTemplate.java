@@ -3,7 +3,7 @@ package dev.com.sigea.apresentacao.disciplinas_periodos.template;
 /**
  * Template Method Pattern - Fluxo de criação/ativação de período
  */
-public abstract class GestãoPeriodoTemplate {
+ public abstract class GestaoPeriodoTemplate {
     
     public final String criarPeriodo(String nome, String dataInicio, String dataFim) {
         validarDatas(dataInicio, dataFim);

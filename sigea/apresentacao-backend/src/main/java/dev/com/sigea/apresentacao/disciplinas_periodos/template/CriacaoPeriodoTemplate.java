@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Template Method Pattern - Criação de período letivo
  */
-public class CriacaoPeriodoTemplate extends GestãoPeriodoTemplate {
+public class CriacaoPeriodoTemplate extends GestaoPeriodoTemplate { 
     
     @Override
     protected void validarDatas(String dataInicio, String dataFim) {

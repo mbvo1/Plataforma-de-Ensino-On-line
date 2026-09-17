@@ -1,4 +1,4 @@
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -16,10 +16,10 @@ window.addEventListener('DOMContentLoaded', () => {
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     
-    // Atualiza o nome do usuário no header
+    // Atualiza o nome do usuÃ¡rio no header
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -52,7 +52,7 @@ async function carregarTurmas(professorId) {
     if (!container) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`, {
+        const response = await fetch(`/api/professor/turmas?professorId=${professorId}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
@@ -87,13 +87,13 @@ async function carregarTurmas(professorId) {
     }
 }
 
-// Carrega disciplinas (salas) do professor para Lançar Notas/Faltas
+// Carrega disciplinas (salas) do professor para LanÃ§ar Notas/Faltas
 async function carregarDisciplinas(professorId) {
     const container = document.getElementById('disciplinas-list');
     if (!container) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/disciplinas?professorId=${professorId}`, {
+        const response = await fetch(`/api/professor/disciplinas?professorId=${professorId}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
@@ -133,17 +133,17 @@ async function carregarDisciplinas(professorId) {
     }
 }
 
-// Carrega aulas do dia baseado no horário das salas
+// Carrega aulas do dia baseado no horÃ¡rio das salas
 async function carregarAulasHoje(professorId, hoje) {
     const container = document.getElementById('aulas-list');
     if (!container) return;
     
     try {
-        // Obtém o dia da semana atual
+        // ObtÃ©m o dia da semana atual
         const diasSemana = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
         const diaAtual = diasSemana[hoje.getDay()];
         
-        const response = await fetch(`http://localhost:8080/api/professor/aulas-hoje?professorId=${professorId}&diaSemana=${diaAtual}`, {
+        const response = await fetch(`/api/professor/aulas-hoje?professorId=${professorId}&diaSemana=${diaAtual}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
@@ -156,7 +156,7 @@ async function carregarAulasHoje(professorId, hoje) {
         const aulas = await response.json();
         
         if (!aulas || aulas.length === 0) {
-            container.innerHTML = '<li class="empty-state">Não há aulas hoje</li>';
+            container.innerHTML = '<li class="empty-state">NÃ£o hÃ¡ aulas hoje</li>';
             return;
         }
         
@@ -171,17 +171,17 @@ async function carregarAulasHoje(professorId, hoje) {
         
     } catch (error) {
         console.error('Erro ao carregar aulas:', error);
-        container.innerHTML = '<li class="empty-state">Não há aulas hoje</li>';
+        container.innerHTML = '<li class="empty-state">NÃ£o hÃ¡ aulas hoje</li>';
     }
 }
 
-// Carrega mensagens novas do fórum
+// Carrega mensagens novas do fÃ³rum
 async function carregarMensagensNovas(professorId) {
     const container = document.getElementById('forum-list');
     if (!container) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/forum/mensagens-novas?professorId=${professorId}`, {
+        const response = await fetch(`/api/professor/forum/mensagens-novas?professorId=${professorId}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             }

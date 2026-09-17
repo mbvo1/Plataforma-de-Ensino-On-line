@@ -8,7 +8,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -16,7 +16,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -32,7 +32,7 @@ function isLoginValido() {
            usuarioPerfil === 'ALUNO';
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -50,7 +50,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('userName');
     if (userNameElement) {
-        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Aluno - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -65,52 +65,52 @@ function initializeMenuToggle() {
     }
 }
 
-// Carregar matrículas do aluno
+// Carregar matrÃ­culas do aluno
 async function carregarMatriculas() {
     const usuarioId = localStorage.getItem('usuarioId');
     const subtitulo = document.getElementById('subtitulo');
     const container = document.getElementById('disciplinasContainer');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/aluno/${usuarioId}/matriculas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
-            throw new Error('Erro ao carregar matrículas');
+            throw new Error('Erro ao carregar matrÃ­culas');
         }
         
         matriculas = await response.json();
         renderizarMatriculas();
         
     } catch (error) {
-        console.error('Erro ao carregar matrículas:', error);
+        console.error('Erro ao carregar matrÃ­culas:', error);
         subtitulo.textContent = 'Erro ao carregar dados';
-        container.innerHTML = '<p class="mensagem-vazia">Erro ao carregar matrículas.</p>';
+        container.innerHTML = '<p class="mensagem-vazia">Erro ao carregar matrÃ­culas.</p>';
     }
 }
 
-// Renderizar lista de matrículas
+// Renderizar lista de matrÃ­culas
 function renderizarMatriculas() {
     const container = document.getElementById('disciplinasContainer');
     const subtitulo = document.getElementById('subtitulo');
     
     if (matriculas.length === 0) {
-        // Só atualiza o subtítulo se não houver mensagem de período de inscrição
-        if (!subtitulo.textContent.includes('período de inscrição')) {
+        // SÃ³ atualiza o subtÃ­tulo se nÃ£o houver mensagem de perÃ­odo de inscriÃ§Ã£o
+        if (!subtitulo.textContent.includes('perÃ­odo de inscriÃ§Ã£o')) {
             subtitulo.textContent = 'Nenhuma disciplina matriculada';
         }
-        container.innerHTML = '<p class="mensagem-vazia">Você ainda não está matriculado em nenhuma disciplina. Clique em "Matricular disciplina" para se matricular.</p>';
+        container.innerHTML = '<p class="mensagem-vazia">VocÃª ainda nÃ£o estÃ¡ matriculado em nenhuma disciplina. Clique em "Matricular disciplina" para se matricular.</p>';
         return;
     }
     
-    // Só limpa o subtítulo se não houver mensagem de período de inscrição
-    if (!subtitulo.textContent.includes('período de inscrição')) {
+    // SÃ³ limpa o subtÃ­tulo se nÃ£o houver mensagem de perÃ­odo de inscriÃ§Ã£o
+    if (!subtitulo.textContent.includes('perÃ­odo de inscriÃ§Ã£o')) {
         subtitulo.textContent = '';
     }
     
-    // Atualizar botão para "Editar Matrícula"
+    // Atualizar botÃ£o para "Editar MatrÃ­cula"
     const btnMatricula = document.querySelector('.btn-matricular');
     if (btnMatricula) {
-        btnMatricula.textContent = 'Editar Matrícula';
+        btnMatricula.textContent = 'Editar MatrÃ­cula';
     }
     
     container.innerHTML = matriculas.map(matricula => {
@@ -119,7 +119,7 @@ function renderizarMatriculas() {
         const salaIdentificador = matricula.salaIdentificador || 'Turma';
         const professorNome = matricula.professorNome || 'Nome';
         
-        // Parsear dias e horário
+        // Parsear dias e horÃ¡rio
         const diasHorario = parseDiasHorario(horario);
         
         return `
@@ -127,7 +127,7 @@ function renderizarMatriculas() {
                 <div class="disciplina-titulo">${escapeHtml(disciplinaNome)} - ${salaIdentificador}</div>
                 <div class="disciplina-info">
                     <div class="disciplina-detalhe">Dias: ${diasHorario.diasTexto}</div>
-                    <div class="disciplina-detalhe">Horário: ${diasHorario.horario}</div>
+                    <div class="disciplina-detalhe">HorÃ¡rio: ${diasHorario.horario}</div>
                     <div class="disciplina-detalhe">Professor: "${escapeHtml(professorNome)}"</div>
                 </div>
             </div>
@@ -135,9 +135,9 @@ function renderizarMatriculas() {
     }).join('');
 }
 
-// Parsear dias e horário do formato "SEG,QUA 08:15-10:15"
+// Parsear dias e horÃ¡rio do formato "SEG,QUA 08:15-10:15"
 function parseDiasHorario(horarioStr) {
-    if (!horarioStr) return { diasTexto: 'Não definido', horario: 'Não definido' };
+    if (!horarioStr) return { diasTexto: 'NÃ£o definido', horario: 'NÃ£o definido' };
     
     const partes = horarioStr.split(' ');
     if (partes.length < 2) return { diasTexto: horarioStr, horario: '' };
@@ -145,14 +145,14 @@ function parseDiasHorario(horarioStr) {
     const dias = partes[0];
     const horario = partes[1];
     
-    // Mapear abreviações para nomes completos
+    // Mapear abreviaÃ§Ãµes para nomes completos
     const diasMap = {
         'SEG': 'Segunda',
-        'TER': 'Terça',
+        'TER': 'TerÃ§a',
         'QUA': 'Quarta',
         'QUI': 'Quinta',
         'SEX': 'Sexta',
-        'SAB': 'Sábado'
+        'SAB': 'SÃ¡bado'
     };
     
     const diasArray = dias.split(',');
@@ -167,44 +167,44 @@ function parseDiasHorario(horarioStr) {
         diasTexto = diasNomes.slice(0, -1).join(', ') + ' e ' + diasNomes[diasNomes.length - 1];
     }
     
-    // Formatar horário de "08:15-10:15" para "8:15 - 10:15"
+    // Formatar horÃ¡rio de "08:15-10:15" para "8:15 - 10:15"
     const horarioFormatado = horario.replace('-', ' - ');
     
     return { diasTexto, horario: horarioFormatado };
 }
 
-// Cancelar matrícula
+// Cancelar matrÃ­cula
 async function cancelarMatricula(matriculaId) {
-    if (!confirm('Tem certeza que deseja cancelar esta matrícula?')) {
+    if (!confirm('Tem certeza que deseja cancelar esta matrÃ­cula?')) {
         return;
     }
     
     const usuarioId = localStorage.getItem('usuarioId');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas/${matriculaId}`, {
+        const response = await fetch(`/api/aluno/${usuarioId}/matriculas/${matriculaId}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (response.ok) {
-            alert('Matrícula cancelada com sucesso!');
+            alert('MatrÃ­cula cancelada com sucesso!');
             carregarMatriculas();
         } else {
-            alert('Erro ao cancelar matrícula');
+            alert('Erro ao cancelar matrÃ­cula');
         }
     } catch (error) {
         console.error('Erro:', error);
-        alert('Erro ao cancelar matrícula');
+        alert('Erro ao cancelar matrÃ­cula');
     }
 }
 
-// Verificar se está no período de inscrição
+// Verificar se estÃ¡ no perÃ­odo de inscriÃ§Ã£o
 async function verificarPeriodoInscricao() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch('/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) {
-            console.error('Erro ao verificar período de inscrição');
+            console.error('Erro ao verificar perÃ­odo de inscriÃ§Ã£o');
             return;
         }
         
@@ -229,7 +229,7 @@ async function verificarPeriodoInscricao() {
                     if (subtitulo) {
                         const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
                         const dataFim = fimInscricao.toLocaleDateString('pt-BR');
-                        subtitulo.textContent = `Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`;
+                        subtitulo.textContent = `NÃ£o estÃ¡ no perÃ­odo de inscriÃ§Ã£o. O perÃ­odo de inscriÃ§Ã£o Ã© de ${dataInicio} atÃ© ${dataFim}.`;
                         subtitulo.style.color = '#e74c3c';
                         subtitulo.style.fontWeight = 'bold';
                     }
@@ -237,15 +237,15 @@ async function verificarPeriodoInscricao() {
             }
         }
     } catch (error) {
-        console.error('Erro ao verificar período de inscrição:', error);
+        console.error('Erro ao verificar perÃ­odo de inscriÃ§Ã£o:', error);
     }
 }
 
-// Abrir página de matrícula
+// Abrir pÃ¡gina de matrÃ­cula
 async function abrirMatricula() {
-    // Verificar período de inscrição antes de redirecionar
+    // Verificar perÃ­odo de inscriÃ§Ã£o antes de redirecionar
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch('/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (response.ok) {
             const periodo = await response.json();
             const hoje = new Date();
@@ -260,16 +260,16 @@ async function abrirMatricula() {
                 if (hoje < inicioInscricao || hoje > fimInscricao) {
                     const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
                     const dataFim = fimInscricao.toLocaleDateString('pt-BR');
-                    alert(`Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`);
+                    alert(`NÃ£o estÃ¡ no perÃ­odo de inscriÃ§Ã£o. O perÃ­odo de inscriÃ§Ã£o Ã© de ${dataInicio} atÃ© ${dataFim}.`);
                     return;
                 }
             }
         }
     } catch (error) {
-        console.error('Erro ao verificar período de inscrição:', error);
+        console.error('Erro ao verificar perÃ­odo de inscriÃ§Ã£o:', error);
     }
     
-    // Salvar matrículas atuais para pré-preencher na página de edição
+    // Salvar matrÃ­culas atuais para prÃ©-preencher na pÃ¡gina de ediÃ§Ã£o
     localStorage.setItem('matriculasAtuais', JSON.stringify(matriculas));
     window.location.href = 'matricula-detalhes-aluno.html';
 }

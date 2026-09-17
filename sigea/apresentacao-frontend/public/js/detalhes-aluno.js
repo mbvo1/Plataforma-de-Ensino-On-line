@@ -7,7 +7,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const alunoId = urlParams.get('id');
     
     if (!alunoId) {
-        alert('ID do aluno não encontrado');
+        alert('ID do aluno nÃ£o encontrado');
         voltarParaLista();
         return;
     }
@@ -44,7 +44,7 @@ function loadUserInfo() {
 
 async function carregarDetalhesAluno(alunoId) {
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoId}`, {
+        const response = await fetch(`/api/admin/alunos/${alunoId}`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -57,14 +57,14 @@ async function carregarDetalhesAluno(alunoId) {
     } catch (error) {
         console.error('Erro ao carregar detalhes do aluno:', error);
         const tbody = document.getElementById('info-aluno');
-        tbody.innerHTML = '<tr><td colspan="3" class="error-message">Erro ao carregar informações do aluno</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" class="error-message">Erro ao carregar informaÃ§Ãµes do aluno</td></tr>';
     }
 }
 
 function exibirDetalhesAluno(aluno) {
     const tbody = document.getElementById('info-aluno');
     
-    // Formata o status para exibição
+    // Formata o status para exibiÃ§Ã£o
     const statusFormatado = aluno.status.charAt(0) + aluno.status.slice(1).toLowerCase();
     const statusClass = aluno.status.toLowerCase();
     
@@ -78,7 +78,7 @@ function exibirDetalhesAluno(aluno) {
         </tr>
     `;
     
-    // Atualiza o botão de desativar/ativar
+    // Atualiza o botÃ£o de desativar/ativar
     atualizarBotaoStatus(aluno.status);
 }
 
@@ -99,20 +99,20 @@ function atualizarBotaoStatus(status) {
 async function carregarHistoricoDisciplinas(alunoId) {
     try {
         // Busca dados reais do banco de dados
-        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoId}/historico`, {
+        const response = await fetch(`/api/admin/alunos/${alunoId}/historico`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao buscar histórico de disciplinas');
+            throw new Error('Erro ao buscar histÃ³rico de disciplinas');
         }
         
         const historico = await response.json();
         exibirHistoricoDisciplinas(historico);
     } catch (error) {
-        console.error('Erro ao carregar histórico:', error);
+        console.error('Erro ao carregar histÃ³rico:', error);
         const tbody = document.getElementById('historico-disciplinas');
-        tbody.innerHTML = '<tr><td colspan="4" class="error-message">Erro ao carregar histórico de disciplinas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="error-message">Erro ao carregar histÃ³rico de disciplinas</td></tr>';
     }
 }
 
@@ -125,7 +125,7 @@ function exibirHistoricoDisciplinas(historico) {
     }
     
     const html = historico.map(item => {
-        // Normaliza o nome da classe CSS (remove espaços e converte para minúsculas)
+        // Normaliza o nome da classe CSS (remove espaÃ§os e converte para minÃºsculas)
         let statusClass = item.status.toLowerCase().replace(/\s+/g, '-');
         
         // Garante que os status conhecidos tenham as classes corretas
@@ -147,7 +147,7 @@ function exibirHistoricoDisciplinas(historico) {
                     <span class="status-badge ${statusClass}">${item.status}</span>
                 </td>
                 <td>
-                    ${item.status === 'Cursando' ? `<button class="btn-cancelar-matricula" onclick="cancelarMatricula(${item.id})">Cancelar Matrícula</button>` : '-'}
+                    ${item.status === 'Cursando' ? `<button class="btn-cancelar-matricula" onclick="cancelarMatricula(${item.id})">Cancelar MatrÃ­cula</button>` : '-'}
                 </td>
             </tr>
         `;
@@ -157,29 +157,29 @@ function exibirHistoricoDisciplinas(historico) {
 }
 
 async function cancelarMatricula(matriculaId) {
-    if (!confirm('Deseja realmente cancelar a matrícula nesta disciplina?')) {
+    if (!confirm('Deseja realmente cancelar a matrÃ­cula nesta disciplina?')) {
         return;
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/matriculas/${matriculaId}/cancelar`, {
+        const response = await fetch(`/api/admin/matriculas/${matriculaId}/cancelar`, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (!response.ok) {
-            throw new Error('Erro ao cancelar matrícula');
+            throw new Error('Erro ao cancelar matrÃ­cula');
         }
         
-        alert('Matrícula cancelada com sucesso!');
+        alert('MatrÃ­cula cancelada com sucesso!');
         
-        // Recarrega o histórico
+        // Recarrega o histÃ³rico
         const urlParams = new URLSearchParams(window.location.search);
         const alunoId = urlParams.get('id');
         carregarHistoricoDisciplinas(alunoId);
     } catch (error) {
-        console.error('Erro ao cancelar matrícula:', error);
-        alert('Erro ao cancelar matrícula. Tente novamente.');
+        console.error('Erro ao cancelar matrÃ­cula:', error);
+        alert('Erro ao cancelar matrÃ­cula. Tente novamente.');
     }
 }
 
@@ -191,7 +191,7 @@ async function desativarAluno() {
     if (!confirmacao) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoAtual.id}/desativar`, {
+        const response = await fetch(`/api/admin/alunos/${alunoAtual.id}/desativar`, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
@@ -219,7 +219,7 @@ async function ativarAluno() {
     if (!confirmacao) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/alunos/${alunoAtual.id}/ativar`, {
+        const response = await fetch(`/api/admin/alunos/${alunoAtual.id}/ativar`, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });

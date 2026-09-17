@@ -7,7 +7,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -23,8 +23,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function carregarDadosDashboard() {
     try {
-        // Carregar estatísticas
-        const statsResponse = await fetch('http://localhost:8080/api/dashboard/stats', {
+        // Carregar estatÃ­sticas
+        const statsResponse = await fetch('/api/dashboard/stats', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         if (statsResponse.ok) {
@@ -32,8 +32,8 @@ async function carregarDadosDashboard() {
             atualizarEstatisticas(stats);
         }
         
-        // Carregar últimos usuários
-        const usuariosResponse = await fetch('http://localhost:8080/api/dashboard/ultimos-usuarios', {
+        // Carregar Ãºltimos usuÃ¡rios
+        const usuariosResponse = await fetch('/api/dashboard/ultimos-usuarios', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         if (usuariosResponse.ok) {
@@ -56,7 +56,7 @@ function exibirUltimosUsuarios(usuarios) {
     const container = document.getElementById('ultimos-usuarios-lista');
     
     if (!usuarios || usuarios.length === 0) {
-        container.innerHTML = '<p class="empty-message">Nenhum usuário cadastrado ainda</p>';
+        container.innerHTML = '<p class="empty-message">Nenhum usuÃ¡rio cadastrado ainda</p>';
         return;
     }
     
@@ -76,8 +76,8 @@ function exibirUltimosUsuarios(usuarios) {
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     
-    // Atualiza o nome do usuário no header
-    document.getElementById('user-name').textContent = `Admin - ${nome || 'Usuário'}`;
+    // Atualiza o nome do usuÃ¡rio no header
+    document.getElementById('user-name').textContent = `Admin - ${nome || 'UsuÃ¡rio'}`;
 }
 
 function handleLogout() {

@@ -1,23 +1,23 @@
-// Estado do calendário
+// Estado do calendÃ¡rio
 let mesAtual = new Date().getMonth();
 let anoAtual = new Date().getFullYear();
 let eventos = [];
 let periodos = [];
 
-// Feriados nacionais brasileiros (fixos e móveis)
+// Feriados nacionais brasileiros (fixos e mÃ³veis)
 const feriadosFixos = {
-    '01-01': 'Confraternização Universal',
+    '01-01': 'ConfraternizaÃ§Ã£o Universal',
     '04-21': 'Tiradentes',
     '05-01': 'Dia do Trabalhador',
-    '09-07': 'Independência do Brasil',
+    '09-07': 'IndependÃªncia do Brasil',
     '10-12': 'Nossa Senhora Aparecida',
     '11-02': 'Finados',
-    '11-15': 'Proclamação da República',
-    '11-20': 'Dia da Consciência Negra',
+    '11-15': 'ProclamaÃ§Ã£o da RepÃºblica',
+    '11-20': 'Dia da ConsciÃªncia Negra',
     '12-25': 'Natal'
 };
 
-// Calcula Páscoa (algoritmo de Meeus/Jones/Butcher)
+// Calcula PÃ¡scoa (algoritmo de Meeus/Jones/Butcher)
 function calcularPascoa(ano) {
     const a = ano % 19;
     const b = Math.floor(ano / 100);
@@ -37,22 +37,22 @@ function calcularPascoa(ano) {
     return new Date(ano, mes - 1, dia);
 }
 
-// Retorna feriados móveis de um ano
+// Retorna feriados mÃ³veis de um ano
 function getFeriadosMoveis(ano) {
     const pascoa = calcularPascoa(ano);
     const feriados = {};
     
-    // Carnaval (47 dias antes da Páscoa)
+    // Carnaval (47 dias antes da PÃ¡scoa)
     const carnaval = new Date(pascoa);
     carnaval.setDate(carnaval.getDate() - 47);
     feriados[formatarData(carnaval)] = 'Carnaval';
     
-    // Sexta-feira Santa (2 dias antes da Páscoa)
+    // Sexta-feira Santa (2 dias antes da PÃ¡scoa)
     const sextaSanta = new Date(pascoa);
     sextaSanta.setDate(sextaSanta.getDate() - 2);
     feriados[formatarData(sextaSanta)] = 'Sexta-feira Santa';
     
-    // Corpus Christi (60 dias depois da Páscoa)
+    // Corpus Christi (60 dias depois da PÃ¡scoa)
     const corpusChristi = new Date(pascoa);
     corpusChristi.setDate(corpusChristi.getDate() + 60);
     feriados[formatarData(corpusChristi)] = 'Corpus Christi';
@@ -66,7 +66,7 @@ function formatarData(data) {
     return `${mes}-${dia}`;
 }
 
-// Verifica se uma data é feriado
+// Verifica se uma data Ã© feriado
 function isFeriado(data) {
     const dataFormatada = formatarData(data);
     
@@ -75,7 +75,7 @@ function isFeriado(data) {
         return feriadosFixos[dataFormatada];
     }
     
-    // Verifica feriados móveis
+    // Verifica feriados mÃ³veis
     const feriadosMoveis = getFeriadosMoveis(data.getFullYear());
     if (feriadosMoveis[dataFormatada]) {
         return feriadosMoveis[dataFormatada];
@@ -84,7 +84,7 @@ function isFeriado(data) {
     return null;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -104,7 +104,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Admin - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Admin - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -118,7 +118,7 @@ function handleLogout() {
     }
 }
 
-// Navegação entre meses
+// NavegaÃ§Ã£o entre meses
 function mesAnterior() {
     mesAtual--;
     if (mesAtual < 0) {
@@ -139,7 +139,7 @@ function proximoMes() {
     renderizarCalendario();
 }
 
-// Adiciona feriados de um ano específico
+// Adiciona feriados de um ano especÃ­fico
 function adicionarFeriadosDoAno(ano) {
     // Remove feriados antigos deste ano
     eventos = eventos.filter(e => !e.isFeriado || !e.id.includes('-' + ano));
@@ -158,7 +158,7 @@ function adicionarFeriadosDoAno(ano) {
         });
     });
     
-    // Adiciona feriados móveis
+    // Adiciona feriados mÃ³veis
     const feriadosMoveis = getFeriadosMoveis(ano);
     Object.keys(feriadosMoveis).forEach(dataKey => {
         const [mes, dia] = dataKey.split('-');
@@ -174,47 +174,47 @@ function adicionarFeriadosDoAno(ano) {
     });
 }
 
-// Renderiza o calendário
+// Renderiza o calendÃ¡rio
 function renderizarCalendario() {
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    const meses = ['Janeiro', 'Fevereiro', 'MarÃ§o', 'Abril', 'Maio', 'Junho',
                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     
-    // Atualiza título
+    // Atualiza tÃ­tulo
     document.getElementById('mesAnoAtual').textContent = `${meses[mesAtual]} ${anoAtual}`;
     
-    // Primeiro dia do mês
+    // Primeiro dia do mÃªs
     const primeiroDia = new Date(anoAtual, mesAtual, 1);
     const diaSemana = primeiroDia.getDay(); // 0=domingo, 1=segunda...
     
-    // Ajusta para começar na segunda-feira
+    // Ajusta para comeÃ§ar na segunda-feira
     const diasOffset = diaSemana === 0 ? 6 : diaSemana - 1;
     
-    // Último dia do mês
+    // Ãšltimo dia do mÃªs
     const ultimoDia = new Date(anoAtual, mesAtual + 1, 0).getDate();
     
     const calendarGrid = document.getElementById('calendarGrid');
     calendarGrid.innerHTML = '';
     
-    // Células vazias antes do primeiro dia
+    // CÃ©lulas vazias antes do primeiro dia
     for (let i = 0; i < diasOffset; i++) {
         const cell = document.createElement('div');
         cell.className = 'calendar-cell empty';
         calendarGrid.appendChild(cell);
     }
     
-    // Dias do mês
+    // Dias do mÃªs
     for (let dia = 1; dia <= ultimoDia; dia++) {
         const data = new Date(anoAtual, mesAtual, dia);
         const cell = document.createElement('div');
         cell.className = 'calendar-cell';
         
-        // Verifica se é hoje
+        // Verifica se Ã© hoje
         const hoje = new Date();
         if (data.toDateString() === hoje.toDateString()) {
             cell.classList.add('today');
         }
         
-        // Número do dia
+        // NÃºmero do dia
         const dayNumber = document.createElement('div');
         dayNumber.className = 'day-number';
         dayNumber.textContent = dia;
@@ -224,7 +224,7 @@ function renderizarCalendario() {
         const eventosContainer = document.createElement('div');
         eventosContainer.className = 'eventos-container';
         
-        // Verifica eventos (incluindo os automáticos do período)
+        // Verifica eventos (incluindo os automÃ¡ticos do perÃ­odo)
         const eventosNoDia = getEventosNaData(data);
         eventosNoDia.forEach(evento => {
             const eventoEl = document.createElement('div');
@@ -235,11 +235,11 @@ function renderizarCalendario() {
             eventoTexto.textContent = evento.titulo;
             eventoEl.appendChild(eventoTexto);
             
-            // Botão de excluir (não mostra para eventos automáticos)
+            // BotÃ£o de excluir (nÃ£o mostra para eventos automÃ¡ticos)
             if (!evento.isAutomatico) {
                 const btnExcluir = document.createElement('button');
                 btnExcluir.className = 'evento-delete';
-                btnExcluir.innerHTML = '×';
+                btnExcluir.innerHTML = 'Ã—';
                 btnExcluir.title = 'Excluir evento';
                 btnExcluir.onclick = (e) => {
                     e.stopPropagation();
@@ -248,9 +248,9 @@ function renderizarCalendario() {
                 eventoEl.appendChild(btnExcluir);
             }
             
-            // Define o rótulo do tipo
+            // Define o rÃ³tulo do tipo
             let tipoLabel = evento.tipo;
-            if (evento.tipo === 'TODOS') tipoLabel = 'Todos os Usuários';
+            if (evento.tipo === 'TODOS') tipoLabel = 'Todos os UsuÃ¡rios';
             else if (evento.tipo === 'ALUNOS') tipoLabel = 'Apenas Alunos';
             else if (evento.tipo === 'PROFESSORES') tipoLabel = 'Apenas Professores';
             
@@ -263,7 +263,7 @@ function renderizarCalendario() {
     }
 }
 
-// Busca período ativo em uma data
+// Busca perÃ­odo ativo em uma data
 function getPeriodoNaData(data) {
     return periodos.find(periodo => {
         const inicio = new Date(periodo.dataInicio);
@@ -276,16 +276,16 @@ function getPeriodoNaData(data) {
 function parseData(dataString) {
     if (!dataString) return null;
     
-    // Se já for um objeto Date, retorna
+    // Se jÃ¡ for um objeto Date, retorna
     if (dataString instanceof Date) return dataString;
     
-    // Verifica se é formato YYYY-MM-DD (sem hora)
+    // Verifica se Ã© formato YYYY-MM-DD (sem hora)
     if (/^\d{4}-\d{2}-\d{2}$/.test(dataString)) {
         const [ano, mes, dia] = dataString.split('-').map(Number);
         return new Date(ano, mes - 1, dia);
     }
     
-    // Para outros formatos (ISO com hora, timestamp, etc), usa Date padrão
+    // Para outros formatos (ISO com hora, timestamp, etc), usa Date padrÃ£o
     // mas ajusta para remover o efeito de timezone
     const data = new Date(dataString);
     // Cria uma nova data com ano/mes/dia local (sem timezone)
@@ -302,23 +302,23 @@ function getEventosNaData(data) {
     });
 }
 
-// Carrega períodos letivos
+// Carrega perÃ­odos letivos
 async function carregarPeriodos() {
     try {
-        const response = await fetch('http://localhost:8080/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-        if (!response.ok) throw new Error('Erro ao carregar períodos');
+        const response = await fetch('/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        if (!response.ok) throw new Error('Erro ao carregar perÃ­odos');
         periodos = await response.json();
         renderizarCalendario();
     } catch (error) {
-        console.error('Erro ao carregar períodos:', error);
+        console.error('Erro ao carregar perÃ­odos:', error);
     }
 }
 
 // Carrega eventos
 async function carregarEventos() {
     try {
-        // Carrega eventos do calendário
-        const responseEventos = await fetch('http://localhost:8080/api/eventos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        // Carrega eventos do calendÃ¡rio
+        const responseEventos = await fetch('/api/eventos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!responseEventos.ok) throw new Error('Erro ao carregar eventos');
         eventos = await responseEventos.json();
         
@@ -328,68 +328,68 @@ async function carregarEventos() {
         const anoInicial = new Date().getFullYear();
         adicionarFeriadosDoAno(anoInicial);
         
-        // Adiciona feriados do próximo ano também (caso período letivo vá para o ano seguinte)
+        // Adiciona feriados do prÃ³ximo ano tambÃ©m (caso perÃ­odo letivo vÃ¡ para o ano seguinte)
         adicionarFeriadosDoAno(anoInicial + 1);
         
         console.log('Feriados adicionados:', eventos.filter(e => e.isFeriado).length);
         
-        // Carrega períodos letivos ativos
+        // Carrega perÃ­odos letivos ativos
         try {
-            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+            const responsePeriodos = await fetch('/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (responsePeriodos.ok) {
                 const periodo = await responsePeriodos.json();
-                console.log('Período letivo atual:', periodo);
+                console.log('PerÃ­odo letivo atual:', periodo);
                 
-                // Adiciona eventos automáticos para o período letivo
+                // Adiciona eventos automÃ¡ticos para o perÃ­odo letivo
                 if (periodo && periodo.dataInicio) {
-                    // Evento de início do período letivo
+                    // Evento de inÃ­cio do perÃ­odo letivo
                     eventos.push({
                         id: 'periodo-inicio-' + periodo.id,
-                        titulo: `Início do Período ${periodo.nome}`,
+                        titulo: `InÃ­cio do PerÃ­odo ${periodo.nome}`,
                         data: periodo.dataInicio,
                         tipo: 'TODOS',
                         isAutomatico: true
                     });
                     
-                    // Evento de fim do período letivo
+                    // Evento de fim do perÃ­odo letivo
                     if (periodo.dataFim) {
                         eventos.push({
                             id: 'periodo-fim-' + periodo.id,
-                            titulo: `Fim do Período ${periodo.nome}`,
+                            titulo: `Fim do PerÃ­odo ${periodo.nome}`,
                             data: periodo.dataFim,
                             tipo: 'TODOS',
                             isAutomatico: true
                         });
                     }
                     
-                    // Evento de início das inscrições
+                    // Evento de inÃ­cio das inscriÃ§Ãµes
                     if (periodo.dataInicioInscricao) {
                         eventos.push({
                             id: 'periodo-inscricao-inicio-' + periodo.id,
-                            titulo: `Início das Inscrições - ${periodo.nome}`,
+                            titulo: `InÃ­cio das InscriÃ§Ãµes - ${periodo.nome}`,
                             data: periodo.dataInicioInscricao,
                             tipo: 'TODOS',
                             isAutomatico: true
                         });
                     }
                     
-                    // Evento de fim das inscrições
+                    // Evento de fim das inscriÃ§Ãµes
                     if (periodo.dataFimInscricao) {
                         eventos.push({
                             id: 'periodo-inscricao-fim-' + periodo.id,
-                            titulo: `Fim das Inscrições - ${periodo.nome}`,
+                            titulo: `Fim das InscriÃ§Ãµes - ${periodo.nome}`,
                             data: periodo.dataFimInscricao,
                             tipo: 'TODOS',
                             isAutomatico: true
                         });
                     }
                     
-                    console.log('Total de eventos após adicionar período:', eventos.length);
-                    console.log('Eventos do período adicionados:', eventos.filter(e => e.isAutomatico));
+                    console.log('Total de eventos apÃ³s adicionar perÃ­odo:', eventos.length);
+                    console.log('Eventos do perÃ­odo adicionados:', eventos.filter(e => e.isAutomatico));
                 }
             }
         } catch (periodoError) {
-            console.log('Nenhum período letivo ativo encontrado');
+            console.log('Nenhum perÃ­odo letivo ativo encontrado');
         }
         
         renderizarCalendario();
@@ -405,7 +405,7 @@ async function excluirEvento(eventoId) {
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, {
+        const response = await fetch(`/api/eventos/${eventoId}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
@@ -413,7 +413,7 @@ async function excluirEvento(eventoId) {
         if (!response.ok) throw new Error('Erro ao excluir evento');
         
         await carregarEventos();
-        alert('Evento excluído com sucesso!');
+        alert('Evento excluÃ­do com sucesso!');
     } catch (error) {
         console.error('Erro ao excluir evento:', error);
         alert('Erro ao excluir evento. Tente novamente.');
@@ -425,10 +425,10 @@ function abrirModalEvento() {
     const modal = document.getElementById('modalEvento');
     if (modal) {
         modal.classList.add('show');
-        // Define a data de hoje como padrão
+        // Define a data de hoje como padrÃ£o
         const hoje = new Date().toISOString().split('T')[0];
         document.getElementById('dataEvento').value = hoje;
-        // Marca "Todos" por padrão
+        // Marca "Todos" por padrÃ£o
         document.getElementById('checkTodos').checked = true;
         handleCheckTodos();
     }
@@ -468,7 +468,7 @@ function handleCheckIndividual() {
     }
 }
 
-// Submissão do formulário de evento
+// SubmissÃ£o do formulÃ¡rio de evento
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('formEvento');
     if (form) {
@@ -489,14 +489,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (checkProfessores && !checkAlunos) {
                 tipo = 'PROFESSORES';
             } else {
-                alert('Por favor, selecione para quem é o evento!');
+                alert('Por favor, selecione para quem Ã© o evento!');
                 return;
             }
             
             const usuarioId = localStorage.getItem('usuarioId');
             
             try {
-                const response = await fetch('http://localhost:8080/api/eventos', {
+                const response = await fetch('/api/eventos', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

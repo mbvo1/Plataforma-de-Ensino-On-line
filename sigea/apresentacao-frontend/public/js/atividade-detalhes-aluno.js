@@ -5,7 +5,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -13,7 +13,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -29,11 +29,11 @@ function isLoginValido() {
            usuarioPerfil === 'ALUNO';
 }
 
-// Variáveis globais
+// VariÃ¡veis globais
 let atividadeAtual = null;
 let arquivoSelecionado = null;
 
-// Inicialização
+// InicializaÃ§Ã£o
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -50,7 +50,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const nomeValido = nome && nome !== 'null' && nome !== 'undefined' && nome.trim() !== '';
-    const nomeExibir = nomeValido ? nome : 'Usuário';
+    const nomeExibir = nomeValido ? nome : 'UsuÃ¡rio';
     
     const userNameElement = document.getElementById('userName');
     if (userNameElement) {
@@ -78,7 +78,7 @@ function carregarAtividade() {
     }
     
     if (!atividadeAtual) {
-        document.getElementById('detTituloTopo').textContent = 'Atividade não encontrada';
+        document.getElementById('detTituloTopo').textContent = 'Atividade nÃ£o encontrada';
         return;
     }
     
@@ -111,7 +111,7 @@ function carregarAtividade() {
                 <div class="arquivo-sem-download">
                     <i class="fas fa-paperclip"></i>
                     <span>${escapeHtml(atividadeAtual.arquivoPath)}</span>
-                    <small>(arquivo não disponível para download)</small>
+                    <small>(arquivo nÃ£o disponÃ­vel para download)</small>
                 </div>
             `;
         }
@@ -126,7 +126,7 @@ function carregarAtividade() {
     verificarPrazoExpirado();
 }
 
-// Verifica se o prazo da atividade já passou
+// Verifica se o prazo da atividade jÃ¡ passou
 function verificarPrazoExpirado() {
     if (!atividadeAtual || !atividadeAtual.prazo) return false;
     
@@ -141,7 +141,7 @@ function verificarPrazoExpirado() {
     
     const prazoDate = new Date(
         parseInt(dataPartes[2]), // ano
-        parseInt(dataPartes[1]) - 1, // mês (0-indexed)
+        parseInt(dataPartes[1]) - 1, // mÃªs (0-indexed)
         parseInt(dataPartes[0]), // dia
         parseInt(horaPartes[0]), // hora
         parseInt(horaPartes[1]) // minuto
@@ -170,7 +170,7 @@ async function verificarStatusEnvio() {
     const atividadeId = atividadeAtual.atividadeId;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/envio`, {
+        const response = await fetch(`/api/aluno/${alunoId}/atividades/${atividadeId}/envio`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
@@ -222,19 +222,19 @@ function atualizarStatusEnvio(data) {
                 feedbackTexto.textContent = data.feedback;
             }
             
-            // Esconde o botão de cancelar se já foi corrigido
+            // Esconde o botÃ£o de cancelar se jÃ¡ foi corrigido
             btnCancelar.style.display = 'none';
         } else {
             statusElement.textContent = 'Enviado';
             statusElement.classList.add('enviado');
             
-            // Mostra botão de cancelar se não expirou e não foi corrigido
+            // Mostra botÃ£o de cancelar se nÃ£o expirou e nÃ£o foi corrigido
             if (!prazoExpirado) {
                 btnCancelar.style.display = 'block';
             }
         }
         
-        // Mostra informações do envio
+        // Mostra informaÃ§Ãµes do envio
         if (data.arquivoPath) {
             arquivoInfo.textContent = `Arquivo: ${data.arquivoPath}`;
             arquivoInfo.style.display = 'block';
@@ -245,7 +245,7 @@ function atualizarStatusEnvio(data) {
             dataEnvioInfo.style.display = 'block';
         }
         
-        // Muda o texto do botão de seleção para reenviar (se não expirou)
+        // Muda o texto do botÃ£o de seleÃ§Ã£o para reenviar (se nÃ£o expirou)
         if (!prazoExpirado) {
             document.getElementById('btnSelecionarArquivo').innerHTML = '<i class="fas fa-redo"></i> Selecionar novo arquivo';
             document.getElementById('btnEnviar').textContent = 'Reenviar';
@@ -253,7 +253,7 @@ function atualizarStatusEnvio(data) {
     } else {
         statusElement.classList.remove('enviado', 'atrasado');
         statusElement.classList.add('nao-enviado');
-        statusElement.textContent = 'Não enviado';
+        statusElement.textContent = 'NÃ£o enviado';
         btnCancelar.style.display = 'none';
     }
 }
@@ -269,11 +269,11 @@ function setupEventListeners() {
         if (e.target.files.length > 0) {
             arquivoSelecionado = e.target.files[0];
             
-            // Atualiza o visual do botão
+            // Atualiza o visual do botÃ£o
             btnSelecionar.classList.add('arquivo-selecionado');
             btnSelecionar.innerHTML = `<i class="fas fa-file"></i> ${arquivoSelecionado.name}`;
             
-            // Habilita o botão de enviar
+            // Habilita o botÃ£o de enviar
             btnEnviar.disabled = false;
         } else {
             arquivoSelecionado = null;
@@ -303,7 +303,7 @@ async function cancelarEnvio() {
     btnCancelar.textContent = 'Cancelando...';
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/envio`, {
+        const response = await fetch(`/api/aluno/${alunoId}/atividades/${atividadeId}/envio`, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -318,16 +318,16 @@ async function cancelarEnvio() {
             const statusElement = document.getElementById('envioStatus');
             statusElement.classList.remove('enviado', 'atrasado');
             statusElement.classList.add('nao-enviado');
-            statusElement.textContent = 'Não enviado';
+            statusElement.textContent = 'NÃ£o enviado';
             
-            // Esconde informações do envio
+            // Esconde informaÃ§Ãµes do envio
             document.getElementById('arquivoSelecionadoInfo').style.display = 'none';
             document.getElementById('dataEnvioInfo').style.display = 'none';
             
-            // Esconde botão de cancelar
+            // Esconde botÃ£o de cancelar
             btnCancelar.style.display = 'none';
             
-            // Reseta o formulário
+            // Reseta o formulÃ¡rio
             document.getElementById('btnSelecionarArquivo').innerHTML = '<i class="fas fa-upload"></i> Selecione seu arquivo';
             document.getElementById('btnSelecionarArquivo').classList.remove('arquivo-selecionado');
             document.getElementById('btnEnviar').textContent = 'Enviar';
@@ -355,7 +355,7 @@ async function enviarAtividade() {
     
     // Verifica prazo antes de enviar
     if (verificarPrazoExpirado()) {
-        alert('O prazo para envio desta atividade já expirou.');
+        alert('O prazo para envio desta atividade jÃ¡ expirou.');
         return;
     }
     
@@ -370,7 +370,7 @@ async function enviarAtividade() {
     btnEnviar.textContent = 'Enviando...';
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/atividades/${atividadeId}/enviar`, {
+        const response = await fetch(`/api/aluno/${alunoId}/atividades/${atividadeId}/enviar`, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -390,7 +390,7 @@ async function enviarAtividade() {
                 dataEnvio: data.dataEnvio
             });
             
-            // Reseta o formulário
+            // Reseta o formulÃ¡rio
             arquivoSelecionado = null;
             const inputArquivo = document.getElementById('inputArquivo');
             if (inputArquivo) inputArquivo.value = '';

@@ -1,6 +1,6 @@
-const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = '/api/auth';
 
-// Função para formatar CPF
+// FunÃ§Ã£o para formatar CPF
 function formatCPF(input) {
     let value = input.value.replace(/\D/g, '');
     
@@ -56,11 +56,11 @@ async function handleLogin(event) {
         
         const data = await response.json();
         
-        // Debug - ver o que o backend está retornando
+        // Debug - ver o que o backend estÃ¡ retornando
         console.log('DEBUG Login - Resposta do backend:', data);
         
         if (response.ok) {
-            // Salva dados do usuário no localStorage
+            // Salva dados do usuÃ¡rio no localStorage
             localStorage.setItem('usuarioId', data.usuarioId);
             localStorage.setItem('usuarioNome', data.nome);
             localStorage.setItem('usuarioEmail', data.email);
@@ -80,7 +80,7 @@ async function handleLogin(event) {
         }
     } catch (error) {
         console.error('Erro:', error);
-        showError('login-error', 'Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+        showError('login-error', 'Erro ao conectar com o servidor. Verifique se o backend estÃ¡ rodando.');
     }
 }
 
@@ -95,14 +95,14 @@ async function handleRegistro(event) {
     
     // Valida se CPF foi preenchido
     if (!cpfRaw || cpfRaw.trim() === '') {
-        showError('registro-error', 'CPF é obrigatório');
+        showError('registro-error', 'CPF Ã© obrigatÃ³rio');
         return;
     }
     
-    const cpf = cpfRaw.replace(/\D/g, ''); // Remove formatação
+    const cpf = cpfRaw.replace(/\D/g, ''); // Remove formataÃ§Ã£o
     
     if (senha !== confirmaSenha) {
-        showError('registro-error', 'As senhas não coincidem');
+        showError('registro-error', 'As senhas nÃ£o coincidem');
         return;
     }
     
@@ -112,7 +112,7 @@ async function handleRegistro(event) {
     }
     
     if (cpf.length !== 11) {
-        showError('registro-error', 'CPF inválido. Digite 11 dígitos.');
+        showError('registro-error', 'CPF invÃ¡lido. Digite 11 dÃ­gitos.');
         return;
     }
     
@@ -130,7 +130,7 @@ async function handleRegistro(event) {
         const data = await response.json();
         
         if (response.ok) {
-            showSuccess('registro-success', data.mensagem + ' Você será redirecionado para fazer login...');
+            showSuccess('registro-success', data.mensagem + ' VocÃª serÃ¡ redirecionado para fazer login...');
             
             document.getElementById('registro-nome').value = '';
             document.getElementById('registro-email').value = '';
@@ -147,7 +147,7 @@ async function handleRegistro(event) {
         }
     } catch (error) {
         console.error('Erro:', error);
-        showError('registro-error', 'Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+        showError('registro-error', 'Erro ao conectar com o servidor. Verifique se o backend estÃ¡ rodando.');
     }
 }
 
@@ -164,11 +164,11 @@ function showSuccess(elementId, message) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Verifica se já está logado e redireciona para o dashboard correto
+    // Verifica se jÃ¡ estÃ¡ logado e redireciona para o dashboard correto
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
-    // Verifica se os dados são válidos (não nulos, não undefined, não vazios)
+    // Verifica se os dados sÃ£o vÃ¡lidos (nÃ£o nulos, nÃ£o undefined, nÃ£o vazios)
     const isValidLogin = usuarioId && 
                          usuarioPerfil && 
                          usuarioId !== 'null' && 
@@ -179,7 +179,7 @@ window.addEventListener('DOMContentLoaded', () => {
                          usuarioPerfil.trim() !== '';
     
     if (isValidLogin) {
-        // Redireciona baseado no perfil do usuário
+        // Redireciona baseado no perfil do usuÃ¡rio
         if (usuarioPerfil === 'ALUNO') {
             window.location.href = '/dashboard-aluno.html';
         } else if (usuarioPerfil === 'PROFESSOR') {
@@ -187,16 +187,16 @@ window.addEventListener('DOMContentLoaded', () => {
         } else if (usuarioPerfil === 'ADMINISTRADOR') {
             window.location.href = '/dashboard-admin.html';
         } else {
-            // Perfil inválido - limpa tudo
+            // Perfil invÃ¡lido - limpa tudo
             limparDadosUsuario();
         }
     } else {
-        // Dados inválidos - limpa tudo para garantir
+        // Dados invÃ¡lidos - limpa tudo para garantir
         limparDadosUsuario();
     }
 });
 
-// Função para limpar dados do usuário do localStorage
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio do localStorage
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -205,7 +205,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('token');
 }
 
-// Função de logout que pode ser chamada de qualquer página
+// FunÃ§Ã£o de logout que pode ser chamada de qualquer pÃ¡gina
 function logout() {
     limparDadosUsuario();
     window.location.href = '/index.html';

@@ -1,4 +1,4 @@
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -6,7 +6,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -22,7 +22,7 @@ function isLoginValido() {
            usuarioPerfil === 'ALUNO';
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     
-    // Debug - verificar o que está no localStorage
+    // Debug - verificar o que estÃ¡ no localStorage
     console.log('DEBUG loadUserInfo - usuarioNome:', nome);
     console.log('DEBUG loadUserInfo - localStorage completo:', {
         usuarioId: localStorage.getItem('usuarioId'),
@@ -47,21 +47,21 @@ function loadUserInfo() {
         usuarioPerfil: localStorage.getItem('usuarioPerfil')
     });
     
-    // Verifica se o nome é válido (não null, não undefined, não "null", não "undefined", não vazio)
+    // Verifica se o nome Ã© vÃ¡lido (nÃ£o null, nÃ£o undefined, nÃ£o "null", nÃ£o "undefined", nÃ£o vazio)
     const nomeValido = nome && 
                        nome !== 'null' && 
                        nome !== 'undefined' && 
                        nome.trim() !== '';
     
-    const nomeExibir = nomeValido ? nome : 'Usuário';
+    const nomeExibir = nomeValido ? nome : 'UsuÃ¡rio';
     
-    // Atualiza o nome do usuário no header
+    // Atualiza o nome do usuÃ¡rio no header
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
         userNameElement.textContent = `Aluno - ${nomeExibir}`;
     }
     
-    // Atualiza o nome no título de boas-vindas
+    // Atualiza o nome no tÃ­tulo de boas-vindas
     const welcomeNameElement = document.getElementById('welcome-name');
     if (welcomeNameElement) {
         welcomeNameElement.textContent = nomeExibir;
@@ -83,7 +83,7 @@ async function carregarDadosDashboard() {
     const usuarioId = localStorage.getItem('usuarioId');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/dashboard/aluno/${usuarioId}`, {
+        const response = await fetch(`/api/dashboard/aluno/${usuarioId}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
@@ -101,14 +101,14 @@ async function carregarDadosDashboard() {
 }
 
 function atualizarDashboard(dados) {
-    // Atualizar datas próximas
+    // Atualizar datas prÃ³ximas
     atualizarDatasProximas(dados.eventosProximos || []);
     
     // Atualizar avisos
     const avisosCard = document.getElementById('avisos-card');
     if (avisosCard) {
         if (dados.avisosNaoLidos > 0) {
-            avisosCard.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">Você tem ${dados.avisosNaoLidos} aviso${dados.avisosNaoLidos > 1 ? 's' : ''} não lido${dados.avisosNaoLidos > 1 ? 's' : ''}</span>`;
+            avisosCard.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">VocÃª tem ${dados.avisosNaoLidos} aviso${dados.avisosNaoLidos > 1 ? 's' : ''} nÃ£o lido${dados.avisosNaoLidos > 1 ? 's' : ''}</span>`;
         } else {
             avisosCard.innerHTML = `<span style="color: #27ae60;">Nenhum aviso novo</span>`;
         }
@@ -117,14 +117,14 @@ function atualizarDashboard(dados) {
     // Atualizar desempenho
     atualizarDesempenho(dados.notasResumo || []);
     
-    // Atualizar frequência
+    // Atualizar frequÃªncia
     const frequenciaContent = document.getElementById('frequencia-content');
     if (frequenciaContent) {
         const frequenciaFormatada = dados.frequenciaPercentual.toFixed(1);
         frequenciaContent.innerHTML = `
             <p class="freq-title">Total</p>
             <p><strong>Faltas:</strong> ${dados.totalFaltas}</p>
-            <p><strong>Frequência:</strong> ${frequenciaFormatada}%</p>
+            <p><strong>FrequÃªncia:</strong> ${frequenciaFormatada}%</p>
         `;
     }
 }
@@ -145,7 +145,7 @@ function atualizarDatasProximas(eventos) {
         return;
     }
     
-    if (cardSubtitle) cardSubtitle.textContent = 'Próximos 7 dias';
+    if (cardSubtitle) cardSubtitle.textContent = 'PrÃ³ximos 7 dias';
     if (cardEmpty) cardEmpty.style.display = 'none';
     
     // Criar lista de eventos
@@ -153,7 +153,7 @@ function atualizarDatasProximas(eventos) {
     eventosList.style.marginTop = '0.5rem';
     eventosList.style.fontSize = '0.875rem';
     
-    eventos.slice(0, 5).forEach(evento => { // Mostra no máximo 5 eventos
+    eventos.slice(0, 5).forEach(evento => { // Mostra no mÃ¡ximo 5 eventos
         const eventoItem = document.createElement('div');
         eventoItem.style.marginBottom = '0.5rem';
         eventoItem.style.padding = '0.5rem';
@@ -162,11 +162,11 @@ function atualizarDatasProximas(eventos) {
         
         let tipoLabel = '';
         if (evento.tipo === 'ATIVIDADE_TURMA') {
-            tipoLabel = '📋 Atividade';
+            tipoLabel = 'ðŸ“‹ Atividade';
         } else if (evento.tipo === 'EVENTO_PROFESSOR') {
-            tipoLabel = '📅 Evento';
+            tipoLabel = 'ðŸ“… Evento';
         } else {
-            tipoLabel = '📅 Evento';
+            tipoLabel = 'ðŸ“… Evento';
         }
         
         eventoItem.innerHTML = `
@@ -203,7 +203,7 @@ function atualizarDesempenho(notasResumo) {
     
     if (!notasResumo || notasResumo.length === 0) {
         if (cardEmpty) {
-            cardEmpty.textContent = 'Sem notas atribuídas';
+            cardEmpty.textContent = 'Sem notas atribuÃ­das';
             cardEmpty.style.display = 'block';
         }
         return;
@@ -216,7 +216,7 @@ function atualizarDesempenho(notasResumo) {
     notasList.style.marginTop = '0.5rem';
     notasList.style.fontSize = '0.875rem';
     
-    notasResumo.slice(0, 3).forEach(nota => { // Mostra no máximo 3 disciplinas
+    notasResumo.slice(0, 3).forEach(nota => { // Mostra no mÃ¡ximo 3 disciplinas
         const notaItem = document.createElement('div');
         notaItem.style.marginBottom = '0.5rem';
         notaItem.style.padding = '0.5rem';
@@ -225,7 +225,7 @@ function atualizarDesempenho(notasResumo) {
         
         let notasTexto = '';
         if (nota.av1 != null && nota.av2 != null) {
-            notasTexto = `AV1: ${nota.av1.toFixed(1)} | AV2: ${nota.av2.toFixed(1)} | Média: ${nota.mediaParcial.toFixed(1)}`;
+            notasTexto = `AV1: ${nota.av1.toFixed(1)} | AV2: ${nota.av2.toFixed(1)} | MÃ©dia: ${nota.mediaParcial.toFixed(1)}`;
         } else if (nota.av1 != null) {
             notasTexto = `AV1: ${nota.av1.toFixed(1)}`;
         } else if (nota.av2 != null) {

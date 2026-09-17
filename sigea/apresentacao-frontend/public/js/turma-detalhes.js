@@ -1,4 +1,4 @@
-// Verifica autenticação
+// Verifica autenticaÃ§Ã£o
 const usuarioId = localStorage.getItem('usuarioId');
 const usuarioPerfil = localStorage.getItem('usuarioPerfil');
 const usuarioNome = localStorage.getItem('usuarioNome');
@@ -12,11 +12,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const turmaId = urlParams.get('id');
 
 if (!turmaId) {
-    alert('Turma não encontrada!');
+    alert('Turma nÃ£o encontrada!');
     window.location.href = 'turmas-professor.html';
 }
 
-// Carrega informações do usuário
+// Carrega informaÃ§Ãµes do usuÃ¡rio
 document.getElementById('userName').textContent = `Professor - ${usuarioNome}`;
 
 // Toggle sidebar
@@ -40,7 +40,7 @@ function handleLogout() {
 // Carrega dados da turma
 async function carregarTurma() {
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/professor/turmas/${turmaId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar turma');
@@ -51,7 +51,7 @@ async function carregarTurma() {
         // Atualiza o nome da turma
         document.getElementById('turmaNome').textContent = turma.titulo;
         
-        // Atualiza o código da turma
+        // Atualiza o cÃ³digo da turma
         document.getElementById('codigoTurma').textContent = turma.codigoAcesso;
         
         // Carrega os avisos da turma
@@ -60,14 +60,14 @@ async function carregarTurma() {
         
     } catch (error) {
         console.error('Erro ao carregar turma:', error);
-        alert('Erro ao carregar informações da turma');
+        alert('Erro ao carregar informaÃ§Ãµes da turma');
     }
 }
 
 // Carrega avisos da turma
 async function carregarAvisos() {
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/avisos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/professor/turmas/${turmaId}/avisos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar avisos');
@@ -80,7 +80,7 @@ async function carregarAvisos() {
         avisos.forEach(aviso => {
             // Ao carregar da API, a lista vem ordenada do mais recente para o mais antigo.
             // Para manter a ordem correta na tela (mais recente em cima), inserimos em ordem
-            // usando append quando a lista já está na ordem desejada.
+            // usando append quando a lista jÃ¡ estÃ¡ na ordem desejada.
             adicionarAvisoNaLista(aviso, false);
         });
         
@@ -89,11 +89,11 @@ async function carregarAvisos() {
     }
 }
 
-// Eventos dos botões
+// Eventos dos botÃµes
 let arquivoSelecionado = null;
-// Mapa temporário de blob URLs para atividades (atividadeId -> blobUrl)
+// Mapa temporÃ¡rio de blob URLs para atividades (atividadeId -> blobUrl)
 const atividadeArquivoBlobMap = new Map();
-// blob URL para pré-visualização no formulário de criar atividade
+// blob URL para prÃ©-visualizaÃ§Ã£o no formulÃ¡rio de criar atividade
 let arquivoAtividadePreviewUrl = null;
 
 // Helper: read File -> data URL (base64) promise
@@ -107,7 +107,7 @@ function readFileAsDataURL(file) {
 }
 
 document.getElementById('btnAdicionarAviso').addEventListener('click', function() {
-    // Esconde o botão e mostra o formulário
+    // Esconde o botÃ£o e mostra o formulÃ¡rio
     document.getElementById('btnAdicionarAviso').style.display = 'none';
     document.getElementById('formAviso').style.display = 'block';
 });
@@ -137,13 +137,13 @@ document.getElementById('btnRemoverArquivo').addEventListener('click', function(
 });
 
 document.getElementById('btnCancelarAviso').addEventListener('click', function() {
-    // Limpa o formulário
+    // Limpa o formulÃ¡rio
     document.getElementById('textoAviso').value = '';
     document.getElementById('arquivoAviso').value = '';
     document.getElementById('arquivoSelecionado').style.display = 'none';
     arquivoSelecionado = null;
     
-    // Esconde o formulário e mostra o botão
+    // Esconde o formulÃ¡rio e mostra o botÃ£o
     document.getElementById('formAviso').style.display = 'none';
     document.getElementById('btnAdicionarAviso').style.display = 'flex';
 });
@@ -175,7 +175,7 @@ document.getElementById('btnPostarAviso').addEventListener('click', async functi
     }
     
     // Envia para o backend
-    fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/avisos?professorId=${professorId}`, {
+    fetch(`/api/professor/turmas/${turmaId}/avisos?professorId=${professorId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -200,14 +200,14 @@ document.getElementById('btnPostarAviso').addEventListener('click', async functi
         // Adiciona o aviso na lista
         adicionarAvisoNaLista(aviso);
         
-        // Limpa o formulário
+        // Limpa o formulÃ¡rio
         document.getElementById('textoAviso').value = '';
         document.getElementById('arquivoAviso').value = '';
         document.getElementById('linkArquivo').href = '#';
         document.getElementById('arquivoSelecionado').style.display = 'none';
         arquivoSelecionado = null;
         
-        // Esconde o formulário e mostra o botão
+        // Esconde o formulÃ¡rio e mostra o botÃ£o
         document.getElementById('formAviso').style.display = 'none';
         document.getElementById('btnAdicionarAviso').style.display = 'flex';
     })
@@ -217,7 +217,7 @@ document.getElementById('btnPostarAviso').addEventListener('click', async functi
     });
 });
 
-// Função para converter arquivo em base64
+// FunÃ§Ã£o para converter arquivo em base64
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -233,11 +233,11 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
     const avisoCard = document.createElement('div');
     avisoCard.className = 'aviso-card';
     
-    // Verifica se há arquivo válido
+    // Verifica se hÃ¡ arquivo vÃ¡lido
     const arquivoUrl = aviso.arquivoUrl || null;
     const temArquivoValido = arquivoUrl && (arquivoUrl.startsWith('data:') || arquivoUrl.startsWith('blob:') || arquivoUrl.startsWith('http') || arquivoUrl.startsWith('/'));
     
-    // Constrói o HTML do arquivo
+    // ConstrÃ³i o HTML do arquivo
     let arquivoHtml = '';
     if (aviso.arquivoPath) {
         if (temArquivoValido) {
@@ -290,14 +290,14 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
         </div>
     `;
     
-    // Se prepend=true adiciona no início, caso contrário adiciona ao fim.
+    // Se prepend=true adiciona no inÃ­cio, caso contrÃ¡rio adiciona ao fim.
     if (prepend) {
         avisosList.insertBefore(avisoCard, avisosList.firstChild);
     } else {
         avisosList.appendChild(avisoCard);
     }
     
-    // Adiciona evento ao botão de menu
+    // Adiciona evento ao botÃ£o de menu
     const btnMenu = avisoCard.querySelector('.btn-menu-aviso');
     const dropdown = avisoCard.querySelector('.menu-dropdown-aviso');
     
@@ -315,7 +315,7 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
         dropdown.classList.toggle('show');
     });
     
-    // Botão Editar
+    // BotÃ£o Editar
     const btnEditar = avisoCard.querySelector('.edit-option');
     btnEditar.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -323,18 +323,18 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
         abrirModalEditar(aviso);
     });
     
-    // Botão Excluir
+    // BotÃ£o Excluir
     const btnExcluir = avisoCard.querySelector('.delete-option');
     btnExcluir.addEventListener('click', async function(e) {
         e.stopPropagation();
         dropdown.classList.remove('show');
 
-        const confirmar = confirm('Tem certeza que deseja excluir este aviso? Esta ação não pode ser desfeita.');
+        const confirmar = confirm('Tem certeza que deseja excluir este aviso? Esta aÃ§Ã£o nÃ£o pode ser desfeita.');
         if (!confirmar) return;
 
         try {
             const resp = await fetch(
-                `http://localhost:8080/api/professor/turmas/${turmaId}/avisos/${aviso.avisoId}?professorId=${usuarioId}`,
+                `/api/professor/turmas/${turmaId}/avisos/${aviso.avisoId}?professorId=${usuarioId}`,
                 { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
             );
 
@@ -343,7 +343,7 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
                 throw new Error(err.message || 'Erro ao excluir aviso');
             }
 
-            alert('Aviso excluído com sucesso!');
+            alert('Aviso excluÃ­do com sucesso!');
             // Recarrega a lista de avisos
             carregarAvisos();
         } catch (error) {
@@ -353,7 +353,7 @@ function adicionarAvisoNaLista(aviso, prepend = true) {
     });
 }
 
-// Variáveis para modal de edição
+// VariÃ¡veis para modal de ediÃ§Ã£o
 let avisoEmEdicao = null;
 let arquivoEditarUrl = null;
 let arquivoFoiRemovido = false;
@@ -361,7 +361,7 @@ let atividadeEmEdicao = null;
 let arquivoAtividadeEditarUrl = null;
 let arquivoAtividadeFoiRemovido = false;
 
-// Abre modal de edição
+// Abre modal de ediÃ§Ã£o
 function abrirModalEditar(aviso) {
     avisoEmEdicao = aviso;
     arquivoFoiRemovido = false;
@@ -392,7 +392,7 @@ function abrirModalEditar(aviso) {
     modal.style.alignItems = 'center';
 }
 
-// Fecha modal de edição
+// Fecha modal de ediÃ§Ã£o
 function fecharModalEditar() {
     document.getElementById('modalEditarAviso').style.display = 'none';
     document.getElementById('textoAvisoEditar').value = '';
@@ -403,11 +403,11 @@ function fecharModalEditar() {
     arquivoFoiRemovido = false;
 }
 
-// Eventos do modal de edição
+// Eventos do modal de ediÃ§Ã£o
 document.getElementById('btnFecharModalEditar').addEventListener('click', fecharModalEditar);
 document.getElementById('btnCancelarEditar').addEventListener('click', fecharModalEditar);
 
-// Remover arquivo do modal de edição
+// Remover arquivo do modal de ediÃ§Ã£o
 document.getElementById('btnRemoverArquivoEditar').addEventListener('click', function() {
     document.getElementById('arquivoAnexadoEditar').style.display = 'none';
     document.getElementById('arquivoAvisoEditar').value = '';
@@ -418,7 +418,7 @@ document.getElementById('btnRemoverArquivoEditar').addEventListener('click', fun
     arquivoFoiRemovido = true;
 });
 
-// Adicionar novo arquivo no modal de edição
+// Adicionar novo arquivo no modal de ediÃ§Ã£o
 document.getElementById('arquivoAvisoEditar').addEventListener('change', function(e) {
     const arquivo = e.target.files[0];
     if (arquivo) {
@@ -436,7 +436,7 @@ document.getElementById('arquivoAvisoEditar').addEventListener('change', functio
     }
 });
 
-// Salvar edição
+// Salvar ediÃ§Ã£o
 document.getElementById('btnSalvarEditar').addEventListener('click', async function() {
     const mensagem = document.getElementById('textoAvisoEditar').value.trim();
     
@@ -454,14 +454,14 @@ document.getElementById('btnSalvarEditar').addEventListener('click', async funct
             // Novo arquivo selecionado
             arquivoPath = inputArquivo.files[0].name;
         } else if (!arquivoFoiRemovido && avisoEmEdicao.arquivoPath) {
-            // Mantém o arquivo existente (só se não foi removido)
+            // MantÃ©m o arquivo existente (sÃ³ se nÃ£o foi removido)
             arquivoPath = avisoEmEdicao.arquivoPath;
         }
-        // Se arquivoFoiRemovido = true e não tem novo arquivo, arquivoPath = null
+        // Se arquivoFoiRemovido = true e nÃ£o tem novo arquivo, arquivoPath = null
         
-        // Requisição PUT para atualizar o aviso
+        // RequisiÃ§Ã£o PUT para atualizar o aviso
         const response = await fetch(
-            `http://localhost:8080/api/professor/turmas/${turmaId}/avisos/${avisoEmEdicao.avisoId}?professorId=${usuarioId}`,
+            `/api/professor/turmas/${turmaId}/avisos/${avisoEmEdicao.avisoId}?professorId=${usuarioId}`,
             {
                 method: 'PUT',
                 headers: {
@@ -493,7 +493,7 @@ document.getElementById('btnSalvarEditar').addEventListener('click', async funct
         // Mostra mensagem de sucesso
         alert('Aviso atualizado com sucesso!');
         
-        // Recarrega os avisos para exibir a atualização
+        // Recarrega os avisos para exibir a atualizaÃ§Ã£o
         carregarAvisos();
         
     } catch (error) {
@@ -510,7 +510,7 @@ document.getElementById('modalEditarAviso').addEventListener('click', function(e
 });
 
 document.getElementById('btnAdicionarAtividade').addEventListener('click', function() {
-    // Toggle do formulário de atividade
+    // Toggle do formulÃ¡rio de atividade
     const form = document.getElementById('formAtividade');
     const willShow = form.style.display === 'none' || form.style.display === '';
     form.style.display = willShow ? 'block' : 'none';
@@ -590,7 +590,7 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
     const temPrazo = document.getElementById('temPrazo').checked;
     const prazoVal = temPrazo ? document.getElementById('prazoAtividade').value : null;
 
-    if (!titulo) { alert('Título obrigatório'); return; }
+    if (!titulo) { alert('TÃ­tulo obrigatÃ³rio'); return; }
 
     try {
         // Send prazo as local datetime string (from input datetime-local) or null
@@ -618,7 +618,7 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
         let criado;
         
         // Sempre usa o endpoint JSON (com base64 no corpo)
-        resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades?professorId=${usuarioId}`, {
+        resp = await fetch(`/api/professor/turmas/${turmaId}/atividades?professorId=${usuarioId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
@@ -636,7 +636,7 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
         }
         
         alert('Atividade criada com sucesso!');
-        // adicionar diretamente na lista (como feito para avisos) para tornar o link clicável
+        // adicionar diretamente na lista (como feito para avisos) para tornar o link clicÃ¡vel
         adicionarAtividadeNaLista(criado, true);
         // fechar e limpar form
         document.getElementById('btnCancelarAtividade').click();
@@ -649,7 +649,7 @@ document.getElementById('btnPostarAtividade').addEventListener('click', async fu
 // Carrega atividades da turma e renderiza
 async function carregarAtividades() {
     try {
-        const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const resp = await fetch(`/api/professor/turmas/${turmaId}/atividades`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!resp.ok) throw new Error('Erro ao carregar atividades');
         const atividades = await resp.json();
 
@@ -690,7 +690,7 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
 
     const isValidArquivoHref = arquivoHref && (arquivoHref.startsWith('data:') || arquivoHref.startsWith('http') || arquivoHref.startsWith('/'));
     
-    // Constrói o HTML do arquivo
+    // ConstrÃ³i o HTML do arquivo
     let arquivoHtml = '';
     if (atv.arquivoPath) {
         if (isValidArquivoHref) {
@@ -796,7 +796,7 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
         try {
             sessionStorage.setItem('atividadeDetalhes', JSON.stringify(atvCopy));
         } catch (err) {
-            console.warn('Não foi possível salvar atividade em sessionStorage', err);
+            console.warn('NÃ£o foi possÃ­vel salvar atividade em sessionStorage', err);
         }
         window.location.href = 'atividade-detalhes.html';
     });
@@ -809,12 +809,12 @@ function adicionarAtividadeNaLista(atv, prepend = true) {
         const confirmar = confirm('Tem certeza que deseja excluir esta atividade?');
         if (!confirmar) return;
         try {
-            const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades/${atv.atividadeId}?professorId=${usuarioId}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+            const resp = await fetch(`/api/professor/turmas/${turmaId}/atividades/${atv.atividadeId}?professorId=${usuarioId}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) {
                 const err = await resp.json().catch(()=>({}));
                 throw new Error(err.message || 'Erro ao excluir atividade');
             }
-            alert('Atividade excluída com sucesso!');
+            alert('Atividade excluÃ­da com sucesso!');
             carregarAtividades();
         } catch (err) {
             console.error('Erro excluir atividade', err);
@@ -928,11 +928,11 @@ document.getElementById('temPrazoEditar').addEventListener('change', function(e)
     document.getElementById('prazoAtividadeEditar').style.display = e.target.checked ? 'inline-block' : 'none';
 });
 
-// Salvar edição da atividade
+// Salvar ediÃ§Ã£o da atividade
 document.getElementById('btnSalvarAtividadeEditar').addEventListener('click', async function() {
     if (!atividadeEmEdicao) return;
     const titulo = document.getElementById('tituloAtividadeEditar').value.trim();
-    if (!titulo) { alert('Título obrigatório'); return; }
+    if (!titulo) { alert('TÃ­tulo obrigatÃ³rio'); return; }
 
     const descricao = document.getElementById('descricaoAtividadeEditar').value.trim() || null;
     const inputArquivo = document.getElementById('arquivoAtividadeEditar');
@@ -954,7 +954,7 @@ document.getElementById('btnSalvarAtividadeEditar').addEventListener('click', as
             prazo: prazoVal ? prazoVal : null
         };
 
-        const resp = await fetch(`http://localhost:8080/api/professor/turmas/${turmaId}/atividades/${atividadeEmEdicao.atividadeId}?professorId=${usuarioId}`, {
+        const resp = await fetch(`/api/professor/turmas/${turmaId}/atividades/${atividadeEmEdicao.atividadeId}?professorId=${usuarioId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
@@ -986,7 +986,7 @@ function abrirModalDetalhesAtividade(atv) {
     document.getElementById('detalhesTitulo').textContent = atv.titulo || 'Atividade';
     document.getElementById('detalhesTituloCentro').textContent = atv.titulo || '';
     const turmaNome = document.getElementById('turmaNome') ? document.getElementById('turmaNome').textContent : '';
-    document.getElementById('detalhesProfessorTurma').textContent = `${atv.professorNome || 'Professor'} • ${turmaNome}`;
+    document.getElementById('detalhesProfessorTurma').textContent = `${atv.professorNome || 'Professor'} â€¢ ${turmaNome}`;
     document.getElementById('detalhesDataPostagem').textContent = atv.dataCriacao || '';
     document.getElementById('detalhesDescricao').textContent = atv.descricao || '';
     const arquivoHref = atividadeArquivoBlobMap.get(atv.atividadeId) || atv.arquivoUrl || '#';

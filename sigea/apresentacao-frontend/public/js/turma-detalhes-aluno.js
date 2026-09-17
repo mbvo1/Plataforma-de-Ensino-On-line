@@ -5,7 +5,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -13,7 +13,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -33,7 +33,7 @@ function isLoginValido() {
 const urlParams = new URLSearchParams(window.location.search);
 const turmaId = urlParams.get('id');
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     
     if (!turmaId) {
-        alert('Turma não encontrada!');
+        alert('Turma nÃ£o encontrada!');
         window.location.href = 'turmas-aluno.html';
         return;
     }
@@ -60,7 +60,7 @@ function loadUserInfo() {
                        nome !== 'undefined' && 
                        nome.trim() !== '';
     
-    const nomeExibir = nomeValido ? nome : 'Usuário';
+    const nomeExibir = nomeValido ? nome : 'UsuÃ¡rio';
     
     const userNameElement = document.getElementById('userName');
     if (userNameElement) {
@@ -84,8 +84,8 @@ async function carregarTurma() {
     const alunoId = localStorage.getItem('usuarioId');
     
     try {
-        // Busca a turma específica do aluno
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas/${turmaId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        // Busca a turma especÃ­fica do aluno
+        const response = await fetch(`/api/aluno/${alunoId}/turmas/${turmaId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar turma');
@@ -112,7 +112,7 @@ async function carregarTurma() {
 // Carrega avisos da turma
 async function carregarAvisos() {
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/turmas/${turmaId}/avisos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/aluno/turmas/${turmaId}/avisos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar avisos');
@@ -152,11 +152,11 @@ function adicionarAvisoNaLista(aviso) {
     const avisoCard = document.createElement('div');
     avisoCard.className = 'aviso-card';
     
-    // Verifica se há arquivo válido
+    // Verifica se hÃ¡ arquivo vÃ¡lido
     const arquivoUrl = aviso.arquivoUrl || null;
     const temArquivoValido = arquivoUrl && (arquivoUrl.startsWith('data:') || arquivoUrl.startsWith('http') || arquivoUrl.startsWith('/'));
     
-    // Constrói o HTML do arquivo
+    // ConstrÃ³i o HTML do arquivo
     let arquivoHtml = '';
     if (aviso.arquivoPath) {
         if (temArquivoValido) {
@@ -200,7 +200,7 @@ function adicionarAvisoNaLista(aviso) {
 // Carrega atividades da turma
 async function carregarAtividades() {
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/turmas/${turmaId}/atividades`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/aluno/turmas/${turmaId}/atividades`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar atividades');
@@ -242,11 +242,11 @@ function adicionarAtividadeNaLista(atv) {
     card.className = 'aviso-card atividade-card atividade-card-aluno';
     card.style.cursor = 'pointer';
     
-    // Verifica se há arquivo válido
+    // Verifica se hÃ¡ arquivo vÃ¡lido
     const arquivoUrl = atv.arquivoUrl || null;
     const temArquivoValido = arquivoUrl && (arquivoUrl.startsWith('data:') || arquivoUrl.startsWith('http') || arquivoUrl.startsWith('/'));
     
-    // Constrói o HTML do arquivo
+    // ConstrÃ³i o HTML do arquivo
     let arquivoHtml = '';
     if (atv.arquivoPath) {
         if (temArquivoValido) {
@@ -290,9 +290,9 @@ function adicionarAtividadeNaLista(atv) {
 
     container.appendChild(card);
     
-    // Click no card navega para a página de detalhes
+    // Click no card navega para a pÃ¡gina de detalhes
     card.addEventListener('click', function(e) {
-        // Não navega se clicar no link do arquivo
+        // NÃ£o navega se clicar no link do arquivo
         if (e.target.closest('.arquivo-link-aluno') || e.target.closest('.aviso-arquivo')) {
             return;
         }
@@ -300,7 +300,7 @@ function adicionarAtividadeNaLista(atv) {
     });
 }
 
-// Navega para a página de detalhes da atividade
+// Navega para a pÃ¡gina de detalhes da atividade
 function navegarParaDetalhes(atv) {
     // Salva os dados da atividade no sessionStorage
     sessionStorage.setItem('atividadeDetalhesAluno', JSON.stringify(atv));
@@ -313,7 +313,7 @@ function abrirModalDetalhes(atv) {
     document.getElementById('detalhesTituloCentro').textContent = atv.titulo;
     document.getElementById('detalhesProfessorTurma').textContent = `${atv.professorNome || 'Professor'}`;
     document.getElementById('detalhesDataPostagem').textContent = atv.dataCriacao || '';
-    document.getElementById('detalhesDescricao').textContent = atv.descricao || 'Sem descrição';
+    document.getElementById('detalhesDescricao').textContent = atv.descricao || 'Sem descriÃ§Ã£o';
     document.getElementById('detalhesPrazo').textContent = atv.prazo || '--';
     
     // Arquivo

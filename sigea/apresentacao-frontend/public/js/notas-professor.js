@@ -8,15 +8,15 @@ function escapeHtml(texto) {
 }
 
 const usuarioId = localStorage.getItem('usuarioId');
-document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
+document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'UsuÃ¡rio'}`;
 
-// Obtém parâmetros da URL
+// ObtÃ©m parÃ¢metros da URL
 const urlParams = new URLSearchParams(window.location.search);
 const salaId = urlParams.get('salaId');
 const disciplinaNome = urlParams.get('disciplina');
 const salaIdentificador = urlParams.get('sala');
 
-// Define o título da página
+// Define o tÃ­tulo da pÃ¡gina
 if (disciplinaNome && salaIdentificador) {
     document.getElementById('titulo-disciplina').textContent = `${disciplinaNome} - ${salaIdentificador}`;
 } else {
@@ -48,7 +48,7 @@ async function carregarNotas() {
     
     try {
         const response = await fetch(
-            `http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`,
+            `/api/notas/sala/${salaId}?professorId=${usuarioId}`,
             { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
         );
         
@@ -130,7 +130,7 @@ async function carregarNotas() {
             tbody.appendChild(tr);
         });
         
-        // Calcula médias iniciais
+        // Calcula mÃ©dias iniciais
         alunosData.forEach((aluno, index) => {
             atualizarMedia(index);
         });
@@ -149,7 +149,7 @@ async function carregarNotas() {
 }
 
 /**
- * Atualiza a média do aluno quando uma nota é alterada
+ * Atualiza a mÃ©dia do aluno quando uma nota Ã© alterada
  */
 function atualizarMedia(index) {
     const aluno = alunosData[index];
@@ -167,7 +167,7 @@ function atualizarMedia(index) {
     let segundaChamadaVal = inputSegundaChamada.value ? parseFloat(inputSegundaChamada.value) : null;
     let finalVal = inputFinal.value ? parseFloat(inputFinal.value) : null;
     
-    // Validação: notas devem estar entre 0 e 10
+    // ValidaÃ§Ã£o: notas devem estar entre 0 e 10
     if (av1Val !== null && (av1Val < 0 || av1Val > 10)) {
         inputAv1.setCustomValidity('Nota deve estar entre 0 e 10');
         inputAv1.reportValidity();
@@ -205,27 +205,27 @@ function atualizarMedia(index) {
     aluno.segundaChamada = segundaChamadaVal;
     aluno.final = finalVal;
     
-    // Calcula média
+    // Calcula mÃ©dia
     let media = calcularMedia(aluno);
     
-    // Atualiza exibição da média
+    // Atualiza exibiÃ§Ã£o da mÃ©dia
     const mediaElement = document.getElementById(`media-${aluno.matriculaId}`);
     if (mediaElement) {
         let textoMedia = media.toFixed(1);
         
-        // Se tiver nota final, calcula média final e mostra status de aprovação
+        // Se tiver nota final, calcula mÃ©dia final e mostra status de aprovaÃ§Ã£o
         if (aluno.final !== null && aluno.final !== undefined && media > 0) {
             const mediaFinal = (media + aluno.final) / 2;
             textoMedia = media.toFixed(1);
             
-            // Aplica cor baseado na aprovação
+            // Aplica cor baseado na aprovaÃ§Ã£o
             mediaElement.classList.remove('media-aprovado', 'media-reprovado');
             if (mediaFinal >= 6) {
                 mediaElement.classList.add('media-aprovado');
-                textoMedia += ' ✓'; // Símbolo de aprovado
+                textoMedia += ' âœ“'; // SÃ­mbolo de aprovado
             } else {
                 mediaElement.classList.add('media-reprovado');
-                textoMedia += ' ✗'; // Símbolo de reprovado
+                textoMedia += ' âœ—'; // SÃ­mbolo de reprovado
             }
         }
         
@@ -234,10 +234,10 @@ function atualizarMedia(index) {
 }
 
 /**
- * Calcula a média do aluno seguindo as regras:
- * - Média = (Av1 + Av2) / 2
- * - Se Av1 preenchida, Av2 não preenchida, e Segunda Chamada preenchida,
- *   então Segunda Chamada substitui Av2 para calcular média
+ * Calcula a mÃ©dia do aluno seguindo as regras:
+ * - MÃ©dia = (Av1 + Av2) / 2
+ * - Se Av1 preenchida, Av2 nÃ£o preenchida, e Segunda Chamada preenchida,
+ *   entÃ£o Segunda Chamada substitui Av2 para calcular mÃ©dia
  */
 function calcularMedia(aluno) {
     let nota1 = null;
@@ -251,12 +251,12 @@ function calcularMedia(aluno) {
     if (aluno.av2 !== null && aluno.av2 !== undefined) {
         nota2 = aluno.av2;
     } else if (aluno.segundaChamada !== null && aluno.segundaChamada !== undefined && nota1 !== null) {
-        // Se Av1 está preenchida, Av2 não está, e Segunda Chamada está preenchida,
-        // então Segunda Chamada substitui Av2
+        // Se Av1 estÃ¡ preenchida, Av2 nÃ£o estÃ¡, e Segunda Chamada estÃ¡ preenchida,
+        // entÃ£o Segunda Chamada substitui Av2
         nota2 = aluno.segundaChamada;
     }
     
-    // Calcula média
+    // Calcula mÃ©dia
     if (nota1 !== null && nota2 !== null) {
         return (nota1 + nota2) / 2;
     } else if (nota1 !== null) {
@@ -278,7 +278,7 @@ async function salvarNotas() {
     btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     
     try {
-        // Atualiza todas as médias antes de salvar
+        // Atualiza todas as mÃ©dias antes de salvar
         alunosData.forEach((aluno, index) => {
             atualizarMedia(index);
         });
@@ -293,7 +293,7 @@ async function salvarNotas() {
         }));
         
         const response = await fetch(
-            `http://localhost:8080/api/notas/sala/${salaId}?professorId=${usuarioId}`,
+            `/api/notas/sala/${salaId}?professorId=${usuarioId}`,
             {
                 method: 'POST',
                 headers: {
@@ -323,7 +323,7 @@ async function salvarNotas() {
 }
 
 /**
- * Volta para a página de detalhes da disciplina
+ * Volta para a pÃ¡gina de detalhes da disciplina
  */
 function voltarParaDisciplina() {
     const params = new URLSearchParams({

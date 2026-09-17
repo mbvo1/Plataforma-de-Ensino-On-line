@@ -8,15 +8,15 @@ function escapeHtml(texto) {
 }
 
 const usuarioId = localStorage.getItem('usuarioId');
-document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
+document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'UsuÃ¡rio'}`;
 
-// Obtém parâmetros da URL
+// ObtÃ©m parÃ¢metros da URL
 const urlParams = new URLSearchParams(window.location.search);
 const salaId = urlParams.get('salaId');
 const disciplinaNome = urlParams.get('disciplina');
 const salaIdentificador = urlParams.get('sala');
 
-// Define o título da página
+// Define o tÃ­tulo da pÃ¡gina
 if (disciplinaNome && salaIdentificador) {
     document.getElementById('titulo-disciplina').textContent = `${disciplinaNome} - ${salaIdentificador}`;
 } else {
@@ -67,7 +67,7 @@ async function carregarChamada() {
     const emptyState = document.getElementById('empty-state');
     const tbody = document.getElementById('alunos-tbody');
     
-    // Atualiza subtítulo
+    // Atualiza subtÃ­tulo
     document.getElementById('subtitulo-chamada').textContent = `Chamada - ${formatarData(data)}`;
     
     loadingElement.style.display = 'block';
@@ -76,7 +76,7 @@ async function carregarChamada() {
     
     try {
         const response = await fetch(
-            `http://localhost:8080/api/chamadas/sala/${salaId}/data/${data}?professorId=${usuarioId}`,
+            `/api/chamadas/sala/${salaId}/data/${data}?professorId=${usuarioId}`,
             { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
         );
         
@@ -148,14 +148,14 @@ async function carregarFaltasTotais() {
     try {
         // Busca alunos da sala para obter total de faltas
         const response = await fetch(
-            `http://localhost:8080/api/salas/${salaId}/alunos?professorId=${usuarioId}`,
+            `/api/salas/${salaId}/alunos?professorId=${usuarioId}`,
             { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }
         );
         
         if (response.ok) {
             const alunos = await response.json();
             alunos.forEach(aluno => {
-                // Encontra a matrícula correspondente
+                // Encontra a matrÃ­cula correspondente
                 const alunoChamada = alunosData.find(a => a.alunoId === aluno.alunoId);
                 if (alunoChamada) {
                     faltasTotais[alunoChamada.matriculaId] = aluno.totalFaltas || 0;
@@ -168,7 +168,7 @@ async function carregarFaltasTotais() {
 }
 
 /**
- * Atualiza os dados do aluno quando checkbox é alterado
+ * Atualiza os dados do aluno quando checkbox Ã© alterado
  */
 function atualizarFaltas(matriculaId) {
     const aluno = alunosData.find(a => a.matriculaId === matriculaId);
@@ -181,7 +181,7 @@ function atualizarFaltas(matriculaId) {
         `input[data-matricula="${matriculaId}"][data-aula="2"]`
     );
     
-    // Atualiza dados do aluno (será salvo quando clicar em Salvar)
+    // Atualiza dados do aluno (serÃ¡ salvo quando clicar em Salvar)
     aluno.faltaAula1 = checkboxAula1 ? checkboxAula1.checked : false;
     aluno.faltaAula2 = checkboxAula2 ? checkboxAula2.checked : false;
 }
@@ -205,7 +205,7 @@ async function salvarChamada() {
         }));
         
         const response = await fetch(
-            `http://localhost:8080/api/chamadas/sala/${salaId}/data/${data}?professorId=${usuarioId}`,
+            `/api/chamadas/sala/${salaId}/data/${data}?professorId=${usuarioId}`,
             {
                 method: 'POST',
                 headers: {
@@ -223,10 +223,10 @@ async function salvarChamada() {
             throw new Error(error.erro || 'Erro ao salvar chamada');
         }
         
-        // Recarrega faltas totais após salvar
+        // Recarrega faltas totais apÃ³s salvar
         await carregarFaltasTotais();
         
-        // Recarrega a chamada para atualizar dados e exibição
+        // Recarrega a chamada para atualizar dados e exibiÃ§Ã£o
         await carregarChamada();
         
         alert('Chamada salva com sucesso!');
@@ -241,7 +241,7 @@ async function salvarChamada() {
 }
 
 /**
- * Volta para a página de detalhes da disciplina
+ * Volta para a pÃ¡gina de detalhes da disciplina
  */
 function voltarParaDisciplina() {
     const params = new URLSearchParams({

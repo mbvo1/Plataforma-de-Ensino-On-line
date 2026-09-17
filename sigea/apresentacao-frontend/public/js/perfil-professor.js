@@ -3,14 +3,14 @@
 const usuarioId = localStorage.getItem('usuarioId');
 const usuarioPerfil = localStorage.getItem('usuarioPerfil');
 
-// Verifica autenticação
+// Verifica autenticaÃ§Ã£o
 if (!usuarioId || usuarioPerfil !== 'PROFESSOR') {
     window.location.href = '/login-professor.html';
 }
 
 // Atualiza nome no header
 const nome = localStorage.getItem('usuarioNome');
-document.getElementById('user-name').textContent = `Professor - ${nome || 'Usuário'}`;
+document.getElementById('user-name').textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
 
 // Carrega dados do perfil ao iniciar
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,16 +19,16 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializarValidacaoCPF();
 });
 
-// Inicializa validação do campo CPF
+// Inicializa validaÃ§Ã£o do campo CPF
 function inicializarValidacaoCPF() {
     const cpfInput = document.getElementById('cpf');
     
-    // Permite apenas números
+    // Permite apenas nÃºmeros
     cpfInput.addEventListener('input', (e) => {
-        // Remove tudo que não é número
+        // Remove tudo que nÃ£o Ã© nÃºmero
         let valor = e.target.value.replace(/\D/g, '');
         
-        // Limita a 11 dígitos
+        // Limita a 11 dÃ­gitos
         if (valor.length > 11) {
             valor = valor.substring(0, 11);
         }
@@ -36,7 +36,7 @@ function inicializarValidacaoCPF() {
         e.target.value = valor;
     });
     
-    // Previne entrada de caracteres não numéricos
+    // Previne entrada de caracteres nÃ£o numÃ©ricos
     cpfInput.addEventListener('keypress', (e) => {
         const char = String.fromCharCode(e.which);
         if (!/[0-9]/.test(char)) {
@@ -61,7 +61,7 @@ async function carregarPerfil() {
     form.style.display = 'none';
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/${usuarioId}/perfil`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/professor/${usuarioId}/perfil`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (!response.ok) {
             throw new Error('Erro ao carregar perfil');
@@ -69,10 +69,10 @@ async function carregarPerfil() {
         
         const perfil = await response.json();
         
-        // Preenche os campos do formulário
+        // Preenche os campos do formulÃ¡rio
         document.getElementById('nome').value = perfil.nome || '';
         document.getElementById('email').value = perfil.email || '';
-        // Remove formatação do CPF (apenas números)
+        // Remove formataÃ§Ã£o do CPF (apenas nÃºmeros)
         const cpfLimpo = perfil.cpf ? perfil.cpf.replace(/\D/g, '') : '';
         document.getElementById('cpf').value = cpfLimpo;
         
@@ -86,7 +86,7 @@ async function carregarPerfil() {
     }
 }
 
-// Manipula o envio do formulário
+// Manipula o envio do formulÃ¡rio
 document.getElementById('perfil-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -95,14 +95,14 @@ document.getElementById('perfil-form').addEventListener('submit', async (e) => {
     
     // Valida senha se fornecida
     if (senha && senha !== confirmarSenha) {
-        mostrarAlerta('As senhas não coincidem', 'error');
+        mostrarAlerta('As senhas nÃ£o coincidem', 'error');
         return;
     }
     
     // Valida CPF se preenchido
     const cpf = document.getElementById('cpf').value.trim();
     if (cpf && cpf.length !== 11) {
-        mostrarAlerta('CPF deve conter exatamente 11 dígitos', 'error');
+        mostrarAlerta('CPF deve conter exatamente 11 dÃ­gitos', 'error');
         return;
     }
     
@@ -114,7 +114,7 @@ document.getElementById('perfil-form').addEventListener('submit', async (e) => {
     };
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/${usuarioId}/perfil`, {
+        const response = await fetch(`/api/professor/${usuarioId}/perfil`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ function mostrarAlerta(mensagem, tipo) {
     container.innerHTML = '';
     container.appendChild(alert);
     
-    // Remove o alerta após 5 segundos
+    // Remove o alerta apÃ³s 5 segundos
     setTimeout(() => {
         alert.remove();
     }, 5000);

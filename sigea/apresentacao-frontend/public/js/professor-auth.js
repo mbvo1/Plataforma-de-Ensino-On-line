@@ -8,7 +8,7 @@ async function handleProfessorLogin(event) {
     errorDiv.style.display = 'none';
     
     try {
-        const response = await fetch('http://localhost:8080/api/auth/login', {
+        const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -19,14 +19,14 @@ async function handleProfessorLogin(event) {
         if (response.ok) {
             const data = await response.json();
             
-            // Verifica se o usuário é realmente um professor
+            // Verifica se o usuÃ¡rio Ã© realmente um professor
             if (data.perfil !== 'PROFESSOR') {
-                errorDiv.textContent = 'Este login é exclusivo para professores';
+                errorDiv.textContent = 'Este login Ã© exclusivo para professores';
                 errorDiv.style.display = 'block';
                 return;
             }
             
-            // Salvar dados do usuário no localStorage
+            // Salvar dados do usuÃ¡rio no localStorage
             localStorage.setItem('usuarioId', data.usuarioId);
             localStorage.setItem('usuarioNome', data.nome);
             localStorage.setItem('usuarioEmail', data.email);
@@ -39,7 +39,7 @@ async function handleProfessorLogin(event) {
             const error = await response.json();
             console.error('Erro de login:', error);
             console.error('Status:', response.status);
-            errorDiv.textContent = error.message || 'Credenciais inválidas';
+            errorDiv.textContent = error.message || 'Credenciais invÃ¡lidas';
             errorDiv.style.display = 'block';
         }
     } catch (error) {

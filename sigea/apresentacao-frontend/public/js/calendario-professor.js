@@ -5,14 +5,14 @@ let eventos = [];
 let periodos = [];
 
 const feriadosFixos = {
-    '01-01': 'Confraternização Universal',
+    '01-01': 'ConfraternizaÃ§Ã£o Universal',
     '04-21': 'Tiradentes',
     '05-01': 'Dia do Trabalhador',
-    '09-07': 'Independência do Brasil',
+    '09-07': 'IndependÃªncia do Brasil',
     '10-12': 'Nossa Senhora Aparecida',
     '11-02': 'Finados',
-    '11-15': 'Proclamação da República',
-    '11-20': 'Dia da Consciência Negra',
+    '11-15': 'ProclamaÃ§Ã£o da RepÃºblica',
+    '11-20': 'Dia da ConsciÃªncia Negra',
     '12-25': 'Natal'
 };
 
@@ -86,7 +86,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -128,7 +128,7 @@ function adicionarFeriadosDoAno(ano) {
 }
 
 function renderizarCalendario() {
-    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const meses = ['Janeiro','Fevereiro','MarÃ§o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     document.getElementById('mesAnoAtual').textContent = `${meses[mesAtual]} ${anoAtual}`;
     const primeiroDia = new Date(anoAtual, mesAtual, 1);
     const diaSemana = primeiroDia.getDay();
@@ -154,14 +154,14 @@ function renderizarCalendario() {
             if (!evento.isAutomatico && evento.isProfessorEvent === true) {
                 const btnExcluir = document.createElement('button'); 
                 btnExcluir.className = 'evento-delete'; 
-                btnExcluir.innerHTML = '×'; 
+                btnExcluir.innerHTML = 'Ã—'; 
                 btnExcluir.title = 'Excluir evento'; 
                 btnExcluir.onclick = (e) => { e.stopPropagation(); excluirEvento(evento.id); };
                 eventoEl.appendChild(btnExcluir);
             }
             
             let tipoLabel = evento.tipo; 
-            if (evento.tipo === 'TODOS') tipoLabel = 'Todos os Usuários'; 
+            if (evento.tipo === 'TODOS') tipoLabel = 'Todos os UsuÃ¡rios'; 
             else if (evento.tipo === 'ALUNOS') tipoLabel = 'Apenas Alunos'; 
             else if (evento.tipo === 'PROFESSORES') tipoLabel = 'Apenas Professores';
             else if (evento.tipo === 'PROFESSOR') tipoLabel = 'Evento do Professor';
@@ -183,14 +183,14 @@ function parseData(dataString) {
 function getEventosNaData(data) { return eventos.filter(evento => { const dataEvento = parseData(evento.data || evento.dataEvento); if (!dataEvento) return false; return dataEvento.toDateString() === data.toDateString(); }); }
 
 async function carregarPeriodos() {
-    try { const response = await fetch('http://localhost:8080/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); if (!response.ok) throw new Error('Erro ao carregar períodos'); periodos = await response.json(); renderizarCalendario(); } catch (error) { console.error('Erro ao carregar períodos:', error); }
+    try { const response = await fetch('/api/periodos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); if (!response.ok) throw new Error('Erro ao carregar perÃ­odos'); periodos = await response.json(); renderizarCalendario(); } catch (error) { console.error('Erro ao carregar perÃ­odos:', error); }
 }
 
 // Carrega eventos e filtra para o professor atual
 async function carregarEventos() {
     try {
         // Load institutional/global events
-        const responseEventos = await fetch('http://localhost:8080/api/eventos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const responseEventos = await fetch('/api/eventos', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!responseEventos.ok) throw new Error('Erro ao carregar eventos');
         const all = await responseEventos.json();
 
@@ -198,7 +198,7 @@ async function carregarEventos() {
         const usuarioId = parseInt(localStorage.getItem('usuarioId'));
         let profEvents = [];
         try {
-            const r2 = await fetch(`http://localhost:8080/api/professor/eventos?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+            const r2 = await fetch(`/api/professor/eventos?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (r2.ok) profEvents = await r2.json();
         } catch (err) { /* ignore */ }
 
@@ -221,19 +221,19 @@ async function carregarEventos() {
             isProfessorEvent: true // Flag to identify professor-specific events
         })));
 
-        // Adiciona feriados do ano atual e próximo
+        // Adiciona feriados do ano atual e prÃ³ximo
         const anoInicial = new Date().getFullYear();
         adicionarFeriadosDoAno(anoInicial);
         adicionarFeriadosDoAno(anoInicial + 1);
 
-        // Tenta adicionar período letivo automático (mesma lógica do admin)
+        // Tenta adicionar perÃ­odo letivo automÃ¡tico (mesma lÃ³gica do admin)
         try {
-            const responsePeriodos = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+            const responsePeriodos = await fetch('/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (responsePeriodos.ok) {
                 const periodo = await responsePeriodos.json();
                 if (periodo && periodo.dataInicio) {
-                    eventos.push({ id: 'periodo-inicio-' + periodo.id, titulo: `Início do Período ${periodo.nome}`, data: periodo.dataInicio, tipo: 'TODOS', isAutomatico: true });
-                    if (periodo.dataFim) eventos.push({ id: 'periodo-fim-' + periodo.id, titulo: `Fim do Período ${periodo.nome}`, data: periodo.dataFim, tipo: 'TODOS', isAutomatico: true });
+                    eventos.push({ id: 'periodo-inicio-' + periodo.id, titulo: `InÃ­cio do PerÃ­odo ${periodo.nome}`, data: periodo.dataInicio, tipo: 'TODOS', isAutomatico: true });
+                    if (periodo.dataFim) eventos.push({ id: 'periodo-fim-' + periodo.id, titulo: `Fim do PerÃ­odo ${periodo.nome}`, data: periodo.dataFim, tipo: 'TODOS', isAutomatico: true });
                 }
             }
         } catch (err) { /* ignore */ }
@@ -252,7 +252,7 @@ async function excluirEvento(eventoId) {
         const evento = eventos.find(e => e.id === eventoId);
         
         if (!evento) {
-            alert('Evento não encontrado.');
+            alert('Evento nÃ£o encontrado.');
             return;
         }
 
@@ -263,26 +263,26 @@ async function excluirEvento(eventoId) {
         let response;
         if (isProfessorEvent) {
             // Delete from professor events table
-            response = await fetch(`http://localhost:8080/api/professor/eventos/${eventoId}?professorId=${usuarioId}`, {
+            response = await fetch(`/api/professor/eventos/${eventoId}?professorId=${usuarioId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
         } else {
             // Delete from institutional events table
-            response = await fetch(`http://localhost:8080/api/eventos/${eventoId}`, {
+            response = await fetch(`/api/eventos/${eventoId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
         }
         
         if (response.status === 404) {
-            alert('Evento não encontrado. Pode já ter sido excluído.');
+            alert('Evento nÃ£o encontrado. Pode jÃ¡ ter sido excluÃ­do.');
             await carregarEventos();
             return;
         }
         
         if (response.status === 403) {
-            alert('Você não tem permissão para excluir este evento.');
+            alert('VocÃª nÃ£o tem permissÃ£o para excluir este evento.');
             return;
         }
         
@@ -291,10 +291,10 @@ async function excluirEvento(eventoId) {
         }
         
         await carregarEventos();
-        alert('Evento excluído com sucesso!');
+        alert('Evento excluÃ­do com sucesso!');
     } catch (error) {
         console.error('Erro ao excluir evento:', error);
-        alert('Erro ao excluir evento. Verifique sua conexão e tente novamente.');
+        alert('Erro ao excluir evento. Verifique sua conexÃ£o e tente novamente.');
     }
 }
 
@@ -312,7 +312,7 @@ function fecharModalEvento() { const modal = document.getElementById('modalEvent
 function handleCheckTodos() { const checkTodos = document.getElementById('checkTodos'); const checkAlunos = document.getElementById('checkAlunos'); const checkProfessores = document.getElementById('checkProfessores'); if (checkTodos.checked) { checkAlunos.disabled = true; checkProfessores.disabled = true; checkAlunos.checked = false; checkProfessores.checked = false; } else { checkAlunos.disabled = false; checkProfessores.disabled = false; } }
 function handleCheckIndividual() { const checkTodos = document.getElementById('checkTodos'); const checkAlunos = document.getElementById('checkAlunos'); const checkProfessores = document.getElementById('checkProfessores'); if (checkAlunos.checked || checkProfessores.checked) { checkTodos.checked = false; } }
 
-// Submissão do formulário de evento (professor criando evento)
+// SubmissÃ£o do formulÃ¡rio de evento (professor criando evento)
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('formEvento');
     if (form) {
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 // Create professor-specific event (won't appear as turmas' events)
                 const payload = { titulo, descricao: null, dataEvento: dataEvento, professorId: parseInt(usuarioId) };
-                const response = await fetch('http://localhost:8080/api/professor/eventos', {
+                const response = await fetch('/api/professor/eventos', {
                     method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     body: JSON.stringify(payload)
                 });

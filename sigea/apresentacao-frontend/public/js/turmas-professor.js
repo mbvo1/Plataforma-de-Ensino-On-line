@@ -5,7 +5,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -23,17 +23,17 @@ window.addEventListener('DOMContentLoaded', () => {
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     
-    // Atualiza o nome do usuário no header
+    // Atualiza o nome do usuÃ¡rio no header
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
 function carregarSalas() {
     const professorId = localStorage.getItem('usuarioId');
     
-    fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
+    fetch(`/api/professor/turmas?professorId=${professorId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
         .then(response => response.json())
         .then(turmas => {
             const container = document.getElementById('salas-container');
@@ -80,7 +80,7 @@ function carregarSalas() {
 }
 
 function criarSala() {
-    // Limpa o formulário
+    // Limpa o formulÃ¡rio
     document.getElementById('form-criar-sala').reset();
     
     // Abre o modal
@@ -99,7 +99,7 @@ async function salvarSala(event) {
     const nomeSala = document.getElementById('input-nome-sala').value.trim();
     const professorId = localStorage.getItem('usuarioId');
     
-    // Gera código de acesso aleatório de 6 caracteres (letras e números)
+    // Gera cÃ³digo de acesso aleatÃ³rio de 6 caracteres (letras e nÃºmeros)
     const codigoAcesso = gerarCodigoAcesso();
     
     const turmaData = {
@@ -108,7 +108,7 @@ async function salvarSala(event) {
     };
     
     try {
-        const response = await fetch(`http://localhost:8080/api/professor/turmas?professorId=${professorId}`, {
+        const response = await fetch(`/api/professor/turmas?professorId=${professorId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(turmaData)
@@ -148,7 +148,7 @@ function acessarSala(salaId) {
 }
 
 function entrarEmSala() {
-    // TODO: Implementar modal para entrar em sala com código
+    // TODO: Implementar modal para entrar em sala com cÃ³digo
     console.log('Entrar em sala clicado');
 }
 

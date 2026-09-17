@@ -1,25 +1,25 @@
-// Variáveis globais
+// VariÃ¡veis globais
 let disciplinaId = null;
 let disciplinaNome = null;
 
-// Verificação de autenticação e inicialização
+// VerificaÃ§Ã£o de autenticaÃ§Ã£o e inicializaÃ§Ã£o
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
     if (!usuarioId || usuarioPerfil !== 'PROFESSOR') {
-        alert('Você precisa fazer login como PROFESSOR para acessar esta página.');
+        alert('VocÃª precisa fazer login como PROFESSOR para acessar esta pÃ¡gina.');
         window.location.href = '/login-professor.html';
         return;
     }
 
-    // Recupera informações da disciplina da URL
+    // Recupera informaÃ§Ãµes da disciplina da URL
     const urlParams = new URLSearchParams(window.location.search);
     disciplinaId = urlParams.get('disciplinaId');
     disciplinaNome = localStorage.getItem('forumDisciplinaNome') || 'Disciplina';
 
     if (!disciplinaId) {
-        alert('Disciplina não especificada.');
+        alert('Disciplina nÃ£o especificada.');
         window.location.href = '/forum-professor.html';
         return;
     }
@@ -28,10 +28,10 @@ window.addEventListener('DOMContentLoaded', () => {
     atualizarTitulo();
     carregarTopicos();
 
-    // Event listener para o formulário de novo tópico
+    // Event listener para o formulÃ¡rio de novo tÃ³pico
     document.getElementById('formNovoTopico').addEventListener('submit', handleNovoTopico);
     
-    // Event listener para mostrar nome do arquivo selecionado com botão X para remover
+    // Event listener para mostrar nome do arquivo selecionado com botÃ£o X para remover
     document.getElementById('arquivoTopico').addEventListener('change', function(e) {
         const nomeArquivo = e.target.files[0]?.name || '';
         const arquivoNomeElement = document.getElementById('arquivo-nome');
@@ -54,7 +54,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -72,7 +72,7 @@ function handleLogout() {
 
 function atualizarTitulo() {
     const tituloElement = document.getElementById('forum-titulo');
-    tituloElement.textContent = `Fórum: ${disciplinaNome}`;
+    tituloElement.textContent = `FÃ³rum: ${disciplinaNome}`;
 }
 
 function voltarParaForuns() {
@@ -85,7 +85,7 @@ async function carregarTopicos() {
     const noTopicosElement = document.getElementById('no-topicos');
     const usuarioId = localStorage.getItem('usuarioId');
 
-    console.log('=== DEBUG CARREGAR TÓPICOS ===');
+    console.log('=== DEBUG CARREGAR TÃ“PICOS ===');
     console.log('Disciplina ID:', disciplinaId);
     console.log('Usuario ID:', usuarioId);
 
@@ -94,8 +94,8 @@ async function carregarTopicos() {
         topicosListElement.style.display = 'none';
         noTopicosElement.style.display = 'none';
 
-        const url = `http://localhost:8080/api/foruns/topicos?disciplinaId=${disciplinaId}&usuarioId=${usuarioId}`;
-        console.log('URL da requisição:', url);
+        const url = `/api/foruns/topicos?disciplinaId=${disciplinaId}&usuarioId=${usuarioId}`;
+        console.log('URL da requisiÃ§Ã£o:', url);
 
         const response = await fetch(url, {
             headers: {
@@ -110,19 +110,19 @@ async function carregarTopicos() {
             console.error('Erro HTTP:', response.status);
             console.error('Mensagem de erro:', errorText);
             
-            // Se for 404 ou 500, trata como lista vazia (sem tópicos)
+            // Se for 404 ou 500, trata como lista vazia (sem tÃ³picos)
             if (response.status === 404 || response.status === 500) {
                 loadingElement.style.display = 'none';
                 noTopicosElement.style.display = 'block';
                 return;
             }
             
-            throw new Error('Erro ao carregar tópicos: ' + response.status);
+            throw new Error('Erro ao carregar tÃ³picos: ' + response.status);
         }
 
         const topicos = await response.json();
-        console.log('Tópicos recebidos:', topicos);
-        console.log('Quantidade de tópicos:', topicos.length);
+        console.log('TÃ³picos recebidos:', topicos);
+        console.log('Quantidade de tÃ³picos:', topicos.length);
 
         loadingElement.style.display = 'none';
 
@@ -134,7 +134,7 @@ async function carregarTopicos() {
         }
 
     } catch (error) {
-        console.error('=== ERRO AO CARREGAR TÓPICOS ===');
+        console.error('=== ERRO AO CARREGAR TÃ“PICOS ===');
         console.error('Tipo do erro:', error.name);
         console.error('Mensagem:', error.message);
         console.error('Stack:', error.stack);
@@ -143,7 +143,7 @@ async function carregarTopicos() {
         noTopicosElement.style.display = 'block';
         noTopicosElement.innerHTML = `
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>Erro ao carregar tópicos</h3>
+            <h3>Erro ao carregar tÃ³picos</h3>
             <p>Verifique o console (F12) para mais detalhes.</p>
             <p style="font-size: 0.875rem; color: #999;">Erro: ${error.message}</p>
         `;
@@ -165,19 +165,19 @@ function criarCardTopico(topico) {
     card.className = 'topico-card';
     card.dataset.topicoId = topico.id;
 
-    // Por enquanto, data fictícia (pode ser adicionada ao backend depois)
+    // Por enquanto, data fictÃ­cia (pode ser adicionada ao backend depois)
     const dataAtual = new Date().toLocaleDateString('pt-BR');
 
-    // Ícone de anexo se houver arquivo
+    // Ãcone de anexo se houver arquivo
     const anexoIcon = topico.arquivoPath ? '<i class="fas fa-paperclip" style="margin-left: 0.5rem; color: var(--primary-color);"></i>' : '';
 
-    // Verifica se o usuário logado é o autor do tópico
+    // Verifica se o usuÃ¡rio logado Ã© o autor do tÃ³pico
     const usuarioId = localStorage.getItem('usuarioId');
     const isAutor = topico.autorId === usuarioId || topico.autorId === parseInt(usuarioId) || String(topico.autorId) === usuarioId;
-    const btnExcluir = isAutor ? `<button class="btn-excluir-topico" onclick="excluirTopico(event, '${topico.id}')" title="Excluir tópico"><i class="fas fa-times"></i></button>` : '';
+    const btnExcluir = isAutor ? `<button class="btn-excluir-topico" onclick="excluirTopico(event, '${topico.id}')" title="Excluir tÃ³pico"><i class="fas fa-times"></i></button>` : '';
 
-    // Nome do autor - usa nomeAutor se disponível, senão mostra o ID
-    const nomeAutor = topico.nomeAutor || `Usuário ${topico.autorId}`;
+    // Nome do autor - usa nomeAutor se disponÃ­vel, senÃ£o mostra o ID
+    const nomeAutor = topico.nomeAutor || `UsuÃ¡rio ${topico.autorId}`;
 
     card.innerHTML = `
         <div class="topico-header">
@@ -209,17 +209,17 @@ function criarCardTopico(topico) {
 }
 
 function abrirTopicoDetalhes(topicoId) {
-    // Navega para a página de detalhes do tópico
+    // Navega para a pÃ¡gina de detalhes do tÃ³pico
     window.location.href = `/topico-detalhes-professor.html?topicoId=${topicoId}&disciplinaId=${disciplinaId}`;
 }
 
-// Modal de novo tópico
+// Modal de novo tÃ³pico
 function abrirModalNovoTopico() {
     const modal = document.getElementById('modalNovoTopico');
     modal.classList.add('show');
     document.getElementById('formNovoTopico').reset();
     
-    // Limpa o campo de arquivo e a exibição do nome
+    // Limpa o campo de arquivo e a exibiÃ§Ã£o do nome
     document.getElementById('arquivoTopico').value = '';
     document.getElementById('arquivo-nome').innerHTML = '';
 }
@@ -233,7 +233,7 @@ function fecharModalNovoTopico() {
     document.getElementById('arquivo-nome').innerHTML = '';
 }
 
-// Função para remover arquivo selecionado
+// FunÃ§Ã£o para remover arquivo selecionado
 function removerArquivoSelecionado() {
     document.getElementById('arquivoTopico').value = '';
     document.getElementById('arquivo-nome').innerHTML = '';
@@ -248,7 +248,7 @@ async function handleNovoTopico(event) {
     const usuarioId = localStorage.getItem('usuarioId');
 
     if (!titulo || !conteudo) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
+        alert('Por favor, preencha todos os campos obrigatÃ³rios.');
         return;
     }
 
@@ -259,7 +259,7 @@ async function handleNovoTopico(event) {
             const formData = new FormData();
             formData.append('file', arquivo);
 
-            const uploadResponse = await fetch('http://localhost:8080/api/upload', {
+            const uploadResponse = await fetch('/api/upload', {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -276,8 +276,8 @@ async function handleNovoTopico(event) {
             }
         }
 
-        // Depois cria o tópico
-        const response = await fetch('http://localhost:8080/api/foruns/topicos', {
+        // Depois cria o tÃ³pico
+        const response = await fetch('/api/foruns/topicos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -294,35 +294,35 @@ async function handleNovoTopico(event) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Erro ao criar tópico:', errorText);
-            throw new Error('Erro ao criar tópico');
+            console.error('Erro ao criar tÃ³pico:', errorText);
+            throw new Error('Erro ao criar tÃ³pico');
         }
 
         const novoTopico = await response.json();
-        console.log('Tópico criado:', novoTopico);
+        console.log('TÃ³pico criado:', novoTopico);
 
-        alert('Tópico criado com sucesso!');
+        alert('TÃ³pico criado com sucesso!');
         fecharModalNovoTopico();
         carregarTopicos();
 
     } catch (error) {
-        console.error('Erro ao criar tópico:', error);
-        alert('Erro ao criar tópico. Tente novamente.');
+        console.error('Erro ao criar tÃ³pico:', error);
+        alert('Erro ao criar tÃ³pico. Tente novamente.');
     }
 }
 
-// Função para excluir tópico
+// FunÃ§Ã£o para excluir tÃ³pico
 async function excluirTopico(event, topicoId) {
-    event.stopPropagation(); // Evita abrir detalhes do tópico ao clicar no X
+    event.stopPropagation(); // Evita abrir detalhes do tÃ³pico ao clicar no X
     
-    if (!confirm('Tem certeza que deseja excluir este tópico?')) {
+    if (!confirm('Tem certeza que deseja excluir este tÃ³pico?')) {
         return;
     }
     
     const usuarioId = localStorage.getItem('usuarioId');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`, {
+        const response = await fetch(`/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -331,8 +331,8 @@ async function excluirTopico(event, topicoId) {
         
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Erro ao excluir tópico:', errorText);
-            throw new Error('Erro ao excluir tópico');
+            console.error('Erro ao excluir tÃ³pico:', errorText);
+            throw new Error('Erro ao excluir tÃ³pico');
         }
         
         // Remove o card do DOM
@@ -341,18 +341,18 @@ async function excluirTopico(event, topicoId) {
             card.remove();
         }
         
-        // Verifica se ainda há tópicos
+        // Verifica se ainda hÃ¡ tÃ³picos
         const topicosListElement = document.getElementById('topicos-list');
         if (topicosListElement.children.length === 0) {
             topicosListElement.style.display = 'none';
             document.getElementById('no-topicos').style.display = 'block';
         }
         
-        alert('Tópico excluído com sucesso!');
+        alert('TÃ³pico excluÃ­do com sucesso!');
         
     } catch (error) {
-        console.error('Erro ao excluir tópico:', error);
-        alert('Erro ao excluir tópico. Tente novamente.');
+        console.error('Erro ao excluir tÃ³pico:', error);
+        alert('Erro ao excluir tÃ³pico. Tente novamente.');
     }
 }
 

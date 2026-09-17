@@ -1,4 +1,4 @@
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -21,21 +21,21 @@ function loadUserInfo() {
     
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Admin - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Admin - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
-// ========== ESTADO DA VISUALIZAÇÃO ==========
+// ========== ESTADO DA VISUALIZAÃ‡ÃƒO ==========
 
 let mostrandoHistorico = false;
 
-// ========== CARREGAR AVISOS NÃO LIDOS ==========
+// ========== CARREGAR AVISOS NÃƒO LIDOS ==========
 
 async function carregarAvisos() {
     const container = document.getElementById('avisos-container');
     let usuarioId = localStorage.getItem('usuarioId');
     
-    // Se não houver usuarioId, usa 1 como padrão (admin)
+    // Se nÃ£o houver usuarioId, usa 1 como padrÃ£o (admin)
     if (!usuarioId || usuarioId === 'undefined' || usuarioId === 'null') {
         usuarioId = '1';
         localStorage.setItem('usuarioId', '1');
@@ -43,8 +43,8 @@ async function carregarAvisos() {
     
     try {
         const endpoint = mostrandoHistorico 
-            ? `http://localhost:8080/api/avisos/historico?usuarioId=${usuarioId}`
-            : `http://localhost:8080/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
+            ? `/api/avisos/historico?usuarioId=${usuarioId}`
+            : `/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
             
         const response = await fetch(endpoint, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
 
@@ -56,8 +56,8 @@ async function carregarAvisos() {
         
         if (avisos.length === 0) {
             const mensagem = mostrandoHistorico 
-                ? 'Nenhum aviso no histórico.' 
-                : 'Nenhum aviso não lido.';
+                ? 'Nenhum aviso no histÃ³rico.' 
+                : 'Nenhum aviso nÃ£o lido.';
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-bell-slash"></i>
@@ -78,7 +78,7 @@ async function carregarAvisos() {
     }
 }
 
-// ========== ALTERNAR ENTRE AVISOS NÃO LIDOS E HISTÓRICO ==========
+// ========== ALTERNAR ENTRE AVISOS NÃƒO LIDOS E HISTÃ“RICO ==========
 
 function toggleHistorico(event) {
     event.preventDefault();
@@ -86,8 +86,8 @@ function toggleHistorico(event) {
     
     const link = event.target;
     link.textContent = mostrandoHistorico 
-        ? 'Ver avisos não lidos' 
-        : 'Ver histórico de avisos';
+        ? 'Ver avisos nÃ£o lidos' 
+        : 'Ver histÃ³rico de avisos';
     
     carregarAvisos();
 }
@@ -131,7 +131,7 @@ function formatarData(dataISO) {
     const hora = String(data.getHours()).padStart(2, '0');
     const minuto = String(data.getMinutes()).padStart(2, '0');
     
-    return `${dia}/${mes}/${ano} às ${hora}:${minuto}`;
+    return `${dia}/${mes}/${ano} Ã s ${hora}:${minuto}`;
 }
 
 // ========== MODAL NOVO AVISO ==========
@@ -141,7 +141,7 @@ function abrirModalNovoAviso() {
     const modal = document.getElementById('modal-novo-aviso');
     modal.classList.add('show');
     
-    // Limpa o formulário
+    // Limpa o formulÃ¡rio
     document.getElementById('form-novo-aviso').reset();
     console.log('Modal aviso aberto');
 }
@@ -169,11 +169,11 @@ async function criarAviso(event) {
     const destinatarios = document.getElementById('destinatarios-aviso').value;
     
     if (!titulo || !mensagem || !destinatarios) {
-        alert('Preencha todos os campos obrigatórios!');
+        alert('Preencha todos os campos obrigatÃ³rios!');
         return;
     }
     
-    // Mapeia destinatários para escopo do backend
+    // Mapeia destinatÃ¡rios para escopo do backend
     let escopo;
     switch(destinatarios) {
         case 'TODOS':
@@ -201,7 +201,7 @@ async function criarAviso(event) {
     };
     
     try {
-        const response = await fetch('http://localhost:8080/api/avisos', {
+        const response = await fetch('/api/avisos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(novoAviso)
@@ -218,16 +218,16 @@ async function criarAviso(event) {
         
     } catch (error) {
         console.error('Erro ao criar aviso:', error);
-        alert('Erro ao criar aviso. Verifique se o servidor está rodando.');
+        alert('Erro ao criar aviso. Verifique se o servidor estÃ¡ rodando.');
     }
 }
 
 // ========== EDITAR AVISO ==========
 
 async function editarAviso(id) {
-    // TODO: Implementar edição
+    // TODO: Implementar ediÃ§Ã£o
     console.log('Editar aviso:', id);
-    alert('Funcionalidade de edição será implementada em breve.');
+    alert('Funcionalidade de ediÃ§Ã£o serÃ¡ implementada em breve.');
 }
 
 // ========== MARCAR COMO LIDO ==========
@@ -240,14 +240,14 @@ async function marcarComoLido(avisoId) {
     }
     
     try {
-        const response = await fetch('http://localhost:8080/api/avisos/marcar-lido', {
+        const response = await fetch('/api/avisos/marcar-lido', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify({ avisoId, usuarioId })
         });
         
         if (response.ok) {
-            // Remove o aviso da tela sem excluí-lo do banco
+            // Remove o aviso da tela sem excluÃ­-lo do banco
             carregarAvisos();
         } else {
             alert('Erro ao marcar aviso como lido.');
@@ -255,7 +255,7 @@ async function marcarComoLido(avisoId) {
         
     } catch (error) {
         console.error('Erro ao marcar como lido:', error);
-        alert('Erro ao marcar aviso como lido. Verifique se o servidor está rodando.');
+        alert('Erro ao marcar aviso como lido. Verifique se o servidor estÃ¡ rodando.');
     }
 }
 
@@ -267,13 +267,13 @@ async function excluirAviso(id) {
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/avisos/${id}`, {
+        const response = await fetch(`/api/avisos/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         
         if (response.ok) {
-            alert('Aviso excluído com sucesso!');
+            alert('Aviso excluÃ­do com sucesso!');
             carregarAvisos();
         } else {
             alert('Erro ao excluir aviso.');
@@ -281,7 +281,7 @@ async function excluirAviso(id) {
         
     } catch (error) {
         console.error('Erro ao excluir aviso:', error);
-        alert('Erro ao excluir aviso. Verifique se o servidor está rodando.');
+        alert('Erro ao excluir aviso. Verifique se o servidor estÃ¡ rodando.');
     }
 }
 

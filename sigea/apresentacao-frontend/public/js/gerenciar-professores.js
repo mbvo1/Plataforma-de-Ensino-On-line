@@ -8,7 +8,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -38,7 +38,7 @@ function loadUserInfo() {
 async function carregarProfessores() {
     try {
         // Busca dados reais do banco de dados
-        const response = await fetch('http://localhost:8080/api/admin/professores', {
+        const response = await fetch('/api/admin/professores', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -64,7 +64,7 @@ function exibirProfessores(professores) {
     }
     
     const html = professores.map(professor => {
-        // Formata o status para exibição (ATIVO → Ativo, INATIVO → Inativo)
+        // Formata o status para exibiÃ§Ã£o (ATIVO â†’ Ativo, INATIVO â†’ Inativo)
         const statusFormatado = professor.status.charAt(0) + professor.status.slice(1).toLowerCase();
         const statusClass = professor.status.toLowerCase();
         
@@ -113,7 +113,7 @@ function filtrarProfessores() {
 async function editarProfessor(professorId) {
     try {
         // Busca os dados do professor
-        const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}`, {
+        const response = await fetch(`/api/admin/professores/${professorId}`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -123,7 +123,7 @@ async function editarProfessor(professorId) {
         
         const professor = await response.json();
         
-        // Preenche o formulário de edição
+        // Preenche o formulÃ¡rio de ediÃ§Ã£o
         document.getElementById('edit-professor-id').value = professor.id;
         document.getElementById('edit-nome').value = professor.nome;
         document.getElementById('edit-email').value = professor.email;
@@ -154,7 +154,7 @@ async function salvarEdicao(event) {
     };
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}`, {
+        const response = await fetch(`/api/admin/professores/${professorId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -182,12 +182,12 @@ async function salvarEdicao(event) {
 async function resetarSenha() {
     const professorId = document.getElementById('edit-professor-id').value;
     
-    if (!confirm('Deseja realmente resetar a senha deste professor?\n\nA senha será redefinida para "senha123".')) {
+    if (!confirm('Deseja realmente resetar a senha deste professor?\n\nA senha serÃ¡ redefinida para "senha123".')) {
         return;
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}/resetar-senha`, {
+        const response = await fetch(`/api/admin/professores/${professorId}/resetar-senha`, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
@@ -212,7 +212,7 @@ async function toggleStatusProfessor(professorId, statusAtual) {
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/professores/${professorId}/${acao}`, {
+        const response = await fetch(`/api/admin/professores/${professorId}/${acao}`, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
@@ -233,7 +233,7 @@ async function toggleStatusProfessor(professorId, statusAtual) {
 
 function cadastrarProfessor() {
     console.log('cadastrarProfessor() chamada');
-    // Limpa os campos do formulário
+    // Limpa os campos do formulÃ¡rio
     document.getElementById('form-cadastrar-professor').reset();
     // Abre o modal usando classe
     const modal = document.getElementById('modal-cadastrar');
@@ -252,9 +252,9 @@ async function salvarProfessor(event) {
     const email = document.getElementById('input-email').value.trim();
     const cpf = document.getElementById('input-cpf').value.trim();
     
-    // Validação básica de CPF (apenas números e 11 dígitos)
+    // ValidaÃ§Ã£o bÃ¡sica de CPF (apenas nÃºmeros e 11 dÃ­gitos)
     if (!/^[0-9]{11}$/.test(cpf)) {
-        alert('CPF inválido! Digite 11 números.');
+        alert('CPF invÃ¡lido! Digite 11 nÃºmeros.');
         return;
     }
     
@@ -265,7 +265,7 @@ async function salvarProfessor(event) {
     };
     
     try {
-        const response = await fetch('http://localhost:8080/api/admin/professores', {
+        const response = await fetch('/api/admin/professores', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

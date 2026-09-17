@@ -5,7 +5,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -13,7 +13,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -29,7 +29,7 @@ function isLoginValido() {
            usuarioPerfil === 'ALUNO';
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -46,7 +46,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Aluno - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -73,7 +73,7 @@ async function carregarDesempenho() {
     emptyState.style.display = 'none';
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/desempenho`, {
+        const response = await fetch(`/api/aluno/${usuarioId}/desempenho`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -98,15 +98,15 @@ async function carregarDesempenho() {
             const tr = document.createElement('tr');
             
             // Formata valores
-            const av1 = d.av1 !== null && d.av1 !== undefined ? d.av1.toFixed(2) : '—';
-            const av2 = d.av2 !== null && d.av2 !== undefined ? d.av2.toFixed(2) : '—';
-            const segundaChamada = d.segundaChamada !== null && d.segundaChamada !== undefined ? d.segundaChamada.toFixed(2) : '—';
-            const mediaParcial = d.mediaParcial !== null && d.mediaParcial !== undefined ? d.mediaParcial.toFixed(2) : '—';
-            const provaFinal = d.provaFinal !== null && d.provaFinal !== undefined ? d.provaFinal.toFixed(2) : '—';
-            const mediaFinal = d.mediaFinal !== null && d.mediaFinal !== undefined ? d.mediaFinal.toFixed(2) : '—';
+            const av1 = d.av1 !== null && d.av1 !== undefined ? d.av1.toFixed(2) : 'â€”';
+            const av2 = d.av2 !== null && d.av2 !== undefined ? d.av2.toFixed(2) : 'â€”';
+            const segundaChamada = d.segundaChamada !== null && d.segundaChamada !== undefined ? d.segundaChamada.toFixed(2) : 'â€”';
+            const mediaParcial = d.mediaParcial !== null && d.mediaParcial !== undefined ? d.mediaParcial.toFixed(2) : 'â€”';
+            const provaFinal = d.provaFinal !== null && d.provaFinal !== undefined ? d.provaFinal.toFixed(2) : 'â€”';
+            const mediaFinal = d.mediaFinal !== null && d.mediaFinal !== undefined ? d.mediaFinal.toFixed(2) : 'â€”';
             const faltas = d.faltas !== null && d.faltas !== undefined ? d.faltas : 0;
             
-            // Determina classe CSS para média final (aprovado/reprovado)
+            // Determina classe CSS para mÃ©dia final (aprovado/reprovado)
             let mediaFinalClass = '';
             if (d.mediaFinal !== null && d.mediaFinal !== undefined) {
                 if (d.mediaFinal >= 6) {

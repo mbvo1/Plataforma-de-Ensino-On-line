@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
-    if (userNameElement) userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+    if (userNameElement) userNameElement.textContent = `Aluno - ${nome || 'UsuÃ¡rio'}`;
 }
 
 async function carregarAvisos() {
@@ -25,14 +25,14 @@ async function carregarAvisos() {
         container.innerHTML = `
             <div class="empty-state error-state">
                 <i class="fas fa-exclamation-circle"></i>
-                <p>Erro: Usuário não identificado.</p>
+                <p>Erro: UsuÃ¡rio nÃ£o identificado.</p>
             </div>
         `;
         return;
     }
 
     try {
-        const endpoint = `http://localhost:8080/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
+        const endpoint = `/api/avisos/nao-lidos?usuarioId=${usuarioId}`;
         const response = await fetch(endpoint, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) throw new Error('Erro ao carregar avisos');
         const avisos = await response.json();
@@ -41,7 +41,7 @@ async function carregarAvisos() {
             container.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-bell-slash"></i>
-                    <p>Nenhum aviso não lido.</p>
+                    <p>Nenhum aviso nÃ£o lido.</p>
                 </div>
             `;
         } else {
@@ -100,12 +100,12 @@ function formatarData(dataISO) {
 async function marcarComoLido(avisoId) {
     let usuarioId = localStorage.getItem('usuarioId');
     if (!usuarioId || usuarioId === 'undefined' || usuarioId === 'null') {
-        alert('Erro: Usuário não identificado.');
+        alert('Erro: UsuÃ¡rio nÃ£o identificado.');
         return;
     }
 
     try {
-        const response = await fetch('http://localhost:8080/api/avisos/marcar-lido', {
+        const response = await fetch('/api/avisos/marcar-lido', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify({ avisoId, usuarioId })

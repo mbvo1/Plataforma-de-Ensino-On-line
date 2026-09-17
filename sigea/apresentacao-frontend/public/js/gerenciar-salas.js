@@ -5,11 +5,11 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Variáveis globais
+// VariÃ¡veis globais
 let disciplinaId = null;
 let disciplinaNome = '';
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
     disciplinaId = urlParams.get('disciplinaId');
     
     if (!disciplinaId) {
-        alert('Disciplina não especificada');
+        alert('Disciplina nÃ£o especificada');
         window.location.href = 'gerenciar-disciplinas.html';
         return;
     }
@@ -39,13 +39,13 @@ function loadUserInfo() {
     
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Admin - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Admin - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
 async function carregarDisciplina() {
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -65,7 +65,7 @@ async function carregarDisciplina() {
 
 async function carregarSalas() {
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/salas`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}/salas`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -100,12 +100,12 @@ function exibirSalas(salas) {
             'QUA': 'Qua',
             'QUI': 'Qui',
             'SEX': 'Sex',
-            'SAB': 'Sáb',
+            'SAB': 'SÃ¡b',
             'DOM': 'Dom'
         };
         const diasFormatados = sala.diasSemana.map(d => diasMap[d] || d).join(', ');
         
-        // Formata horários
+        // Formata horÃ¡rios
         const horario = `${sala.horarioInicio} - ${sala.horarioFim}`;
         
         return `
@@ -153,7 +153,7 @@ async function adicionarNovaSala() {
     // Preenche nome da disciplina no modal
     document.getElementById('disciplina-modal-nome').textContent = disciplinaNome;
     
-    // Limpa o formulário
+    // Limpa o formulÃ¡rio
     document.getElementById('form-adicionar-sala').reset();
     
     // Abre o modal
@@ -173,7 +173,7 @@ function fecharModalAdicionarSala() {
 
 async function carregarProfessores() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/professores', {
+        const response = await fetch('/api/admin/professores', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -184,8 +184,8 @@ async function carregarProfessores() {
         const professores = await response.json();
         const select = document.getElementById('input-professor');
         
-        // Limpa opções anteriores (mantém apenas a primeira)
-        select.innerHTML = '<option value="">Selecione o professor responsável</option>';
+        // Limpa opÃ§Ãµes anteriores (mantÃ©m apenas a primeira)
+        select.innerHTML = '<option value="">Selecione o professor responsÃ¡vel</option>';
         
         // Adiciona apenas professores com status ATIVO
         professores.filter(p => p.status === 'ATIVO').forEach(professor => {
@@ -209,7 +209,7 @@ async function salvarSala(event) {
     const horarioFim = document.getElementById('input-horario-fim').value;
     const vagas = parseInt(document.getElementById('input-vagas').value);
     
-    // Validações
+    // ValidaÃ§Ãµes
     if (!identificador) {
         alert('Preencha o identificador da sala');
         return;
@@ -221,12 +221,12 @@ async function salvarSala(event) {
     }
     
     if (!horarioInicio || !horarioFim) {
-        alert('Preencha os horários');
+        alert('Preencha os horÃ¡rios');
         return;
     }
     
     if (!vagas || vagas <= 0) {
-        alert('Informe um número válido de vagas');
+        alert('Informe um nÃºmero vÃ¡lido de vagas');
         return;
     }
     
@@ -250,7 +250,7 @@ async function salvarSala(event) {
     };
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/salas`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}/salas`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -276,7 +276,7 @@ async function salvarSala(event) {
 async function editarSala(salaId) {
     try {
         // Busca os dados da sala
-        const response = await fetch(`http://localhost:8080/api/admin/salas/${salaId}`, {
+        const response = await fetch(`/api/admin/salas/${salaId}`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -292,7 +292,7 @@ async function editarSala(salaId) {
         // Preenche o nome da disciplina
         document.getElementById('disciplina-modal-nome-edit').textContent = disciplinaNome;
         
-        // Preenche o formulário
+        // Preenche o formulÃ¡rio
         document.getElementById('edit-sala-id').value = sala.id;
         document.getElementById('edit-identificador-sala').value = sala.identificador;
         document.getElementById('edit-professor').value = sala.professorId || '';
@@ -326,7 +326,7 @@ function fecharModalEditarSala() {
 
 async function carregarProfessoresEdit() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/professores', {
+        const response = await fetch('/api/admin/professores', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -337,8 +337,8 @@ async function carregarProfessoresEdit() {
         const professores = await response.json();
         const select = document.getElementById('edit-professor');
         
-        // Limpa opções anteriores (mantém apenas a primeira)
-        select.innerHTML = '<option value="">Selecione o professor responsável</option>';
+        // Limpa opÃ§Ãµes anteriores (mantÃ©m apenas a primeira)
+        select.innerHTML = '<option value="">Selecione o professor responsÃ¡vel</option>';
         
         // Adiciona apenas professores com status ATIVO
         professores.filter(p => p.status === 'ATIVO').forEach(professor => {
@@ -363,7 +363,7 @@ async function atualizarSala(event) {
     const horarioFim = document.getElementById('edit-horario-fim').value;
     const vagas = parseInt(document.getElementById('edit-vagas').value);
     
-    // Validações
+    // ValidaÃ§Ãµes
     if (!identificador) {
         alert('Preencha o identificador da sala');
         return;
@@ -375,12 +375,12 @@ async function atualizarSala(event) {
     }
     
     if (!horarioInicio || !horarioFim) {
-        alert('Preencha os horários');
+        alert('Preencha os horÃ¡rios');
         return;
     }
     
     if (!vagas || vagas <= 0) {
-        alert('Informe um número válido de vagas');
+        alert('Informe um nÃºmero vÃ¡lido de vagas');
         return;
     }
     
@@ -403,7 +403,7 @@ async function atualizarSala(event) {
     };
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/salas/${salaId}`, {
+        const response = await fetch(`/api/admin/salas/${salaId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -434,7 +434,7 @@ function toggleStatusSala(salaId, statusAtual) {
         return;
     }
     
-    fetch(`http://localhost:8080/api/admin/salas/${salaId}/${acao}`, {
+    fetch(`/api/admin/salas/${salaId}/${acao}`, {
         method: 'PATCH',
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
     })
@@ -452,11 +452,11 @@ function toggleStatusSala(salaId, statusAtual) {
 }
 
 function excluirSala(salaId) {
-    if (!confirm('Deseja realmente excluir esta sala?\n\nEsta ação não pode ser desfeita.')) {
+    if (!confirm('Deseja realmente excluir esta sala?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita.')) {
         return;
     }
     
-    fetch(`http://localhost:8080/api/admin/salas/${salaId}`, {
+    fetch(`/api/admin/salas/${salaId}`, {
         method: 'DELETE',
         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
     })
@@ -464,7 +464,7 @@ function excluirSala(salaId) {
         if (!response.ok) {
             throw new Error('Erro ao excluir sala');
         }
-        alert('Sala excluída com sucesso!');
+        alert('Sala excluÃ­da com sucesso!');
         carregarSalas();
     })
     .catch(error => {

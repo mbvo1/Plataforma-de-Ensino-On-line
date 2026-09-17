@@ -1,9 +1,9 @@
-// Variáveis globais
+// VariÃ¡veis globais
 let salasDisponiveis = [];
 let disciplinasSelecionadas = [];
-let matriculasExistentesGlobal = []; // Armazena matrículas existentes para comparação
+let matriculasExistentesGlobal = []; // Armazena matrÃ­culas existentes para comparaÃ§Ã£o
 
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -11,7 +11,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -27,7 +27,7 @@ function isLoginValido() {
            usuarioPerfil === 'ALUNO';
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -45,7 +45,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('userName');
     if (userNameElement) {
-        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Aluno - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -60,21 +60,21 @@ function initializeMenuToggle() {
     }
 }
 
-// Carregar salas disponíveis
+// Carregar salas disponÃ­veis
 async function carregarSalasDisponiveis() {
     const usuarioId = localStorage.getItem('usuarioId');
     
     try {
-        // Carregar salas disponíveis
-        const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/salas-disponiveis`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        // Carregar salas disponÃ­veis
+        const response = await fetch(`/api/aluno/${usuarioId}/salas-disponiveis`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) {
             throw new Error('Erro ao carregar salas');
         }
         
         salasDisponiveis = await response.json();
         
-        // Carregar também as matrículas existentes do aluno
-        const matriculasResponse = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        // Carregar tambÃ©m as matrÃ­culas existentes do aluno
+        const matriculasResponse = await fetch(`/api/aluno/${usuarioId}/matriculas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         let matriculasExistentes = [];
         if (matriculasResponse.ok) {
             matriculasExistentes = await matriculasResponse.json();
@@ -83,21 +83,21 @@ async function carregarSalasDisponiveis() {
         
         preencherSelects();
         
-        // Pré-preencher com matrículas existentes
+        // PrÃ©-preencher com matrÃ­culas existentes
         if (matriculasExistentes.length > 0) {
             preencherComMatriculasExistentes(matriculasExistentes);
         }
     } catch (error) {
         console.error('Erro ao carregar salas:', error);
-        exibirMensagem('Erro ao carregar disciplinas disponíveis', 'erro');
+        exibirMensagem('Erro ao carregar disciplinas disponÃ­veis', 'erro');
     }
 }
 
-// Pré-preencher selects com matrículas existentes
+// PrÃ©-preencher selects com matrÃ­culas existentes
 async function preencherComMatriculasExistentes(matriculasExistentes) {
     const usuarioId = localStorage.getItem('usuarioId');
     
-    // Buscar informações completas das salas matriculadas e outras salas da mesma disciplina
+    // Buscar informaÃ§Ãµes completas das salas matriculadas e outras salas da mesma disciplina
     for (let i = 0; i < matriculasExistentes.length && i < 5; i++) {
         const matricula = matriculasExistentes[i];
         const select = document.getElementById(`disciplina${i + 1}`);
@@ -105,12 +105,12 @@ async function preencherComMatriculasExistentes(matriculasExistentes) {
         if (select) {
             // Buscar todas as salas da disciplina matriculada
             try {
-                const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/disciplinas/${matricula.disciplinaId}/salas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+                const response = await fetch(`/api/aluno/${usuarioId}/disciplinas/${matricula.disciplinaId}/salas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
                 if (response.ok) {
                     const data = await response.json();
                     const salasDaDisciplina = data.salas || [];
                     
-                    // Adicionar a sala matriculada primeiro (que pode não aparecer se tem 0 vagas restantes pra outros)
+                    // Adicionar a sala matriculada primeiro (que pode nÃ£o aparecer se tem 0 vagas restantes pra outros)
                     const salaMatriculadaExiste = salasDaDisciplina.find(s => s.salaId === matricula.salaId);
                     if (!salaMatriculadaExiste) {
                         // Adicionar a sala matriculada manualmente
@@ -131,7 +131,7 @@ async function preencherComMatriculasExistentes(matriculasExistentes) {
                         }
                     }
                     
-                    // Adicionar todas as salas da disciplina à lista
+                    // Adicionar todas as salas da disciplina Ã  lista
                     salasDaDisciplina.forEach(salaInfo => {
                         const salaId = salaInfo.salaId || salaInfo.id;
                         const jaExiste = salasDisponiveis.find(s => s.id === salaId);
@@ -149,7 +149,7 @@ async function preencherComMatriculasExistentes(matriculasExistentes) {
                             };
                             salasDisponiveis.push(novaSala);
                         } else if (salaId === matricula.salaId) {
-                            // Marcar a sala atual como já matriculado
+                            // Marcar a sala atual como jÃ¡ matriculado
                             jaExiste.jaMatriculado = true;
                         }
                     });
@@ -190,23 +190,23 @@ async function preencherComMatriculasExistentes(matriculasExistentes) {
         }
     }
     
-    // Atualizar a grade com as seleções
+    // Atualizar a grade com as seleÃ§Ãµes
     atualizarGrade();
     
     // Limpar o localStorage
     localStorage.removeItem('matriculasAtuais');
 }
 
-// Preencher todos os selects com as salas disponíveis
+// Preencher todos os selects com as salas disponÃ­veis
 function preencherSelects() {
     atualizarSelectsDisponiveis();
 }
 
-// Atualizar selects removendo disciplinas já selecionadas em outros selects
+// Atualizar selects removendo disciplinas jÃ¡ selecionadas em outros selects
 function atualizarSelectsDisponiveis() {
     // Coletar disciplinas selecionadas em cada select
     const selecoesPorSelect = {};
-    const disciplinasSelecionadasIds = new Set(); // IDs das disciplinas (não salas) já selecionadas
+    const disciplinasSelecionadasIds = new Set(); // IDs das disciplinas (nÃ£o salas) jÃ¡ selecionadas
     
     for (let i = 1; i <= 5; i++) {
         const select = document.getElementById(`disciplina${i}`);
@@ -227,17 +227,17 @@ function atualizarSelectsDisponiveis() {
             const salaAtual = valorAtual ? salasDisponiveis.find(s => s.id == valorAtual) : null;
             const disciplinaAtualId = salaAtual ? salaAtual.disciplinaId : null;
             
-            // Limpar opções existentes
+            // Limpar opÃ§Ãµes existentes
             select.innerHTML = '<option value="">Disciplina</option>';
             
             // Adicionar salas filtradas
             salasDisponiveis.forEach(sala => {
                 const disciplinaId = sala.disciplinaId;
                 
-                // Verificar se esta disciplina já foi selecionada em outro select
+                // Verificar se esta disciplina jÃ¡ foi selecionada em outro select
                 // Permite mostrar a disciplina se:
-                // 1. A disciplina não foi selecionada em nenhum outro select, OU
-                // 2. A disciplina é a mesma que está selecionada neste select (para manter a opção atual)
+                // 1. A disciplina nÃ£o foi selecionada em nenhum outro select, OU
+                // 2. A disciplina Ã© a mesma que estÃ¡ selecionada neste select (para manter a opÃ§Ã£o atual)
                 const disciplinaJaSelecionadaEmOutro = disciplinasSelecionadasIds.has(disciplinaId) && disciplinaId !== disciplinaAtualId;
                 
                 if (!disciplinaJaSelecionadaEmOutro) {
@@ -245,12 +245,12 @@ function atualizarSelectsDisponiveis() {
                     option.value = sala.id;
                     const nomeDisciplina = sala.disciplinaNome || (sala.disciplina ? sala.disciplina.nome : 'Disciplina');
                     const identificador = sala.identificador || '';
-                    const horario = sala.horario || 'Horário não definido';
+                    const horario = sala.horario || 'HorÃ¡rio nÃ£o definido';
                     const periodo = sala.disciplinaPeriodo || '';
                     const vagasDisponiveis = sala.vagasDisponiveis || 0;
                     
-                    // Formato: "Disciplina - Sala X (HORARIO) | Período: X | Vagas: X"
-                    option.textContent = `${nomeDisciplina} - ${identificador} (${horario}) | Período: ${periodo} | Vagas: ${vagasDisponiveis}`;
+                    // Formato: "Disciplina - Sala X (HORARIO) | PerÃ­odo: X | Vagas: X"
+                    option.textContent = `${nomeDisciplina} - ${identificador} (${horario}) | PerÃ­odo: ${periodo} | Vagas: ${vagasDisponiveis}`;
                     option.dataset.horario = sala.horario || '';
                     option.dataset.disciplinaNome = nomeDisciplina;
                     select.appendChild(option);
@@ -265,7 +265,7 @@ function atualizarSelectsDisponiveis() {
     }
 }
 
-// Atualizar grade horária
+// Atualizar grade horÃ¡ria
 function atualizarGrade() {
     limparGrade();
     
@@ -282,7 +282,7 @@ function atualizarGrade() {
         }
     }
     
-    // Atualizar os selects para remover disciplinas já selecionadas
+    // Atualizar os selects para remover disciplinas jÃ¡ selecionadas
     atualizarSelectsDisponiveis();
 }
 
@@ -302,7 +302,7 @@ function limparGrade() {
     });
 }
 
-// Preencher horário na grade
+// Preencher horÃ¡rio na grade
 function preencherHorarioNaGrade(sala) {
     if (!sala.horario) return;
     
@@ -317,13 +317,13 @@ function preencherHorarioNaGrade(sala) {
         'SEX': 'sex',
         'SEGUNDA': 'seg',
         'TERCA': 'ter',
-        'TERÇA': 'ter',
+        'TERÃ‡A': 'ter',
         'QUARTA': 'qua',
         'QUINTA': 'qui',
         'SEXTA': 'sex'
     };
     
-    // Lista ordenada de horários da grade
+    // Lista ordenada de horÃ¡rios da grade
     const horariosOrdenados = [
         { id: '0815', inicio: '08:15', fim: '09:15' },
         { id: '0915', inicio: '09:15', fim: '10:15' },
@@ -333,7 +333,7 @@ function preencherHorarioNaGrade(sala) {
         { id: '1430', inicio: '14:30', fim: '15:30' }
     ];
     
-    // Função auxiliar para converter horário em minutos
+    // FunÃ§Ã£o auxiliar para converter horÃ¡rio em minutos
     function horaParaMinutos(hora) {
         const partes = hora.replace(':', '.').split('.');
         const h = parseInt(partes[0]);
@@ -353,15 +353,15 @@ function preencherHorarioNaGrade(sala) {
         const inicioMinutos = horaParaMinutos(horaInicio);
         const fimMinutos = horaParaMinutos(horaFim);
         
-        // Encontrar quais células preencher
+        // Encontrar quais cÃ©lulas preencher
         const celulasParaPreencher = horariosOrdenados.filter(h => {
             const celulaInicio = horaParaMinutos(h.inicio);
             const celulaFim = horaParaMinutos(h.fim);
-            // A célula deve ser preenchida se estiver dentro do intervalo
+            // A cÃ©lula deve ser preenchida se estiver dentro do intervalo
             return celulaInicio >= inicioMinutos && celulaFim <= fimMinutos;
         });
         
-        // Preencher cada célula para cada dia
+        // Preencher cada cÃ©lula para cada dia
         dias.forEach(dia => {
             const diaId = diasMap[dia.trim()];
             if (diaId) {
@@ -369,7 +369,7 @@ function preencherHorarioNaGrade(sala) {
                     const celula = document.getElementById(`${diaId}-${h.id}`);
                     if (celula) {
                         if (celula.textContent && celula.textContent !== nomeDisciplina && !celula.textContent.includes(nomeDisciplina)) {
-                            // Conflito de horário
+                            // Conflito de horÃ¡rio
                             celula.className = 'conflito';
                             celula.textContent = 'CONFLITO';
                         } else {
@@ -385,13 +385,13 @@ function preencherHorarioNaGrade(sala) {
     }
 }
 
-// Realizar matrícula
-// Verificar se está no período de inscrição
+// Realizar matrÃ­cula
+// Verificar se estÃ¡ no perÃ­odo de inscriÃ§Ã£o
 async function verificarPeriodoInscricao() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch('/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!response.ok) {
-            console.error('Erro ao verificar período de inscrição');
+            console.error('Erro ao verificar perÃ­odo de inscriÃ§Ã£o');
             return;
         }
         
@@ -416,7 +416,7 @@ async function verificarPeriodoInscricao() {
                     if (mensagem) {
                         const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
                         const dataFim = fimInscricao.toLocaleDateString('pt-BR');
-                        mensagem.textContent = `Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`;
+                        mensagem.textContent = `NÃ£o estÃ¡ no perÃ­odo de inscriÃ§Ã£o. O perÃ­odo de inscriÃ§Ã£o Ã© de ${dataInicio} atÃ© ${dataFim}.`;
                         mensagem.style.color = '#e74c3c';
                         mensagem.style.fontWeight = 'bold';
                     }
@@ -424,7 +424,7 @@ async function verificarPeriodoInscricao() {
             }
         }
     } catch (error) {
-        console.error('Erro ao verificar período de inscrição:', error);
+        console.error('Erro ao verificar perÃ­odo de inscriÃ§Ã£o:', error);
     }
 }
 
@@ -432,9 +432,9 @@ async function realizarMatricula() {
     const usuarioId = localStorage.getItem('usuarioId');
     const btnMatricular = document.getElementById('btnMatricular');
     
-    // Verificar período de inscrição antes de processar
+    // Verificar perÃ­odo de inscriÃ§Ã£o antes de processar
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch('/api/admin/periodos/atual', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (response.ok) {
             const periodo = await response.json();
             const hoje = new Date();
@@ -449,13 +449,13 @@ async function realizarMatricula() {
                 if (hoje < inicioInscricao || hoje > fimInscricao) {
                     const dataInicio = inicioInscricao.toLocaleDateString('pt-BR');
                     const dataFim = fimInscricao.toLocaleDateString('pt-BR');
-                    exibirMensagem(`Não está no período de inscrição. O período de inscrição é de ${dataInicio} até ${dataFim}.`, 'erro');
+                    exibirMensagem(`NÃ£o estÃ¡ no perÃ­odo de inscriÃ§Ã£o. O perÃ­odo de inscriÃ§Ã£o Ã© de ${dataInicio} atÃ© ${dataFim}.`, 'erro');
                     return;
                 }
             }
         }
     } catch (error) {
-        console.error('Erro ao verificar período de inscrição:', error);
+        console.error('Erro ao verificar perÃ­odo de inscriÃ§Ã£o:', error);
     }
     
     btnMatricular.disabled = true;
@@ -465,9 +465,9 @@ async function realizarMatricula() {
     const gradeBody = document.getElementById('gradeBody');
     const conflitos = gradeBody.querySelectorAll('.conflito');
     if (conflitos.length > 0) {
-        exibirMensagem('Existem conflitos de horário. Ajuste suas seleções.', 'erro');
+        exibirMensagem('Existem conflitos de horÃ¡rio. Ajuste suas seleÃ§Ãµes.', 'erro');
         btnMatricular.disabled = false;
-        btnMatricular.textContent = 'Realizar Matrícula';
+        btnMatricular.textContent = 'Realizar MatrÃ­cula';
         return;
     }
     
@@ -478,16 +478,16 @@ async function realizarMatricula() {
     // Identificar salas selecionadas atualmente (IDs)
     const salasSelecionadasIds = new Set(disciplinasSelecionadas.map(s => s.id));
     
-    // Identificar matrículas que precisam ser canceladas
-    // (estavam matriculadas antes, mas não estão mais selecionadas)
+    // Identificar matrÃ­culas que precisam ser canceladas
+    // (estavam matriculadas antes, mas nÃ£o estÃ£o mais selecionadas)
     const matriculasParaCancelar = matriculasExistentesGlobal.filter(
         mat => !salasSelecionadasIds.has(mat.salaId)
     );
     
-    // Cancelar matrículas removidas
+    // Cancelar matrÃ­culas removidas
     for (const matricula of matriculasParaCancelar) {
         try {
-            const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matriculas/${matricula.matriculaId}`, {
+            const response = await fetch(`/api/aluno/${usuarioId}/matriculas/${matricula.matriculaId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
@@ -503,13 +503,13 @@ async function realizarMatricula() {
         }
     }
     
-    // Filtrar apenas salas novas que não estão já matriculadas
+    // Filtrar apenas salas novas que nÃ£o estÃ£o jÃ¡ matriculadas
     const novasSalas = disciplinasSelecionadas.filter(sala => !sala.jaMatriculado);
     
-    // Adicionar novas matrículas
+    // Adicionar novas matrÃ­culas
     for (const sala of novasSalas) {
         try {
-            const response = await fetch(`http://localhost:8080/api/aluno/${usuarioId}/matricular`, {
+            const response = await fetch(`/api/aluno/${usuarioId}/matricular`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -530,12 +530,12 @@ async function realizarMatricula() {
     }
     
     btnMatricular.disabled = false;
-    btnMatricular.textContent = 'Realizar Matrícula';
+    btnMatricular.textContent = 'Realizar MatrÃ­cula';
     
     const totalAlteracoes = sucessoAdd + sucessoRemove;
     
     if (totalAlteracoes === 0 && erros.length === 0) {
-        exibirMensagem('Nenhuma alteração realizada.', 'sucesso');
+        exibirMensagem('Nenhuma alteraÃ§Ã£o realizada.', 'sucesso');
         setTimeout(() => {
             window.location.href = 'matricula-aluno.html';
         }, 1500);
@@ -548,7 +548,7 @@ async function realizarMatricula() {
             window.location.href = 'matricula-aluno.html';
         }, 2000);
     } else if (erros.length > 0) {
-        exibirMensagem('Erro ao atualizar matrícula: ' + erros.join(', '), 'erro');
+        exibirMensagem('Erro ao atualizar matrÃ­cula: ' + erros.join(', '), 'erro');
     }
 }
 
@@ -566,7 +566,7 @@ function exibirMensagem(texto, tipo) {
     }
 }
 
-// Voltar para página anterior
+// Voltar para pÃ¡gina anterior
 function voltarPagina() {
     window.location.href = 'matricula-aluno.html';
 }

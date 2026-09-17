@@ -1,4 +1,4 @@
-// Verificação de autenticação
+// VerificaÃ§Ã£o de autenticaÃ§Ã£o
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log('Usuario ID:', usuarioId);
     
     if (!usuarioId || usuarioPerfil !== 'PROFESSOR') {
-        alert('Você precisa fazer login como PROFESSOR para acessar esta página.\n\nPerfil atual: ' + (usuarioPerfil || 'Não logado'));
+        alert('VocÃª precisa fazer login como PROFESSOR para acessar esta pÃ¡gina.\n\nPerfil atual: ' + (usuarioPerfil || 'NÃ£o logado'));
         window.location.href = '/login-professor.html';
         return;
     }
@@ -20,7 +20,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -60,8 +60,8 @@ async function carregarDisciplinas() {
         noForumsElement.style.display = 'none';
 
         // Busca as salas (disciplinas) do professor
-        const url = `http://localhost:8080/api/professor/salas?professorId=${usuarioId}`;
-        console.log('Fazendo requisição para:', url);
+        const url = `/api/professor/salas?professorId=${usuarioId}`;
+        console.log('Fazendo requisiÃ§Ã£o para:', url);
         
         const response = await fetch(url, {
             headers: {
@@ -95,7 +95,7 @@ async function carregarDisciplinas() {
             }
         });
 
-        // Renderiza os cards das disciplinas únicas
+        // Renderiza os cards das disciplinas Ãºnicas
         gridElement.style.display = 'grid';
         gridElement.innerHTML = '';
 
@@ -110,7 +110,7 @@ async function carregarDisciplinas() {
         noForumsElement.style.display = 'block';
         noForumsElement.innerHTML = `
             <i class="fas fa-exclamation-triangle"></i>
-            <p>Erro ao carregar fóruns.</p>
+            <p>Erro ao carregar fÃ³runs.</p>
             <p style="font-size: 0.9rem; margin-top: 0.5rem;">Tente novamente mais tarde.</p>
         `;
     }
@@ -133,10 +133,10 @@ function criarCardDisciplina(sala) {
 }
 
 function abrirForum(disciplinaId, disciplinaNome) {
-    // Salva informações da disciplina para usar na próxima página
+    // Salva informaÃ§Ãµes da disciplina para usar na prÃ³xima pÃ¡gina
     localStorage.setItem('forumDisciplinaId', disciplinaId);
     localStorage.setItem('forumDisciplinaNome', disciplinaNome);
     
-    // Redireciona para página de detalhes do fórum
+    // Redireciona para pÃ¡gina de detalhes do fÃ³rum
     window.location.href = `forum-detalhes-professor.html?disciplinaId=${disciplinaId}`;
 }

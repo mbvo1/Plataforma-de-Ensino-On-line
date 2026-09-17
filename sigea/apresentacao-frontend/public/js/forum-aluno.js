@@ -1,10 +1,10 @@
-// Verificação de autenticação
+// VerificaÃ§Ã£o de autenticaÃ§Ã£o
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
     if (!usuarioId || usuarioPerfil !== 'ALUNO') {
-        alert('Você precisa fazer login como ALUNO para acessar esta página.');
+        alert('VocÃª precisa fazer login como ALUNO para acessar esta pÃ¡gina.');
         window.location.href = '/index.html';
         return;
     }
@@ -24,7 +24,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Aluno - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Aluno - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -63,9 +63,9 @@ async function carregarDisciplinas() {
         gridElement.style.display = 'none';
         noForumsElement.style.display = 'none';
 
-        // Busca as disciplinas do aluno através do endpoint de matrículas
-        const url = `http://localhost:8080/api/aluno/${usuarioId}/matriculas`;
-        console.log('Fazendo requisição para:', url);
+        // Busca as disciplinas do aluno atravÃ©s do endpoint de matrÃ­culas
+        const url = `/api/aluno/${usuarioId}/matriculas`;
+        console.log('Fazendo requisiÃ§Ã£o para:', url);
         
         const response = await fetch(url, {
             headers: {
@@ -82,7 +82,7 @@ async function carregarDisciplinas() {
         }
 
         const matriculas = await response.json();
-        console.log('Matrículas recebidas:', matriculas);
+        console.log('MatrÃ­culas recebidas:', matriculas);
         
         loadingElement.style.display = 'none';
 
@@ -91,12 +91,12 @@ async function carregarDisciplinas() {
             return;
         }
 
-        // Agrupa disciplinas por ID (remove duplicatas) - o endpoint retorna matrículas com disciplinaId
+        // Agrupa disciplinas por ID (remove duplicatas) - o endpoint retorna matrÃ­culas com disciplinaId
         const disciplinasUnicas = new Map();
         matriculas.forEach(matricula => {
             const disciplinaId = matricula.disciplinaId;
             if (disciplinaId && !disciplinasUnicas.has(disciplinaId)) {
-                // Cria objeto disciplina a partir da matrícula
+                // Cria objeto disciplina a partir da matrÃ­cula
                 disciplinasUnicas.set(disciplinaId, {
                     id: disciplinaId,
                     nome: matricula.disciplinaNome || `Disciplina ${disciplinaId}`,
@@ -105,7 +105,7 @@ async function carregarDisciplinas() {
             }
         });
 
-        // Renderiza os cards das disciplinas únicas
+        // Renderiza os cards das disciplinas Ãºnicas
         gridElement.style.display = 'grid';
         gridElement.innerHTML = '';
 
@@ -120,7 +120,7 @@ async function carregarDisciplinas() {
         noForumsElement.style.display = 'block';
         noForumsElement.innerHTML = `
             <i class="fas fa-exclamation-triangle"></i>
-            <p>Erro ao carregar fóruns.</p>
+            <p>Erro ao carregar fÃ³runs.</p>
             <p style="font-size: 0.9rem; margin-top: 0.5rem;">Tente novamente mais tarde.</p>
         `;
     }
@@ -131,7 +131,7 @@ function criarCardDisciplina(disc) {
     card.className = 'forum-card';
     card.onclick = () => abrirForum(disc.id, disc.nome);
 
-    // Busca nome do professor da disciplina (se disponível)
+    // Busca nome do professor da disciplina (se disponÃ­vel)
     const professorNome = disc.professorNome || 'Professor';
 
     card.innerHTML = `
@@ -146,10 +146,10 @@ function criarCardDisciplina(disc) {
 }
 
 function abrirForum(disciplinaId, disciplinaNome) {
-    // Salva informações da disciplina para usar na próxima página
+    // Salva informaÃ§Ãµes da disciplina para usar na prÃ³xima pÃ¡gina
     localStorage.setItem('forumDisciplinaId', disciplinaId);
     localStorage.setItem('forumDisciplinaNome', disciplinaNome);
     
-    // Redireciona para página de detalhes do fórum
+    // Redireciona para pÃ¡gina de detalhes do fÃ³rum
     window.location.href = `forum-detalhes-aluno.html?disciplinaId=${disciplinaId}`;
 }

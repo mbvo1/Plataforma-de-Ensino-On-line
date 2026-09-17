@@ -5,7 +5,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Função para limpar dados do usuário
+// FunÃ§Ã£o para limpar dados do usuÃ¡rio
 function limparDadosUsuario() {
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('usuarioNome');
@@ -13,7 +13,7 @@ function limparDadosUsuario() {
     localStorage.removeItem('usuarioPerfil');
 }
 
-// Verifica se o login é válido
+// Verifica se o login Ã© vÃ¡lido
 function isLoginValido() {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -29,7 +29,7 @@ function isLoginValido() {
            usuarioPerfil === 'ALUNO';
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     if (!isLoginValido()) {
         limparDadosUsuario();
@@ -50,7 +50,7 @@ function loadUserInfo() {
                        nome !== 'undefined' && 
                        nome.trim() !== '';
     
-    const nomeExibir = nomeValido ? nome : 'Usuário';
+    const nomeExibir = nomeValido ? nome : 'UsuÃ¡rio';
     
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
@@ -74,7 +74,7 @@ async function carregarTurmas() {
     const container = document.getElementById('turmas-container');
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/aluno/${alunoId}/turmas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         
         if (response.ok) {
             const turmas = await response.json();
@@ -83,7 +83,7 @@ async function carregarTurmas() {
                 container.innerHTML = `
                     <div class="empty-state-no-border">
                         <i class="fas fa-chalkboard-teacher empty-icon" style="font-size: 48px; color: #999; margin-bottom: 16px;"></i>
-                        <p style="color: #666; font-size: 16px;">O aluno não está cadastrado em nenhuma sala.</p>
+                        <p style="color: #666; font-size: 16px;">O aluno nÃ£o estÃ¡ cadastrado em nenhuma sala.</p>
                     </div>
                 `;
             } else {
@@ -111,7 +111,7 @@ async function carregarTurmas() {
             container.innerHTML = `
                 <div class="empty-state-no-border">
                     <i class="fas fa-chalkboard-teacher empty-icon" style="font-size: 48px; color: #999; margin-bottom: 16px;"></i>
-                    <p style="color: #666; font-size: 16px;">O aluno não está cadastrado em nenhuma sala.</p>
+                    <p style="color: #666; font-size: 16px;">O aluno nÃ£o estÃ¡ cadastrado em nenhuma sala.</p>
                 </div>
             `;
         }
@@ -144,12 +144,12 @@ async function entrarNaSala(event) {
     const alunoId = localStorage.getItem('usuarioId');
     
     if (!codigo) {
-        alert('Por favor, digite o código da sala.');
+        alert('Por favor, digite o cÃ³digo da sala.');
         return;
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/aluno/${alunoId}/turmas/entrar`, {
+        const response = await fetch(`/api/aluno/${alunoId}/turmas/entrar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify({ codigoAcesso: codigo })
@@ -157,12 +157,12 @@ async function entrarNaSala(event) {
         
         if (response.ok) {
             const turma = await response.json();
-            alert(`Você entrou na turma "${turma.titulo || turma.nomeTurma}" com sucesso!`);
+            alert(`VocÃª entrou na turma "${turma.titulo || turma.nomeTurma}" com sucesso!`);
             fecharModalEntrarSala();
             carregarTurmas();
         } else {
             const error = await response.json();
-            alert(error.erro || error.message || 'Código de sala inválido ou sala não encontrada.');
+            alert(error.erro || error.message || 'CÃ³digo de sala invÃ¡lido ou sala nÃ£o encontrada.');
         }
     } catch (error) {
         console.error('Erro ao entrar na sala:', error);

@@ -8,7 +8,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -27,14 +27,14 @@ function loadUserInfo() {
     
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Admin - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Admin - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
 async function carregarAlunos() {
     try {
         // Busca dados reais do banco de dados
-        const response = await fetch('http://localhost:8080/api/admin/alunos', {
+        const response = await fetch('/api/admin/alunos', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -60,7 +60,7 @@ function exibirAlunos(alunos) {
     }
     
     const html = alunos.map(aluno => {
-        // Formata o status para exibição (ATIVO → Ativo, INATIVO → Inativo)
+        // Formata o status para exibiÃ§Ã£o (ATIVO â†’ Ativo, INATIVO â†’ Inativo)
         const statusFormatado = aluno.status.charAt(0) + aluno.status.slice(1).toLowerCase();
         const statusClass = aluno.status.toLowerCase();
         
@@ -101,7 +101,7 @@ function filtrarAlunos() {
 }
 
 function visualizarDetalhes(alunoId) {
-    // Navega para a página de detalhes do aluno
+    // Navega para a pÃ¡gina de detalhes do aluno
     window.location.href = `/detalhes-aluno.html?id=${alunoId}`;
 }
 

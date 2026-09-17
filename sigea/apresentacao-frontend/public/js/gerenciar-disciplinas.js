@@ -9,7 +9,7 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
-// Verifica autenticação ao carregar a página
+// Verifica autenticaÃ§Ã£o ao carregar a pÃ¡gina
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
@@ -43,19 +43,19 @@ function loadUserInfo() {
 
 async function carregarPeriodoAtual() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos/atual', {
+        const response = await fetch('/api/admin/periodos/atual', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao buscar período atual');
+            throw new Error('Erro ao buscar perÃ­odo atual');
         }
         
         periodoAtual = await response.json();
         exibirPeriodoAtual(periodoAtual);
     } catch (error) {
-        console.error('Erro ao carregar período atual:', error);
-        // Define um período padrão caso não haja no banco
+        console.error('Erro ao carregar perÃ­odo atual:', error);
+        // Define um perÃ­odo padrÃ£o caso nÃ£o haja no banco
         periodoAtual = {
             nome: '2025.2',
             status: 'ATIVO'
@@ -78,7 +78,7 @@ function exibirPeriodoAtual(periodo) {
 
 async function carregarDisciplinas() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/disciplinas', {
+        const response = await fetch('/api/admin/disciplinas', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -93,7 +93,7 @@ async function carregarDisciplinas() {
         exibirDisciplinas(todasDisciplinas);
     } catch (error) {
         console.error('Erro ao carregar disciplinas:', error);
-        // Em caso de erro de conexão, mostra mensagem vazia
+        // Em caso de erro de conexÃ£o, mostra mensagem vazia
         todasDisciplinas = [];
         exibirDisciplinas(todasDisciplinas);
     }
@@ -147,13 +147,13 @@ function exibirDisciplinas(disciplinas) {
 
 function criarPeriodoLetivo() {
     console.log('criarPeriodoLetivo() chamada');
-    // Abre o modal de criar período letivo usando classe
+    // Abre o modal de criar perÃ­odo letivo usando classe
     const modal = document.getElementById('modal-criar-periodo');
     modal.classList.add('show');
     
-    // Limpa o formulário
+    // Limpa o formulÃ¡rio
     document.getElementById('form-criar-periodo').reset();
-    console.log('Modal período aberto');
+    console.log('Modal perÃ­odo aberto');
 }
 
 function fecharModalPeriodo() {
@@ -169,20 +169,20 @@ function confirmarCriarPeriodo(event) {
     const inscricaoInicio = document.getElementById('inscricao-inicio-periodo').value;
     const inscricaoFim = document.getElementById('inscricao-fim-periodo').value;
     
-    // Validações
+    // ValidaÃ§Ãµes
     if (!nome || !dataInicio || !dataFim || !inscricaoInicio || !inscricaoFim) {
         alert('Por favor, preencha todos os campos.');
         return;
     }
     
-    // Mensagem de confirmação
-    const mensagem = `ATENÇÃO!\n\nAo criar o período letivo "${nome}", o período letivo atual será automaticamente ENCERRADO.\n\nTodas as disciplinas do período atual serão transferidas para o novo período com status INATIVO.\n\nDeseja continuar?`;
+    // Mensagem de confirmaÃ§Ã£o
+    const mensagem = `ATENÃ‡ÃƒO!\n\nAo criar o perÃ­odo letivo "${nome}", o perÃ­odo letivo atual serÃ¡ automaticamente ENCERRADO.\n\nTodas as disciplinas do perÃ­odo atual serÃ£o transferidas para o novo perÃ­odo com status INATIVO.\n\nDeseja continuar?`;
     
     if (!confirm(mensagem)) {
         return;
     }
     
-    // Dados do novo período
+    // Dados do novo perÃ­odo
     const novoPeriodo = {
         nome: nome,
         dataInicio: dataInicio,
@@ -191,8 +191,8 @@ function confirmarCriarPeriodo(event) {
         inscricaoFim: inscricaoFim
     };
     
-    // Envia requisição para criar período
-    fetch('http://localhost:8080/api/admin/periodos', {
+    // Envia requisiÃ§Ã£o para criar perÃ­odo
+    fetch('/api/admin/periodos', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -203,17 +203,17 @@ function confirmarCriarPeriodo(event) {
     .then(response => {
         if (!response.ok) {
             return response.json().then(err => {
-                throw new Error(err.erro || 'Erro ao criar período letivo');
+                throw new Error(err.erro || 'Erro ao criar perÃ­odo letivo');
             });
         }
         return response.json();
     })
     .then(data => {
-        const mensagemSucesso = data.mensagem || `Período letivo "${data.nome}" criado com sucesso!`;
+        const mensagemSucesso = data.mensagem || `PerÃ­odo letivo "${data.nome}" criado com sucesso!`;
         alert(mensagemSucesso);
         fecharModalPeriodo();
-        carregarPeriodoAtual(); // Atualiza o período exibido
-        carregarDisciplinas(); // Recarrega a lista (estará vazia)
+        carregarPeriodoAtual(); // Atualiza o perÃ­odo exibido
+        carregarDisciplinas(); // Recarrega a lista (estarÃ¡ vazia)
     })
     .catch(error => {
         console.error('Erro:', error);
@@ -223,12 +223,12 @@ function confirmarCriarPeriodo(event) {
 
 function criarDisciplina() {
     console.log('criarDisciplina() chamada');
-    // Limpa o formulário
+    // Limpa o formulÃ¡rio
     document.getElementById('form-criar-disciplina').reset();
     document.getElementById('pre-requisitos-selecionados').innerHTML = '';
     preRequisitosSelecionados = [];
     
-    // Carrega a lista de disciplinas para pré-requisitos
+    // Carrega a lista de disciplinas para prÃ©-requisitos
     carregarListaDisciplinas();
     
     // Abre o modal usando classe
@@ -254,7 +254,7 @@ function carregarListaDisciplinas() {
     });
 }
 
-// Adiciona evento ao input de pré-requisitos
+// Adiciona evento ao input de prÃ©-requisitos
 document.addEventListener('DOMContentLoaded', () => {
     const inputPreRequisitos = document.getElementById('input-pre-requisitos');
     if (inputPreRequisitos) {
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Evento para o input de pré-requisitos na edição
+    // Evento para o input de prÃ©-requisitos na ediÃ§Ã£o
     const editPreRequisitos = document.getElementById('edit-pre-requisitos');
     if (editPreRequisitos) {
         editPreRequisitos.addEventListener('change', function() {
@@ -320,7 +320,7 @@ async function salvarDisciplina(event) {
     };
     
     try {
-        const response = await fetch('http://localhost:8080/api/admin/disciplinas', {
+        const response = await fetch('/api/admin/disciplinas', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -350,7 +350,7 @@ let preRequisitosEditados = [];
 async function editarDisciplina(disciplinaId) {
     try {
         // Busca os dados da disciplina
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
@@ -360,12 +360,12 @@ async function editarDisciplina(disciplinaId) {
         
         const disciplina = await response.json();
         
-        // Preenche o formulário
+        // Preenche o formulÃ¡rio
         document.getElementById('edit-disciplina-id').value = disciplina.id;
         document.getElementById('edit-nome-disciplina').value = disciplina.nome;
         document.getElementById('edit-periodo').value = disciplina.periodo;
         
-        // Carrega pré-requisitos
+        // Carrega prÃ©-requisitos
         preRequisitosEditados = disciplina.preRequisitosIds.map(id => {
             return todasDisciplinas.find(d => d.id === id);
         }).filter(d => d !== undefined);
@@ -448,7 +448,7 @@ async function atualizarDisciplina(event) {
     };
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -484,7 +484,7 @@ async function toggleStatusDisciplina(disciplinaId, statusAtual) {
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}/${acao}`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}/${acao}`, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
@@ -502,12 +502,12 @@ async function toggleStatusDisciplina(disciplinaId, statusAtual) {
 }
 
 async function excluirDisciplina(disciplinaId) {
-    if (!confirm('Deseja realmente excluir esta disciplina?\n\nEsta ação não pode ser desfeita.')) {
+    if (!confirm('Deseja realmente excluir esta disciplina?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita.')) {
         return;
     }
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/disciplinas/${disciplinaId}`, {
+        const response = await fetch(`/api/admin/disciplinas/${disciplinaId}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
@@ -516,7 +516,7 @@ async function excluirDisciplina(disciplinaId) {
             throw new Error('Erro ao excluir disciplina');
         }
         
-        alert('Disciplina excluída com sucesso!');
+        alert('Disciplina excluÃ­da com sucesso!');
         carregarDisciplinas();
     } catch (error) {
         console.error('Erro ao excluir disciplina:', error);
@@ -535,7 +535,7 @@ function handleLogout() {
     }
 }
 
-// ========== SELETOR DE PERÍODOS ==========
+// ========== SELETOR DE PERÃODOS ==========
 
 let periodoSelecionadoId = null;
 
@@ -556,19 +556,19 @@ function fecharSelectorPeriodo() {
 
 async function carregarTodosPeriodos() {
     try {
-        const response = await fetch('http://localhost:8080/api/admin/periodos', {
+        const response = await fetch('/api/admin/periodos', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao buscar períodos');
+            throw new Error('Erro ao buscar perÃ­odos');
         }
         
         const periodos = await response.json();
         exibirListaPeriodos(periodos);
     } catch (error) {
-        console.error('Erro ao carregar períodos:', error);
-        alert('Erro ao carregar lista de períodos.');
+        console.error('Erro ao carregar perÃ­odos:', error);
+        alert('Erro ao carregar lista de perÃ­odos.');
     }
 }
 
@@ -576,7 +576,7 @@ function exibirListaPeriodos(periodos) {
     const lista = document.getElementById('lista-periodos');
     
     if (!periodos || periodos.length === 0) {
-        lista.innerHTML = '<p class="empty-message">Nenhum período cadastrado</p>';
+        lista.innerHTML = '<p class="empty-message">Nenhum perÃ­odo cadastrado</p>';
         return;
     }
     
@@ -591,7 +591,7 @@ function exibirListaPeriodos(periodos) {
                 <span class="periodo-status ${statusClass}">${statusFormatado}</span>
             </div>
             <div class="periodo-item-datas">
-                ${periodo.dataInicio ? `<small>Início: ${formatarData(periodo.dataInicio)} | Fim: ${formatarData(periodo.dataFim)}</small>` : ''}
+                ${periodo.dataInicio ? `<small>InÃ­cio: ${formatarData(periodo.dataInicio)} | Fim: ${formatarData(periodo.dataFim)}</small>` : ''}
             </div>
         </div>
         `;
@@ -604,20 +604,20 @@ async function selecionarPeriodo(periodoId) {
     periodoSelecionadoId = periodoId;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/admin/periodos/${periodoId}/disciplinas`, {
+        const response = await fetch(`/api/admin/periodos/${periodoId}/disciplinas`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao buscar disciplinas do período');
+            throw new Error('Erro ao buscar disciplinas do perÃ­odo');
         }
 
         const disciplinas = await response.json();
         todasDisciplinas = disciplinas;
         exibirDisciplinas(disciplinas);
 
-        // Atualiza indicador visual do período selecionado
-        const responsePeriodo = await fetch('http://localhost:8080/api/admin/periodos', {
+        // Atualiza indicador visual do perÃ­odo selecionado
+        const responsePeriodo = await fetch('/api/admin/periodos', {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         const periodos = await responsePeriodo.json();
@@ -629,8 +629,8 @@ async function selecionarPeriodo(periodoId) {
         
         fecharSelectorPeriodo();
     } catch (error) {
-        console.error('Erro ao selecionar período:', error);
-        alert('Erro ao carregar disciplinas do período.');
+        console.error('Erro ao selecionar perÃ­odo:', error);
+        alert('Erro ao carregar disciplinas do perÃ­odo.');
     }
 }
 

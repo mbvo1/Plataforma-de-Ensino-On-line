@@ -1,25 +1,25 @@
-// Variáveis globais
+// VariÃ¡veis globais
 let topicoId = null;
 let disciplinaId = null;
 
-// Verificação de autenticação e inicialização
+// VerificaÃ§Ã£o de autenticaÃ§Ã£o e inicializaÃ§Ã£o
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
     const usuarioPerfil = localStorage.getItem('usuarioPerfil');
     
     if (!usuarioId || usuarioPerfil !== 'PROFESSOR') {
-        alert('Você precisa fazer login como PROFESSOR para acessar esta página.');
+        alert('VocÃª precisa fazer login como PROFESSOR para acessar esta pÃ¡gina.');
         window.location.href = '/login-professor.html';
         return;
     }
 
-    // Recupera informações do tópico da URL
+    // Recupera informaÃ§Ãµes do tÃ³pico da URL
     const urlParams = new URLSearchParams(window.location.search);
     topicoId = urlParams.get('topicoId');
     disciplinaId = urlParams.get('disciplinaId');
 
     if (!topicoId) {
-        alert('Tópico não especificado.');
+        alert('TÃ³pico nÃ£o especificado.');
         window.location.href = '/forum-professor.html';
         return;
     }
@@ -40,7 +40,7 @@ function loadUserInfo() {
     const nome = localStorage.getItem('usuarioNome');
     const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
-        userNameElement.textContent = `Professor - ${nome || 'Usuário'}`;
+        userNameElement.textContent = `Professor - ${nome || 'UsuÃ¡rio'}`;
     }
 }
 
@@ -68,18 +68,18 @@ async function carregarTopico() {
     const usuarioId = localStorage.getItem('usuarioId');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/foruns/topicos/${topicoId}?usuarioId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
 
         if (!response.ok) {
-            throw new Error('Erro ao carregar tópico');
+            throw new Error('Erro ao carregar tÃ³pico');
         }
 
         const topico = await response.json();
-        console.log('Tópico carregado:', topico);
+        console.log('TÃ³pico carregado:', topico);
 
-        // Preenche os dados do tópico
+        // Preenche os dados do tÃ³pico
         document.getElementById('topico-titulo').textContent = topico.titulo;
-        document.getElementById('topico-autor').textContent = `Por: "${topico.nomeAutor || 'Usuário ' + topico.autorId}"`;
+        document.getElementById('topico-autor').textContent = `Por: "${topico.nomeAutor || 'UsuÃ¡rio ' + topico.autorId}"`;
         document.getElementById('topico-conteudo').textContent = topico.conteudo;
         
         // Data
@@ -102,10 +102,10 @@ async function carregarTopico() {
         topicoPrincipalElement.style.display = 'block';
 
     } catch (error) {
-        console.error('Erro ao carregar tópico:', error);
+        console.error('Erro ao carregar tÃ³pico:', error);
         loadingElement.innerHTML = `
             <i class="fas fa-exclamation-triangle"></i>
-            <p>Erro ao carregar tópico</p>
+            <p>Erro ao carregar tÃ³pico</p>
         `;
     }
 }
@@ -116,18 +116,18 @@ async function carregarComentarios() {
     const usuarioId = localStorage.getItem('usuarioId');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}/respostas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const response = await fetch(`/api/foruns/topicos/${topicoId}/respostas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
 
         if (!response.ok) {
             if (response.status === 404) {
                 noComentariosElement.style.display = 'block';
                 return;
             }
-            throw new Error('Erro ao carregar comentários');
+            throw new Error('Erro ao carregar comentÃ¡rios');
         }
 
         const comentarios = await response.json();
-        console.log('Comentários carregados:', comentarios);
+        console.log('ComentÃ¡rios carregados:', comentarios);
 
         if (!comentarios || comentarios.length === 0) {
             noComentariosElement.style.display = 'block';
@@ -140,7 +140,7 @@ async function carregarComentarios() {
         }
 
     } catch (error) {
-        console.error('Erro ao carregar comentários:', error);
+        console.error('Erro ao carregar comentÃ¡rios:', error);
         noComentariosElement.style.display = 'block';
     }
 }
@@ -150,15 +150,15 @@ function criarCardComentario(comentario) {
     card.className = 'comentario-card';
     card.setAttribute('data-comentario-id', comentario.id);
 
-    const nomeAutor = comentario.nomeAutor || `Usuário ${comentario.autorId}`;
+    const nomeAutor = comentario.nomeAutor || `UsuÃ¡rio ${comentario.autorId}`;
     const dataComentario = comentario.dataCriacao || new Date().toLocaleDateString('pt-BR');
 
-    // Verifica se o usuário atual é o autor do comentário
+    // Verifica se o usuÃ¡rio atual Ã© o autor do comentÃ¡rio
     const usuarioId = localStorage.getItem('usuarioId');
     const isAutor = comentario.autorId && comentario.autorId.toString() === usuarioId;
 
     card.innerHTML = `
-        ${isAutor ? `<button class="btn-excluir-comentario" onclick="excluirComentario(${comentario.id})" title="Excluir comentário">
+        ${isAutor ? `<button class="btn-excluir-comentario" onclick="excluirComentario(${comentario.id})" title="Excluir comentÃ¡rio">
             <i class="fas fa-times"></i>
         </button>` : ''}
         <div class="comentario-autor">Por: "${escapeHtml(nomeAutor)}"</div>
@@ -176,20 +176,20 @@ function criarCardComentario(comentario) {
 }
 
 async function excluirComentario(comentarioId) {
-    if (!confirm('Tem certeza que deseja excluir este comentário?')) {
+    if (!confirm('Tem certeza que deseja excluir este comentÃ¡rio?')) {
         return;
     }
 
     const usuarioId = localStorage.getItem('usuarioId');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/respostas/${comentarioId}?usuarioId=${usuarioId}`, {
+        const response = await fetch(`/api/foruns/respostas/${comentarioId}?usuarioId=${usuarioId}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao excluir comentário');
+            throw new Error('Erro ao excluir comentÃ¡rio');
         }
 
         // Remove o card do DOM
@@ -198,15 +198,15 @@ async function excluirComentario(comentarioId) {
             card.remove();
         }
 
-        // Verifica se há mais comentários
+        // Verifica se hÃ¡ mais comentÃ¡rios
         const comentariosList = document.getElementById('comentarios-list');
         if (comentariosList.children.length === 0) {
             document.getElementById('no-comentarios').style.display = 'block';
         }
 
     } catch (error) {
-        console.error('Erro ao excluir comentário:', error);
-        alert('Erro ao excluir comentário. Tente novamente.');
+        console.error('Erro ao excluir comentÃ¡rio:', error);
+        alert('Erro ao excluir comentÃ¡rio. Tente novamente.');
     }
 }
 
@@ -224,12 +224,12 @@ async function publicarComentario() {
     const usuarioId = localStorage.getItem('usuarioId');
 
     if (!texto) {
-        alert('Por favor, digite um comentário.');
+        alert('Por favor, digite um comentÃ¡rio.');
         return;
     }
 
     try {
-        const response = await fetch(`http://localhost:8080/api/foruns/topicos/${topicoId}/respostas`, {
+        const response = await fetch(`/api/foruns/topicos/${topicoId}/respostas`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -242,23 +242,23 @@ async function publicarComentario() {
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao publicar comentário');
+            throw new Error('Erro ao publicar comentÃ¡rio');
         }
 
-        // Limpa o campo e esconde o formulário
+        // Limpa o campo e esconde o formulÃ¡rio
         document.getElementById('comentario-texto').value = '';
         document.getElementById('novo-comentario-container').classList.remove('show');
         
-        // Recarrega os comentários
+        // Recarrega os comentÃ¡rios
         document.getElementById('comentarios-list').innerHTML = '';
         document.getElementById('no-comentarios').style.display = 'none';
         carregarComentarios();
 
-        alert('Comentário publicado com sucesso!');
+        alert('ComentÃ¡rio publicado com sucesso!');
 
     } catch (error) {
-        console.error('Erro ao publicar comentário:', error);
-        alert('Erro ao publicar comentário. Tente novamente.');
+        console.error('Erro ao publicar comentÃ¡rio:', error);
+        alert('Erro ao publicar comentÃ¡rio. Tente novamente.');
     }
 }
 

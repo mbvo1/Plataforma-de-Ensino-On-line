@@ -7,7 +7,7 @@ function escapeHtml(texto) {
 }
 
 const usuarioId = localStorage.getItem('usuarioId');
-document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'Usuário'}`;
+document.getElementById('userName').textContent = `Professor - ${localStorage.getItem('usuarioNome') || 'UsuÃ¡rio'}`;
 
 async function carregarDisciplinas() {
     const container = document.getElementById('disciplinasContainer');
@@ -16,7 +16,7 @@ async function carregarDisciplinas() {
     // Try to fetch from backend; fallback to mock list
     try {
         if (!usuarioId) throw new Error('No user');
-        const resp = await fetch(`http://localhost:8080/api/professor/disciplinas?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const resp = await fetch(`/api/professor/disciplinas?professorId=${usuarioId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!resp.ok) throw new Error('no-api');
         const list = await resp.json();
         if (!Array.isArray(list) || list.length === 0) {
@@ -49,7 +49,7 @@ function renderDisciplina(d) {
         <div class="disciplina-right">Alunos : <strong>${alunosCount}</strong></div>
     `;
     card.addEventListener('click', () => {
-        // Navega para a página de detalhes da disciplina
+        // Navega para a pÃ¡gina de detalhes da disciplina
         try { sessionStorage.setItem('disciplinaSelecionada', JSON.stringify(d)); } catch(_) {}
         const params = new URLSearchParams({
             salaId: d.salaId || d.id || '',

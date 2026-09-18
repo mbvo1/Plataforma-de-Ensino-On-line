@@ -138,7 +138,7 @@ mvn test
 ## 👥 Integrantes
 
 * Felipe Bandeira
-* Rodrigo Marques
+* Rodrigo Leal
 * Marcelo Bresani
 * Paulo Portella
 * Rodrigo Nunes

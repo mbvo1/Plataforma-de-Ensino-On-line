@@ -15,7 +15,7 @@ Este repositório foi reutilizado como base de estudo para a disciplina **Cibers
 **Aplicação publicada:** [plataforma-de-ensino-on-line-production.up.railway.app](https://plataforma-de-ensino-on-line-production.up.railway.app)
 *(o banco de dados é reiniciado a cada novo deploy; se estiver vazio, use a tela "Cadastre-se" para criar uma conta de teste)*
 
-**Relatório técnico:** `[adicionar link aqui quando finalizado]`
+**Relatório técnico:** [Relatório técnico completo](file:///C:/Users/conse/Downloads/Relat%C3%B3rio%20T%C3%A9cnico%20-%20Projeto%20SecureAI%20Lab%20(3).pdf)
 
 ### As 14 vulnerabilidades trabalhadas
 

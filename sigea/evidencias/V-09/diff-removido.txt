@@ -1,0 +1,10 @@
+﻿
+       public ResponseEntity<?> registro(@RequestBody RegistroRequest request) {
+           try {
+  -            // Log para debug
+> -            System.out.println("DEBUG - Request recebido: nome=" + request.getNome() + 
+  -                             ", email=" + request.getEmail() + 
+  -                             ", cpf=" + request.getCpf() + 
+  -                             ", senha=" + (request.getSenha() != null ? "***" : "null"));
+
+

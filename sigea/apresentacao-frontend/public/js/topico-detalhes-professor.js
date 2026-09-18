@@ -91,7 +91,7 @@ async function carregarTopico() {
             const arquivoDiv = document.getElementById('topico-arquivo');
             const arquivoLink = document.getElementById('topico-arquivo-link');
             arquivoDiv.style.display = 'flex';
-            arquivoLink.href = `http://localhost:8080/${topico.arquivoPath}`;
+            arquivoLink.href = `/${topico.arquivoPath}`;
             
             // Extrai nome do arquivo do path
             const nomeArquivo = topico.arquivoPath.split('/').pop();

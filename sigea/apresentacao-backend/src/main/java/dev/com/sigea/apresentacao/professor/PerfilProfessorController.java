@@ -1,9 +1,12 @@
 package dev.com.sigea.apresentacao.professor;
 
+import dev.com.sigea.dominio.usuario.Senha;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioEntity;
 import dev.com.sigea.infraestrutura.persistencia.UsuarioJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -12,13 +15,26 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/professor")
 public class PerfilProfessorController {
-    
+
     private final UsuarioJpaRepository usuarioJpaRepository;
-    
+
     public PerfilProfessorController(UsuarioJpaRepository usuarioJpaRepository) {
         this.usuarioJpaRepository = usuarioJpaRepository;
     }
-    
+
+    /**
+     * Mitigacao V-03 (IDOR): confirma que quem esta autenticado so acessa
+     * o proprio registro, a menos que seja ADMIN ou PROFESSOR.
+     */
+    private boolean semPermissaoSobre(Long professorId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String usuarioIdAutenticado = auth.getName();
+        boolean ehAdminOuProfessor = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR")
+                        || a.getAuthority().equals("ROLE_PROFESSOR"));
+        return !ehAdminOuProfessor && !usuarioIdAutenticado.equals(professorId.toString());
+    }
+
     /**
      * GET /api/professor/{professorId}/perfil
      * Busca dados do perfil do professor
@@ -26,6 +42,11 @@ public class PerfilProfessorController {
     @GetMapping("/{professorId}/perfil")
     public ResponseEntity<?> buscarPerfil(@PathVariable Long professorId) {
         try {
+            if (semPermissaoSobre(professorId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("erro", "Você não tem permissão para ver o perfil de outro professor"));
+            }
+
             Optional<UsuarioEntity> usuarioOpt = usuarioJpaRepository.findById(professorId);
             
             if (usuarioOpt.isEmpty()) {
@@ -65,6 +86,11 @@ public class PerfilProfessorController {
             @PathVariable Long professorId,
             @RequestBody AtualizarPerfilRequest request) {
         try {
+            if (semPermissaoSobre(professorId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("erro", "Você não tem permissão para alterar o perfil de outro professor"));
+            }
+
             Optional<UsuarioEntity> usuarioOpt = usuarioJpaRepository.findById(professorId);
             
             if (usuarioOpt.isEmpty()) {
@@ -110,8 +136,10 @@ public class PerfilProfessorController {
             }
             
             // Atualiza senha se fornecida
+            // Mitigacao V-01: senha agora passa por Argon2id, nao mais
+            // pelo prefixo "HASH_" em texto claro.
             if (request.getSenha() != null && !request.getSenha().trim().isEmpty()) {
-                String senhaHash = "HASH_" + request.getSenha().trim();
+                String senhaHash = Senha.criarNova(request.getSenha().trim()).getSenhaHash();
                 usuario.setSenhaHash(senhaHash);
             }
             

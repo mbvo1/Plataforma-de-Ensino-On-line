@@ -54,3 +54,12 @@ quem é o usuário, o sistema não verifica *o que* ele tem permissão de ver
 - PUT em perfil de terceiro: 403 Forbidden (depois-put-bloqueado.png)
 - Resultado: Ataque → Correção → Ataque bloqueado (confirmado), inclusive
   na operação de escrita (PUT), que era ainda mais grave que a leitura
+
+## Achado complementar (auditoria final, pós-entrega das correções)
+Uma varredura final no repositório revelou que PerfilProfessorController.java
+não possuía NENHUMA verificação de propriedade (ownership check) - o
+mesmo tipo de IDOR já corrigido em PerfilAlunoController.java, mas nunca
+replicado para o equivalente de professor. Qualquer usuário autenticado,
+independente de papel, poderia visualizar ou alterar o perfil de
+qualquer professor. Corrigido replicando o método semPermissaoSobre()
+já validado, com a mesma exceção para ADMIN e PROFESSOR. Commit: 76dec0c.

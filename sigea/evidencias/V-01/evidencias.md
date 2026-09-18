@@ -53,3 +53,11 @@ nenhuma criptografia real na aplicacao.
   (depois-hash-ilegivel.png)
 - Login com senha original continua funcionando (depois-login-funcionando.png)
 - Resultado: Ataque → Correção → Dado protegido, uso legítimo preservado
+
+## Achado complementar (auditoria final, pós-entrega das correções)
+Uma varredura final no repositório revelou uma sexta ocorrência do
+mesmo padrão inseguro ("HASH_" + senha em texto claro), em
+PerfilProfessorController.java (endpoint de atualização do próprio
+perfil do professor) - um arquivo que nunca tinha sido revisado nas
+correções anteriores da V-01. Corrigido usando o mesmo padrão já
+validado (Senha.criarNova(), Argon2id). Commit: 76dec0c.

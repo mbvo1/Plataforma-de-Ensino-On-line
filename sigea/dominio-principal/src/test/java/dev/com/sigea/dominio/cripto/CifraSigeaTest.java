@@ -42,37 +42,44 @@ class CifraSigeaTest {
     // ------------------------------------------------------------------
 
     @Test
-    @DisplayName("1.000 entradas aleatorias de 1 a 10.000 bytes voltam identicas byte a byte")
+    @DisplayName("1.000 entradas aleatorias de 1 a 10.000 bytes voltam identicas byte a byte, nas duas camadas")
     void propriedadeIdaEVolta() {
-        Random rnd = new Random(SEMENTE);
-        for (int n = 0; n < 1000; n++) {
-            int tamanho = 1 + rnd.nextInt(10_000);
-            byte[] texto = aleatorio(rnd, tamanho);
-            // Chave nova a cada entrada: exercita 1.000 S-boxes e permutacoes
-            // diferentes, nao so 1.000 textos sob as mesmas tabelas.
-            CifraSigea cifra = new CifraSigea(chave(rnd));
+        // As duas camadas passam pelo criterio completo: a CADEIA_DUPLA
+        // continua sendo medida na comparacao, e uma cifra que nao decifra
+        // nao serve nem como objeto de comparacao.
+        for (CamadaDifusao camada : CamadaDifusao.values()) {
+            Random rnd = new Random(SEMENTE);
+            for (int n = 0; n < 1000; n++) {
+                int tamanho = 1 + rnd.nextInt(10_000);
+                byte[] texto = aleatorio(rnd, tamanho);
+                // Chave nova a cada entrada: exercita 1.000 S-boxes e permutacoes
+                // diferentes, nao so 1.000 textos sob as mesmas tabelas.
+                CifraSigea cifra = new CifraSigea(chave(rnd), CifraSigea.RODADAS_PADRAO, camada);
 
-            ResultadoCifragem resultado = cifra.cifrar(texto);
-            byte[] decifrado = cifra.decifrar(resultado);
+                ResultadoCifragem resultado = cifra.cifrar(texto);
+                byte[] decifrado = cifra.decifrar(resultado);
 
-            String contexto = "entrada #" + n + ", " + tamanho + " bytes, semente " + SEMENTE;
-            assertEquals((tamanho / 16 + 1) * 16, resultado.textoCifrado().length, "tamanho do ciphertext, " + contexto);
-            assertArrayEquals(texto, decifrado, contexto);
+                String contexto = camada + ", entrada #" + n + ", " + tamanho + " bytes, semente " + SEMENTE;
+                assertEquals((tamanho / 16 + 1) * 16, resultado.textoCifrado().length, "tamanho do ciphertext, " + contexto);
+                assertArrayEquals(texto, decifrado, contexto);
+            }
         }
     }
 
     @Test
-    @DisplayName("Ida e volta funciona com qualquer numero de rodadas de 1 a 16")
+    @DisplayName("Ida e volta funciona com qualquer numero de rodadas de 1 a 16, nas duas camadas")
     void idaEVoltaEmTodasAsRodadas() {
         // A Fase 2 mede avalanche de 1 a 10 rodadas; se a inversa so estiver
         // certa para 10, aquele grafico seria construido sobre uma cifra quebrada.
         Random rnd = new Random(SEMENTE ^ 0x5EEDL);
-        for (int rodadas = 1; rodadas <= 16; rodadas++) {
-            CifraSigea cifra = new CifraSigea(chave(rnd), rodadas);
-            for (int n = 0; n < 50; n++) {
-                byte[] texto = aleatorio(rnd, rnd.nextInt(300));
-                assertArrayEquals(texto, cifra.decifrar(cifra.cifrar(texto)),
-                        rodadas + " rodadas, entrada #" + n + ", semente " + SEMENTE);
+        for (CamadaDifusao camada : CamadaDifusao.values()) {
+            for (int rodadas = 1; rodadas <= 16; rodadas++) {
+                CifraSigea cifra = new CifraSigea(chave(rnd), rodadas, camada);
+                for (int n = 0; n < 50; n++) {
+                    byte[] texto = aleatorio(rnd, rnd.nextInt(300));
+                    assertArrayEquals(texto, cifra.decifrar(cifra.cifrar(texto)),
+                            camada + ", " + rodadas + " rodadas, entrada #" + n + ", semente " + SEMENTE);
+                }
             }
         }
     }
@@ -241,6 +248,8 @@ class CifraSigeaTest {
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(new byte[16]));
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(null));
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd), 0));
+        assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd), 10, null));
+        assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd)).cifrarBlocoUnico(new byte[15], new byte[12]));
 
         CifraSigea cifra = new CifraSigea(chave(rnd));
         byte[] nonce = new byte[CifraSigea.TAMANHO_NONCE];

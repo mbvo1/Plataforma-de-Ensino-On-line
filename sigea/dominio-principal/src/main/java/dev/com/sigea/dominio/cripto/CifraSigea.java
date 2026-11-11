@@ -16,17 +16,17 @@ import java.util.Base64;
  * Rodada de cifragem, nesta ordem (a ordem e parte da especificacao):
  *   1. AddRoundKey  bloco[i] ^= K_r[i]          - onde a chave entra (XOR)
  *   2. SubBytes     bloco[i] = S[bloco[i]]       - confusao, S-box da chave
- *   3. MixChain     frente: i=1..15  b[i] ^= b[i-1]
- *                   tras:   i=14..0  b[i] ^= b[i+1]
+ *   3. Difusao      CamadaDifusao selecionada: MixColumns do Rijndael
+ *                   (padrao) ou a cadeia dupla original do grupo
  *   4. Permute      saida[i] = rotl(entrada[P[i]], (i % 7) + 1)
  *
- * Por que o MixChain tem as duas passadas: a passada para frente leva a
- * mudanca de um byte para todos os bytes a direita dele; a passada para
- * tras traz o resultado de volta para a esquerda. Depois das duas, um bit
- * alterado em qualquer posicao ja tocou os 16 bytes numa unica rodada.
- * Sem esse passo, a mudanca fica presa num so byte (SubBytes e Permute
- * sao byte a byte) e o avalanche nao chega perto de 50% - nao remover
- * "para simplificar".
+ * Por que existe o passo 3: SubBytes e Permute trabalham byte a byte, e
+ * sem uma camada linear que misture bytes entre si a mudanca de um bit
+ * fica presa num so byte por varias rodadas - nao remover "para
+ * simplificar". Por que a camada padrao deixou de ser a cadeia dupla do
+ * brief e passou a ser a MixColumns do Rijndael: a cadeia tem uma posicao
+ * (byte 14) em que a diferenca se cancela e sobra um unico byte afetado
+ * na rodada; o diagnostico completo esta em CamadaDifusao.
  *
  * Por que a rotacao usa o indice de DESTINO (posicao depois da
  * permutacao): assim a quantidade de bits girados e fixa por posicao de
@@ -48,12 +48,17 @@ import java.util.Base64;
  *     flipping do CBC). E a falha de padding gera uma excecao distinguivel das
  *     demais; quem expuser essa diferenca ao usuario cria um padding
  *     oracle (Vaudenay, 2002) que recupera o texto claro sem a chave.
- *   - A ultima rodada termina em MixChain + Permute, que nao envolvem
- *     subchave. Como nao ha AddRoundKey final (o AES tem um), o atacante
- *     que conhecer P consegue desfazer esse trecho; na pratica a ultima
- *     rodada protege menos que as outras.
+ *   - Nao ha AddRoundKey final (o AES tem um). As tres ultimas operacoes
+ *     (SubBytes, difusao, Permute) dependem so da chave mestra, nao do
+ *     nonce: formam uma camada final fixa por chave, que um ataque de texto
+ *     claro escolhido pode tentar remover. Segundo a referencia do Adendo
+ *     01, acrescenta-lo nao muda a avalanche de forma mensuravel, entao a
+ *     ausencia e fraqueza de seguranca, nao de difusao.
  *   - A validacao do padding nao e de tempo constante.
  *   - Nenhuma analise formal da S-box gerada (ver CaixaSubstituicao).
+ *     Mesmo com a MixColumns, sobra uma fracao de pares com difusao fraca
+ *     bem acima do ideal binomial; a suspeita registrada e a S-box gerada
+ *     por hash, sem garantia de nao-linearidade.
  *
  * Imutavel e segura para uso concorrente: as tabelas da chave sao
  * calculadas no construtor e o estado de cada cifragem e local a chamada.
@@ -64,6 +69,7 @@ public final class CifraSigea {
     public static final int TAMANHO_CHAVE = 32;
     public static final int TAMANHO_NONCE = 12;
     public static final int RODADAS_PADRAO = 10;
+    public static final CamadaDifusao DIFUSAO_PADRAO = CamadaDifusao.MIXCOLUMNS_MDS;
 
     // SecureRandom e thread-safe; uma instancia compartilhada evita
     // reabrir a fonte de entropia do SO a cada mensagem.
@@ -71,33 +77,48 @@ public final class CifraSigea {
 
     private final byte[] chaveMestra;
     private final int rodadas;
+    private final CamadaDifusao difusao;
     private final CaixaSubstituicao caixa;
 
     public CifraSigea(byte[] chaveMestra) {
-        this(chaveMestra, RODADAS_PADRAO);
+        this(chaveMestra, RODADAS_PADRAO, DIFUSAO_PADRAO);
+    }
+
+    public CifraSigea(byte[] chaveMestra, int rodadas) {
+        this(chaveMestra, rodadas, DIFUSAO_PADRAO);
     }
 
     /**
-     * Rodadas como parametro de construtor, nao constante: o experimento de
-     * avalanche por rodada (1..10) da Fase 2 precisa instanciar a mesma
-     * cifra com contagens diferentes para mostrar onde a difusao satura.
+     * Rodadas e camada de difusao como parametros de construtor, nao
+     * constantes: o experimento de avalanche por rodada (1..10) precisa
+     * instanciar a mesma cifra com contagens diferentes para mostrar onde a
+     * difusao satura, e a comparacao CADEIA_DUPLA x MIXCOLUMNS_MDS precisa
+     * das duas camadas lado a lado sob a mesma chave.
      */
-    public CifraSigea(byte[] chaveMestra, int rodadas) {
+    public CifraSigea(byte[] chaveMestra, int rodadas, CamadaDifusao difusao) {
         if (chaveMestra == null || chaveMestra.length != TAMANHO_CHAVE) {
             throw new IllegalArgumentException("Chave mestra deve ter exatamente " + TAMANHO_CHAVE + " bytes (256 bits)");
         }
         if (rodadas < 1) {
             throw new IllegalArgumentException("Numero de rodadas deve ser ao menos 1");
         }
+        if (difusao == null) {
+            throw new IllegalArgumentException("Camada de difusao nao pode ser nula");
+        }
         // Copia defensiva: se o chamador zerar ou reutilizar o array, a cifra
         // nao passa a cifrar com outra chave sem ninguem perceber.
         this.chaveMestra = chaveMestra.clone();
         this.rodadas = rodadas;
+        this.difusao = difusao;
         this.caixa = new CaixaSubstituicao(this.chaveMestra, TAMANHO_BLOCO);
     }
 
     public int rodadas() {
         return rodadas;
+    }
+
+    public CamadaDifusao difusao() {
+        return difusao;
     }
 
     /** Cifra com um nonce novo de 12 bytes do SecureRandom - o unico caminho de uso normal. */
@@ -108,16 +129,21 @@ public final class CifraSigea {
     }
 
     /**
-     * Cifra com um nonce escolhido pelo chamador.
+     * Cifra com um nonce escolhido pelo chamador. FIXAR O NONCE ANULA A
+     * SEGURANCA DA CIFRA; o metodo existe so para medicao.
      *
-     * Existe por causa dos experimentos da Fase 2: medir avalanche de texto
-     * ou de chave exige fixar o nonce, senao o nonce aleatorio sozinho ja
-     * produz ~50% de bits diferentes e o numero nao diria nada sobre a
-     * cifra. NUNCA usar fora de experimento: repetir nonce com a mesma chave
-     * repete subchaves e IV, e mensagens com o mesmo prefixo passam a
-     * produzir o mesmo prefixo cifrado.
+     * Medir avalanche ou repetir uma cifragem para comparar exige fixar o
+     * nonce, senao o nonce aleatorio sozinho ja produz ~50% de bits
+     * diferentes e o numero nao diria nada sobre a cifra. Fora disso,
+     * repetir nonce com a mesma chave repete subchaves e IV, e mensagens com
+     * o mesmo prefixo passam a produzir o mesmo prefixo cifrado.
+     *
+     * Visibilidade de pacote de proposito (Adendo 01): publico, qualquer
+     * modulo que dependa do dominio poderia chama-lo em producao. Por isso os
+     * testes de ataque ficam neste mesmo pacote, nao num subpacote - em Java,
+     * subpacote nao herda acesso de pacote.
      */
-    public ResultadoCifragem cifrarComNonce(byte[] textoClaro, byte[] nonce) {
+    ResultadoCifragem cifrarComNonce(byte[] textoClaro, byte[] nonce) {
         if (textoClaro == null) {
             throw new IllegalArgumentException("Texto claro nao pode ser nulo (use array vazio)");
         }
@@ -204,6 +230,25 @@ public final class CifraSigea {
     // Bloco
     // ------------------------------------------------------------------
 
+    /**
+     * Uma aplicacao da funcao de bloco, sem CBC, IV nem padding.
+     *
+     * Existe so para medicao: avalanche tem de ser medida na funcao de
+     * rodada, porque o CBC so propaga para frente - um bit virado no ultimo
+     * bloco de uma mensagem longa nao toca os anteriores, e a media passaria
+     * a descrever o modo de operacao e o tamanho da mensagem, nao a cifra.
+     * Visibilidade de pacote de proposito; nao e API de uso.
+     */
+    byte[] cifrarBlocoUnico(byte[] bloco, byte[] nonce) {
+        if (bloco == null || bloco.length != TAMANHO_BLOCO) {
+            throw new IllegalArgumentException("Bloco deve ter exatamente " + TAMANHO_BLOCO + " bytes");
+        }
+        validarNonce(nonce);
+        byte[] s = bloco.clone();
+        cifrarBloco(s, new EscalonadorChaves(chaveMestra, nonce, rodadas), new byte[TAMANHO_BLOCO]);
+        return s;
+    }
+
     private void cifrarBloco(byte[] s, EscalonadorChaves escalonador, byte[] temp) {
         for (int r = 1; r <= rodadas; r++) {
             byte[] k = escalonador.subchave(r);
@@ -216,13 +261,8 @@ public final class CifraSigea {
             for (int i = 0; i < TAMANHO_BLOCO; i++) {
                 s[i] = (byte) caixa.substituir(s[i]);
             }
-            // 3. MixChain - frente, depois tras; cada passo usa o vizinho ja atualizado.
-            for (int i = 1; i < TAMANHO_BLOCO; i++) {
-                s[i] ^= s[i - 1];
-            }
-            for (int i = TAMANHO_BLOCO - 2; i >= 0; i--) {
-                s[i] ^= s[i + 1];
-            }
+            // 3. Difusao
+            difusao.aplicar(s);
             // 4. Permute - move os bytes e gira cada um pela posicao de destino.
             for (int i = 0; i < TAMANHO_BLOCO; i++) {
                 temp[i] = rotacionarEsquerda(s[caixa.origemDaPosicao(i)], deslocamento(i));
@@ -234,11 +274,9 @@ public final class CifraSigea {
     /**
      * Inverso exato da rodada, passos na ordem inversa e rodadas de tras
      * para frente. Os dois pontos onde e facil errar:
-     *   - MixChain: a inversa da passada para tras e um laco CRESCENTE
-     *     (b[i] ^= b[i+1], com b[i+1] ainda intacto), e a inversa da
-     *     passada para frente e um laco DECRESCENTE (b[i] ^= b[i-1], com
-     *     b[i-1] ainda intacto). Repetir as passadas na mesma direcao da
-     *     cifragem nao as desfaz, e o erro aparece so em alguns bytes.
+     *   - Difusao: cada camada tem a sua inversa (a da cadeia dupla inverte
+     *     a direcao dos lacos; a da MixColumns usa outra matriz) - ver
+     *     CamadaDifusao.
      *   - Permute: desgirar ANTES de despermutar, porque a rotacao foi
      *     aplicada pela posicao de destino.
      * O teste de propriedade com 1.000 entradas existe para pegar isso.
@@ -252,13 +290,8 @@ public final class CifraSigea {
                 temp[caixa.origemDaPosicao(i)] = rotacionarDireita(s[i], deslocamento(i));
             }
             System.arraycopy(temp, 0, s, 0, TAMANHO_BLOCO);
-            // 3^-1. MixChain - desfaz a passada para tras, depois a para frente.
-            for (int i = 0; i <= TAMANHO_BLOCO - 2; i++) {
-                s[i] ^= s[i + 1];
-            }
-            for (int i = TAMANHO_BLOCO - 1; i >= 1; i--) {
-                s[i] ^= s[i - 1];
-            }
+            // 3^-1. Difusao
+            difusao.inverter(s);
             // 2^-1. SubBytes
             for (int i = 0; i < TAMANHO_BLOCO; i++) {
                 s[i] = (byte) caixa.substituirInverso(s[i]);
@@ -322,7 +355,7 @@ public final class CifraSigea {
     @Override
     public String toString() {
         // Nunca incluir a chave: toString vai parar em log sem ninguem decidir isso.
-        return "CifraSigea[" + rodadas + " rodadas]";
+        return "CifraSigea[" + rodadas + " rodadas, " + difusao + "]";
     }
 
     /**

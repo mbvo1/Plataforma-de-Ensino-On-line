@@ -24,8 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * virado no ultimo bloco nao toca os anteriores - a media mediria o modo de
  * operacao e o tamanho da mensagem, nao a funcao de rodada.
  *
- * As duas camadas recebem exatamente os mesmos pares (mesma chave, nonce,
- * bloco e bit), entao a diferenca entre as linhas do CSV e so da camada.
+ * Quatro variantes, camada x modo de permutacao: CADEIA_DUPLA/LIVRE e a
+ * cifra da Fase 1, MIXCOLUMNS_MDS/LIVRE a do Adendo 01, MIXCOLUMNS_MDS/
+ * ESPALHA_COLUNAS a atual (ver ModoPermutacao). Todas recebem exatamente os
+ * mesmos pares (mesma chave, nonce, bloco e bit), entao a diferenca entre as
+ * linhas do CSV e so da variante.
  * Semente fixa: o CSV e evidencia de relatorio e precisa sair identico a
  * cada execucao. Este teste nao afirma nenhum numero "bom" - ele registra
  * o que medir; o julgamento fica no relatorio.
@@ -40,7 +43,10 @@ class DiagnosticoDifusaoTest {
     @Test
     @DisplayName("Diagnostico da camada de difusao: 20.000 pares, 10 rodadas, bloco unico, por byte")
     void compararCamadas() throws IOException {
-        CamadaDifusao[] camadas = CamadaDifusao.values();
+        CamadaDifusao[] camadas = {CamadaDifusao.CADEIA_DUPLA, CamadaDifusao.MIXCOLUMNS_MDS,
+                CamadaDifusao.CADEIA_DUPLA, CamadaDifusao.MIXCOLUMNS_MDS};
+        ModoPermutacao[] permutacoes = {ModoPermutacao.LIVRE, ModoPermutacao.LIVRE,
+                ModoPermutacao.ESPALHA_COLUNAS, ModoPermutacao.ESPALHA_COLUNAS};
         int k = camadas.length;
         long[] soma = new long[k];
         long[] somaQuadrados = new long[k];
@@ -65,7 +71,7 @@ class DiagnosticoDifusaoTest {
             paresPorByte[bit / 8]++;
 
             for (int c = 0; c < k; c++) {
-                CifraSigea cifra = new CifraSigea(chave, RODADAS, camadas[c]);
+                CifraSigea cifra = new CifraSigea(chave, RODADAS, camadas[c], permutacoes[c]);
                 int d = Estatistica.distanciaHamming(cifra.cifrarBlocoUnico(bloco, nonce), cifra.cifrarBlocoUnico(vizinho, nonce));
                 soma[c] += d;
                 somaQuadrados[c] += (long) d * d;
@@ -79,20 +85,20 @@ class DiagnosticoDifusaoTest {
         }
 
         List<String> resumo = new ArrayList<>();
-        resumo.add("camada,rodadas,pares,media_pct,desvio_pct,min_bits,max_bits,pares_abaixo_32_bits,pct_abaixo_32_bits");
+        resumo.add("camada,permutacao,rodadas,pares,media_pct,desvio_pct,min_bits,max_bits,pares_abaixo_32_bits,pct_abaixo_32_bits");
         List<String> porByte = new ArrayList<>();
-        porByte.add("camada,byte,pares,pares_abaixo_32_bits");
+        porByte.add("camada,permutacao,byte,pares,pares_abaixo_32_bits");
         for (int c = 0; c < k; c++) {
             double media = (double) soma[c] / PARES;
             double desvio = Math.sqrt((double) somaQuadrados[c] / PARES - media * media);
-            resumo.add(String.format(Locale.ROOT, "%s,%d,%d,%.4f,%.4f,%d,%d,%d,%.4f",
-                    camadas[c], RODADAS, PARES, 100 * media / 128, 100 * desvio / 128,
+            resumo.add(String.format(Locale.ROOT, "%s,%s,%d,%d,%.4f,%.4f,%d,%d,%d,%.4f",
+                    camadas[c], permutacoes[c], RODADAS, PARES, 100 * media / 128, 100 * desvio / 128,
                     min[c], max[c], ruins[c], 100.0 * ruins[c] / PARES));
             for (int b = 0; b < 16; b++) {
-                porByte.add(String.format(Locale.ROOT, "%s,%d,%d,%d", camadas[c], b, paresPorByte[b], ruinsPorByte[c][b]));
+                porByte.add(String.format(Locale.ROOT, "%s,%s,%d,%d,%d", camadas[c], permutacoes[c], b, paresPorByte[b], ruinsPorByte[c][b]));
             }
             System.out.println("[DiagnosticoDifusao] " + resumo.get(resumo.size() - 1));
-            System.out.println("[DiagnosticoDifusao] " + camadas[c] + " ruins por byte: " + java.util.Arrays.toString(ruinsPorByte[c]));
+            System.out.println("[DiagnosticoDifusao] " + camadas[c] + "/" + permutacoes[c] + " ruins por byte: " + java.util.Arrays.toString(ruinsPorByte[c]));
         }
 
         Path dir = Evidencias.diretorio();

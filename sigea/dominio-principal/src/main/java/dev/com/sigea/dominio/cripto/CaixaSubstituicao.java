@@ -30,16 +30,30 @@ import java.security.NoSuchAlgorithmException;
  * A entrada tem 36 bytes, enquanto a das subchaves de rodada tem 48
  * (chave || nonce || r), entao os dois usos do SHA-256 nunca recebem a
  * mesma mensagem.
+ *
+ * A permutacao de posicoes e sorteada conforme o ModoPermutacao; o padrao
+ * (ESPALHA_COLUNAS) e o motivo estao documentados la.
  */
 public final class CaixaSubstituicao {
 
     private static final int TAMANHO_SBOX = 256;
+    private static final int TAMANHO_COLUNA = 4;
 
     private final byte[] sbox;
     private final byte[] sboxInversa;
     private final int[] permutacaoPosicoes;
 
     public CaixaSubstituicao(byte[] chaveMestra, int tamanhoBloco) {
+        this(chaveMestra, tamanhoBloco, ModoPermutacao.ESPALHA_COLUNAS);
+    }
+
+    public CaixaSubstituicao(byte[] chaveMestra, int tamanhoBloco, ModoPermutacao modo) {
+        if (modo == null) {
+            throw new IllegalArgumentException("Modo de permutacao nao pode ser nulo");
+        }
+        if (modo == ModoPermutacao.ESPALHA_COLUNAS && tamanhoBloco != TAMANHO_COLUNA * TAMANHO_COLUNA) {
+            throw new IllegalArgumentException("ESPALHA_COLUNAS exige bloco de 4 colunas de 4 bytes");
+        }
         FluxoChave fluxo = new FluxoChave(chaveMestra);
 
         int[] permutacaoSbox = fisherYates(TAMANHO_SBOX, fluxo);
@@ -52,7 +66,9 @@ public final class CaixaSubstituicao {
             sboxInversa[permutacaoSbox[i]] = (byte) i;
         }
 
-        this.permutacaoPosicoes = fisherYates(tamanhoBloco, fluxo);
+        this.permutacaoPosicoes = modo == ModoPermutacao.LIVRE
+                ? fisherYates(tamanhoBloco, fluxo)
+                : espalhandoColunas(fluxo);
     }
 
     public int substituir(int valor) {
@@ -75,6 +91,38 @@ public final class CaixaSubstituicao {
 
     public int[] permutacaoPosicoes() {
         return permutacaoPosicoes.clone();
+    }
+
+    /**
+     * Sorteia uma permutacao em que cada coluna de origem manda exatamente um
+     * byte para cada coluna de destino. Duas etapas, ambas pela chave:
+     *   1. para cada coluna de origem c, uma permutacao sigma_c de 4 decide
+     *      para qual coluna de destino vai o byte da linha r (sigma_c(r));
+     *   2. cada coluna de destino d recebe entao um byte de cada coluna de
+     *      origem, e uma permutacao tau_d de 4 decide em que linha cai o
+     *      byte vindo da coluna c (tau_d(c)).
+     * Toda permutacao com a propriedade corresponde a exatamente uma escolha
+     * de (sigma_0..3, tau_0..3), entao com cada sigma e tau uniformes o
+     * sorteio e uniforme sobre as 24^8 permutacoes validas - nao ha uma
+     * permutacao "favorita" escondida na construcao.
+     */
+    private static int[] espalhandoColunas(FluxoChave fluxo) {
+        // chegadas[d][c] = posicao de origem (vinda da coluna c) que vai para a coluna d
+        int[][] chegadas = new int[TAMANHO_COLUNA][TAMANHO_COLUNA];
+        for (int c = 0; c < TAMANHO_COLUNA; c++) {
+            int[] sigma = fisherYates(TAMANHO_COLUNA, fluxo);
+            for (int r = 0; r < TAMANHO_COLUNA; r++) {
+                chegadas[sigma[r]][c] = c * TAMANHO_COLUNA + r;
+            }
+        }
+        int[] origemDaPosicao = new int[TAMANHO_COLUNA * TAMANHO_COLUNA];
+        for (int d = 0; d < TAMANHO_COLUNA; d++) {
+            int[] tau = fisherYates(TAMANHO_COLUNA, fluxo);
+            for (int c = 0; c < TAMANHO_COLUNA; c++) {
+                origemDaPosicao[d * TAMANHO_COLUNA + tau[c]] = chegadas[d][c];
+            }
+        }
+        return origemDaPosicao;
     }
 
     /**

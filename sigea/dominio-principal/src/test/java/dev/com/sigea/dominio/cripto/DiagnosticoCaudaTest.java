@@ -35,6 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Previsao de H2, antes de medir: a chance de uma coluna especifica ser
  * fechada e 4!12!/16! = 1/1820; so os pares com o bit nessa coluna sofrem;
  * logo ~4 x (1/1820) x (1/4) = 0,055% dos pares - contra 0,06% observados.
+ *
+ * A medicao confirmou H2 e a correcao virou o modo ESPALHA_COLUNAS (ver
+ * ModoPermutacao). O CSV traz as duas permutacoes sobre os mesmos pares: a
+ * LIVRE e o "antes"; na ESPALHA_COLUNAS o menor conjunto fechado e sempre 4,
+ * por construcao, e o que sobrar de pares ruins ali nao vem de confinamento.
  */
 class DiagnosticoCaudaTest {
 
@@ -84,15 +89,27 @@ class DiagnosticoCaudaTest {
     }
 
     @Test
-    @DisplayName("Cauda da MIXCOLUMNS_MDS: S-box (H1) x colunas fechadas pela permutacao (H2)")
+    @DisplayName("Cauda da MIXCOLUMNS_MDS: S-box (H1) x colunas fechadas pela permutacao (H2), antes e depois")
     void investigarCauda() {
+        Evidencias.Csv resumo = new Evidencias.Csv("cauda-diagnostico.csv",
+                "permutacao,hipotese,grupo,pares,pares_abaixo_32_bits,pct_abaixo_32_bits,media_pct");
+        Evidencias.Csv ruins = new Evidencias.Csv("cauda-pares-ruins.csv",
+                "permutacao,par,bits_alterados,byte_virado,coluna,menor_conjunto_fechado,uniformidade_diferencial_sbox");
+        for (ModoPermutacao modo : ModoPermutacao.values()) {
+            long[][] porConfinamento = medir(modo, resumo, ruins);
+            if (modo == ModoPermutacao.ESPALHA_COLUNAS) {
+                assertEquals(PARES, porConfinamento[4][0], "ESPALHA_COLUNAS nao pode confinar nenhuma coluna");
+            }
+        }
+        resumo.gravar();
+        ruins.gravar();
+    }
+
+    private static long[][] medir(ModoPermutacao modo, Evidencias.Csv resumo, Evidencias.Csv ruins) {
         // [tamanho do conjunto fechado 1..4] -> pares, ruins, soma de bits
         long[][] porConfinamento = new long[5][3];
         // [uniformidade diferencial 0..32] -> pares, ruins
         long[][] porUniformidade = new long[33][2];
-
-        Evidencias.Csv ruins = new Evidencias.Csv("cauda-pares-ruins.csv",
-                "par,bits_alterados,byte_virado,coluna,menor_conjunto_fechado,uniformidade_diferencial_sbox");
 
         Random rnd = new Random(SEMENTE);
         for (int n = 0; n < PARES; n++) {
@@ -107,11 +124,11 @@ class DiagnosticoCaudaTest {
             byte[] vizinho = bloco.clone();
             Estatistica.virarBit(vizinho, bit);
 
-            CifraSigea cifra = new CifraSigea(chave, RODADAS, CamadaDifusao.MIXCOLUMNS_MDS);
+            CifraSigea cifra = new CifraSigea(chave, RODADAS, CamadaDifusao.MIXCOLUMNS_MDS, modo);
             int d = Estatistica.distanciaHamming(cifra.cifrarBlocoUnico(bloco, nonce), cifra.cifrarBlocoUnico(vizinho, nonce));
 
             // Mesmas tabelas que a cifra usou: CaixaSubstituicao e deterministica na chave.
-            CaixaSubstituicao caixa = new CaixaSubstituicao(chave, 16);
+            CaixaSubstituicao caixa = new CaixaSubstituicao(chave, 16, modo);
             int byteVirado = bit / 8;
             int confinamento = menorConjuntoFechado(caixa.permutacaoPosicoes(), byteVirado / 4);
             int uniformidade = uniformidadeDiferencial(caixa.sbox());
@@ -123,29 +140,26 @@ class DiagnosticoCaudaTest {
             if (ruim) {
                 porConfinamento[confinamento][1]++;
                 porUniformidade[uniformidade][1]++;
-                ruins.linha("%d,%d,%d,%d,%d,%d", n, d, byteVirado, byteVirado / 4, confinamento, uniformidade);
+                ruins.linha("%s,%d,%d,%d,%d,%d,%d", modo, n, d, byteVirado, byteVirado / 4, confinamento, uniformidade);
             }
         }
 
-        Evidencias.Csv resumo = new Evidencias.Csv("cauda-diagnostico.csv",
-                "hipotese,grupo,pares,pares_abaixo_32_bits,pct_abaixo_32_bits,media_pct");
         long total = 0;
         for (int k = 1; k <= 4; k++) {
             long[] g = porConfinamento[k];
             total += g[0];
             if (g[0] > 0) {
-                resumo.linha("H2_permutacao,menor_conjunto_fechado_%d_colunas,%d,%d,%.4f,%.4f", k, g[0], g[1],
+                resumo.linha("%s,H2_permutacao,menor_conjunto_fechado_%d_colunas,%d,%d,%.4f,%.4f", modo, k, g[0], g[1],
                         100.0 * g[1] / g[0], 100.0 * g[2] / g[0] / 128);
             }
         }
         for (int u = 0; u < porUniformidade.length; u++) {
             long[] g = porUniformidade[u];
             if (g[0] > 0) {
-                resumo.linha("H1_sbox,uniformidade_diferencial_%d,%d,%d,%.4f,", u, g[0], g[1], 100.0 * g[1] / g[0]);
+                resumo.linha("%s,H1_sbox,uniformidade_diferencial_%d,%d,%d,%.4f,", modo, u, g[0], g[1], 100.0 * g[1] / g[0]);
             }
         }
-        resumo.gravar();
-        ruins.gravar();
         assertEquals(PARES, total);
+        return porConfinamento;
     }
 }

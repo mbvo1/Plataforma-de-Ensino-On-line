@@ -18,7 +18,9 @@ import java.util.Base64;
  *   2. SubBytes     bloco[i] = S[bloco[i]]       - confusao, S-box da chave
  *   3. Difusao      CamadaDifusao selecionada: MixColumns do Rijndael
  *                   (padrao) ou a cadeia dupla original do grupo
- *   4. Permute      saida[i] = rotl(entrada[P[i]], (i % 7) + 1)
+ *   4. Permute      saida[i] = rotl(entrada[P[i]], (i % 7) + 1), com P
+ *                   sorteada pela chave de forma a espalhar cada coluna
+ *                   pelas quatro (padrao; ver ModoPermutacao)
  *
  * Por que existe o passo 3: SubBytes e Permute trabalham byte a byte, e
  * sem uma camada linear que misture bytes entre si a mudanca de um bit
@@ -56,9 +58,11 @@ import java.util.Base64;
  *     ausencia e fraqueza de seguranca, nao de difusao.
  *   - A validacao do padding nao e de tempo constante.
  *   - Nenhuma analise formal da S-box gerada (ver CaixaSubstituicao).
- *     Mesmo com a MixColumns, sobra uma fracao de pares com difusao fraca
- *     bem acima do ideal binomial; a suspeita registrada e a S-box gerada
- *     por hash, sem garantia de nao-linearidade.
+ *     O Adendo 01 suspeitava dela pela fracao de pares com difusao fraca
+ *     que sobrava com a MixColumns; a medicao (DiagnosticoCaudaTest) mostrou
+ *     que a causa era a permutacao LIVRE, nao a S-box - corrigida pelo
+ *     modo ESPALHA_COLUNAS. A ausencia de analise da S-box continua valendo
+ *     como fraqueza, so deixou de ser a explicacao daquela cauda.
  *
  * Imutavel e segura para uso concorrente: as tabelas da chave sao
  * calculadas no construtor e o estado de cada cifragem e local a chamada.
@@ -70,6 +74,7 @@ public final class CifraSigea {
     public static final int TAMANHO_NONCE = 12;
     public static final int RODADAS_PADRAO = 10;
     public static final CamadaDifusao DIFUSAO_PADRAO = CamadaDifusao.MIXCOLUMNS_MDS;
+    public static final ModoPermutacao PERMUTACAO_PADRAO = ModoPermutacao.ESPALHA_COLUNAS;
 
     // SecureRandom e thread-safe; uma instancia compartilhada evita
     // reabrir a fonte de entropia do SO a cada mensagem.
@@ -78,6 +83,7 @@ public final class CifraSigea {
     private final byte[] chaveMestra;
     private final int rodadas;
     private final CamadaDifusao difusao;
+    private final ModoPermutacao permutacao;
     private final CaixaSubstituicao caixa;
 
     public CifraSigea(byte[] chaveMestra) {
@@ -96,6 +102,15 @@ public final class CifraSigea {
      * das duas camadas lado a lado sob a mesma chave.
      */
     public CifraSigea(byte[] chaveMestra, int rodadas, CamadaDifusao difusao) {
+        this(chaveMestra, rodadas, difusao, PERMUTACAO_PADRAO);
+    }
+
+    /**
+     * Com o modo de sorteio da permutacao P explicito. LIVRE so existe para
+     * reproduzir a cifra da Fase 1 e do Adendo 01 e medir o antes e o depois;
+     * ver ModoPermutacao.
+     */
+    public CifraSigea(byte[] chaveMestra, int rodadas, CamadaDifusao difusao, ModoPermutacao permutacao) {
         if (chaveMestra == null || chaveMestra.length != TAMANHO_CHAVE) {
             throw new IllegalArgumentException("Chave mestra deve ter exatamente " + TAMANHO_CHAVE + " bytes (256 bits)");
         }
@@ -105,12 +120,16 @@ public final class CifraSigea {
         if (difusao == null) {
             throw new IllegalArgumentException("Camada de difusao nao pode ser nula");
         }
+        if (permutacao == null) {
+            throw new IllegalArgumentException("Modo de permutacao nao pode ser nulo");
+        }
         // Copia defensiva: se o chamador zerar ou reutilizar o array, a cifra
         // nao passa a cifrar com outra chave sem ninguem perceber.
         this.chaveMestra = chaveMestra.clone();
         this.rodadas = rodadas;
         this.difusao = difusao;
-        this.caixa = new CaixaSubstituicao(this.chaveMestra, TAMANHO_BLOCO);
+        this.permutacao = permutacao;
+        this.caixa = new CaixaSubstituicao(this.chaveMestra, TAMANHO_BLOCO, permutacao);
     }
 
     public int rodadas() {
@@ -119,6 +138,10 @@ public final class CifraSigea {
 
     public CamadaDifusao difusao() {
         return difusao;
+    }
+
+    public ModoPermutacao permutacao() {
+        return permutacao;
     }
 
     /** Cifra com um nonce novo de 12 bytes do SecureRandom - o unico caminho de uso normal. */
@@ -355,7 +378,7 @@ public final class CifraSigea {
     @Override
     public String toString() {
         // Nunca incluir a chave: toString vai parar em log sem ninguem decidir isso.
-        return "CifraSigea[" + rodadas + " rodadas, " + difusao + "]";
+        return "CifraSigea[" + rodadas + " rodadas, " + difusao + ", " + permutacao + "]";
     }
 
     /**

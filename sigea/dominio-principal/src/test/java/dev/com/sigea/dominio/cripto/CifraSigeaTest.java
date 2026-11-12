@@ -42,45 +42,50 @@ class CifraSigeaTest {
     // ------------------------------------------------------------------
 
     @Test
-    @DisplayName("1.000 entradas aleatorias de 1 a 10.000 bytes voltam identicas byte a byte, nas duas camadas")
+    @DisplayName("1.000 entradas aleatorias de 1 a 10.000 bytes voltam identicas byte a byte, em todas as variantes")
     void propriedadeIdaEVolta() {
-        // As duas camadas passam pelo criterio completo: a CADEIA_DUPLA
-        // continua sendo medida na comparacao, e uma cifra que nao decifra
-        // nao serve nem como objeto de comparacao.
+        // Todas as combinacoes de camada e permutacao passam pelo criterio
+        // completo: as variantes antigas continuam sendo medidas na
+        // comparacao, e uma cifra que nao decifra nao serve nem como objeto
+        // de comparacao.
         for (CamadaDifusao camada : CamadaDifusao.values()) {
+          for (ModoPermutacao permutacao : ModoPermutacao.values()) {
             Random rnd = new Random(SEMENTE);
             for (int n = 0; n < 1000; n++) {
                 int tamanho = 1 + rnd.nextInt(10_000);
                 byte[] texto = aleatorio(rnd, tamanho);
                 // Chave nova a cada entrada: exercita 1.000 S-boxes e permutacoes
                 // diferentes, nao so 1.000 textos sob as mesmas tabelas.
-                CifraSigea cifra = new CifraSigea(chave(rnd), CifraSigea.RODADAS_PADRAO, camada);
+                CifraSigea cifra = new CifraSigea(chave(rnd), CifraSigea.RODADAS_PADRAO, camada, permutacao);
 
                 ResultadoCifragem resultado = cifra.cifrar(texto);
                 byte[] decifrado = cifra.decifrar(resultado);
 
-                String contexto = camada + ", entrada #" + n + ", " + tamanho + " bytes, semente " + SEMENTE;
+                String contexto = camada + "/" + permutacao + ", entrada #" + n + ", " + tamanho + " bytes, semente " + SEMENTE;
                 assertEquals((tamanho / 16 + 1) * 16, resultado.textoCifrado().length, "tamanho do ciphertext, " + contexto);
                 assertArrayEquals(texto, decifrado, contexto);
             }
+          }
         }
     }
 
     @Test
-    @DisplayName("Ida e volta funciona com qualquer numero de rodadas de 1 a 16, nas duas camadas")
+    @DisplayName("Ida e volta funciona com qualquer numero de rodadas de 1 a 16, em todas as variantes")
     void idaEVoltaEmTodasAsRodadas() {
         // A Fase 2 mede avalanche de 1 a 10 rodadas; se a inversa so estiver
         // certa para 10, aquele grafico seria construido sobre uma cifra quebrada.
         Random rnd = new Random(SEMENTE ^ 0x5EEDL);
         for (CamadaDifusao camada : CamadaDifusao.values()) {
+          for (ModoPermutacao permutacao : ModoPermutacao.values()) {
             for (int rodadas = 1; rodadas <= 16; rodadas++) {
-                CifraSigea cifra = new CifraSigea(chave(rnd), rodadas, camada);
+                CifraSigea cifra = new CifraSigea(chave(rnd), rodadas, camada, permutacao);
                 for (int n = 0; n < 50; n++) {
                     byte[] texto = aleatorio(rnd, rnd.nextInt(300));
                     assertArrayEquals(texto, cifra.decifrar(cifra.cifrar(texto)),
-                            camada + ", " + rodadas + " rodadas, entrada #" + n + ", semente " + SEMENTE);
+                            camada + "/" + permutacao + ", " + rodadas + " rodadas, entrada #" + n + ", semente " + SEMENTE);
                 }
             }
+          }
         }
     }
 
@@ -249,6 +254,8 @@ class CifraSigeaTest {
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(null));
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd), 0));
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd), 10, null));
+        assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd), 10, CamadaDifusao.MIXCOLUMNS_MDS, null));
+        assertThrows(IllegalArgumentException.class, () -> new CaixaSubstituicao(chave(rnd), 8, ModoPermutacao.ESPALHA_COLUNAS));
         assertThrows(IllegalArgumentException.class, () -> new CifraSigea(chave(rnd)).cifrarBlocoUnico(new byte[15], new byte[12]));
 
         CifraSigea cifra = new CifraSigea(chave(rnd));
@@ -292,6 +299,62 @@ class CifraSigeaTest {
         int[] p = caixa.permutacaoPosicoes();
         assertEquals(16, p.length);
         assertEquals(16, Arrays.stream(p).distinct().filter(v -> v >= 0 && v < 16).count());
+    }
+
+    @Test
+    @DisplayName("ESPALHA_COLUNAS: em 20.000 chaves, cada coluna manda um byte para cada uma das quatro")
+    void permutacaoEspalhaColunasEmTodaChave() {
+        // A propriedade e garantida pela construcao, nao estatistica - entao
+        // tem de valer em TODAS as chaves. A mesma varredura no modo LIVRE
+        // precisa achar chaves com coluna fechada; senao o teste nao estaria
+        // distinguindo nada (esperado ~4/1820 das chaves, ~44 em 20.000).
+        Random rnd = new Random(SEMENTE ^ 0xC01L);
+        int livresComColunaFechada = 0;
+        for (int n = 0; n < 20_000; n++) {
+            byte[] chave = chave(rnd);
+            int[] p = new CaixaSubstituicao(chave, 16, ModoPermutacao.ESPALHA_COLUNAS).permutacaoPosicoes();
+            assertEquals(16, Arrays.stream(p).distinct().filter(v -> v >= 0 && v < 16).count(), "P nao e permutacao, chave #" + n);
+            for (int origem = 0; origem < 4; origem++) {
+                Set<Integer> destinos = new HashSet<>();
+                for (int destino = 0; destino < 16; destino++) {
+                    if (p[destino] / 4 == origem) {
+                        destinos.add(destino / 4);
+                    }
+                }
+                assertEquals(4, destinos.size(), "coluna " + origem + " nao espalha, chave #" + n);
+                assertEquals(4, DiagnosticoCaudaTest.menorConjuntoFechado(p, origem));
+            }
+            int[] livre = new CaixaSubstituicao(chave, 16, ModoPermutacao.LIVRE).permutacaoPosicoes();
+            for (int coluna = 0; coluna < 4; coluna++) {
+                if (DiagnosticoCaudaTest.menorConjuntoFechado(livre, coluna) == 1) {
+                    livresComColunaFechada++;
+                    break;
+                }
+            }
+        }
+        assertTrue(livresComColunaFechada > 0, "modo LIVRE sem nenhuma coluna fechada em 20.000 chaves");
+    }
+
+    @Test
+    @DisplayName("MixColumns + ESPALHA_COLUNAS: com 2 rodadas, um bit virado muda os 16 bytes, em toda chave")
+    void difusaoCompletaEmDuasRodadas() {
+        // Rodada 1: 1 byte diferente -> MixColumns (MDS) -> 4 bytes na coluna
+        // -> Permute -> 1 byte em cada coluna. Rodada 2: MixColumns -> 16 bytes.
+        // A S-box e bijetora e a rotacao tambem, entao diferenca nao nula
+        // nunca vira zero. Garantia deterministica: vale em todo par.
+        Random rnd = new Random(SEMENTE ^ 0x2L);
+        for (int n = 0; n < 5_000; n++) {
+            CifraSigea cifra = new CifraSigea(chave(rnd), 2, CamadaDifusao.MIXCOLUMNS_MDS, ModoPermutacao.ESPALHA_COLUNAS);
+            byte[] nonce = aleatorio(rnd, CifraSigea.TAMANHO_NONCE);
+            byte[] bloco = aleatorio(rnd, 16);
+            byte[] vizinho = bloco.clone();
+            Estatistica.virarBit(vizinho, rnd.nextInt(128));
+            byte[] a = cifra.cifrarBlocoUnico(bloco, nonce);
+            byte[] b = cifra.cifrarBlocoUnico(vizinho, nonce);
+            for (int i = 0; i < 16; i++) {
+                assertNotEquals(a[i], b[i], "byte " + i + " igual com 2 rodadas, par #" + n);
+            }
+        }
     }
 
     @Test

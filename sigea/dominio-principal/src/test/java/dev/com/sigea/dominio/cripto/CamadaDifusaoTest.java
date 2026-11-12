@@ -65,6 +65,8 @@ class CamadaDifusaoTest {
         // Vetores capturados do commit da Fase 1 (379685e), com o MixChain
         // ainda inline. Garantem que a comparacao do relatorio compara a
         // camada que de fato foi medida, e nao uma reimplementacao parecida.
+        // A Fase 1 sorteava a permutacao no modo LIVRE; o padrao mudou depois
+        // (ver ModoPermutacao), entao a reproducao fixa LIVRE explicitamente.
         byte[] chave = new byte[32];
         for (int i = 0; i < 32; i++) chave[i] = (byte) i;
         byte[] nonce = new byte[12];
@@ -86,7 +88,7 @@ class CamadaDifusaoTest {
             int tamanho = (int) v[1];
             byte[] texto = new byte[tamanho];
             for (int i = 0; i < tamanho; i++) texto[i] = (byte) (i * 7);
-            CifraSigea cifra = new CifraSigea(chave, rodadas, CamadaDifusao.CADEIA_DUPLA);
+            CifraSigea cifra = new CifraSigea(chave, rodadas, CamadaDifusao.CADEIA_DUPLA, ModoPermutacao.LIVRE);
             assertEquals(v[2], HEX.formatHex(cifra.cifrarComNonce(texto, nonce).textoCifrado()),
                     rodadas + " rodadas, " + tamanho + " bytes");
         }
@@ -99,6 +101,7 @@ class CamadaDifusaoTest {
         byte[] nonce = new byte[12];
         CifraSigea padrao = new CifraSigea(chave);
         assertEquals(CamadaDifusao.MIXCOLUMNS_MDS, padrao.difusao());
+        assertEquals(ModoPermutacao.ESPALHA_COLUNAS, padrao.permutacao());
         assertNotEquals(
                 HEX.formatHex(new CifraSigea(chave, 10, CamadaDifusao.CADEIA_DUPLA).cifrarComNonce(new byte[16], nonce).textoCifrado()),
                 HEX.formatHex(padrao.cifrarComNonce(new byte[16], nonce).textoCifrado()));

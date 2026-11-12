@@ -22,7 +22,7 @@ encontrada não variam.
 
 | Arquivo | Gerado por | O que contém |
 |---|---|---|
-| `difusao-comparacao.csv` | `DiagnosticoDifusaoTest` | Adendo 01: cadeia dupla x MixColumns, 20.000 pares, 10 rodadas, bloco único |
+| `difusao-comparacao.csv` | `DiagnosticoDifusaoTest` | Adendo 01: camada de difusão x permutação, 20.000 pares, 10 rodadas, bloco único |
 | `difusao-ruins-por-byte.csv` | `DiagnosticoDifusaoTest` | Pares com menos de 32 bits alterados, por byte em que o bit foi virado |
 | `avalanche.csv` | `AtaqueDiferencialTest` | Avalanche de texto e de chave por rodada (1 a 10, e 14 para o AES), bloco único |
 | `avalanche-histograma.csv` | `AtaqueDiferencialTest` | Distribuição completa da distância de Hamming com o número padrão de rodadas |
@@ -33,8 +33,26 @@ encontrada não variam.
 | `estatistico.csv` | `AtaqueEstatisticoTest` | Qui-quadrado, valor-p, entropia, índice de coincidência e blocos repetidos |
 | `frequencia-bytes.csv` | `AtaqueEstatisticoTest` | Histograma de bytes do corpus: texto claro x CifraSigea x AES-256-GCM |
 | `corpus-estatistico.csv` | `AtaqueEstatisticoTest` | Arquivos que compõem o corpus, tamanhos e SHA-256 do total |
-| `cauda-diagnostico.csv` | `DiagnosticoCaudaTest` | Cauda residual da MixColumns: S-box (H1) x colunas fechadas pela permutação (H2) |
-| `cauda-pares-ruins.csv` | `DiagnosticoCaudaTest` | Cada par ruim, com o confinamento e a uniformidade diferencial da sua chave |
+| `cauda-diagnostico.csv` | `DiagnosticoCaudaTest` | Cauda residual da MixColumns: S-box (H1) x colunas fechadas pela permutação (H2), P livre e P atual |
+| `cauda-pares-ruins.csv` | `DiagnosticoCaudaTest` | Cada par ruim, com a permutação, o confinamento e a uniformidade diferencial da sua chave |
+
+## Variantes da CifraSigea nos CSVs
+
+A cifra mudou duas vezes; os CSVs comparam as três versões sobre os mesmos pares.
+
+| Rótulo nos CSVs | Camada de difusão | Permutação P | Versão |
+|---|---|---|---|
+| `CIFRA_SIGEA_CADEIA_DUPLA_P_LIVRE` / `CADEIA_DUPLA,LIVRE` | cadeia dupla | livre (16!) | Fase 1 |
+| `CIFRA_SIGEA_MDS_P_LIVRE` / `MIXCOLUMNS_MDS,LIVRE` | MixColumns | livre (16!) | Adendo 01 |
+| `CIFRA_SIGEA_MDS` / `MIXCOLUMNS_MDS,ESPALHA_COLUNAS` | MixColumns | espalha cada coluna pelas quatro | atual (padrão) |
+
+Por que a P mudou: com a P livre, algumas chaves devolvem os 4 bytes de uma
+coluna para a mesma coluna, e a diferença fica presa em 32 bits em todas as
+rodadas. `cauda-diagnostico.csv` mostra isso (linhas `LIVRE`) e mostra que a
+qualidade da S-box não explica a cauda. A correção, `ModoPermutacao.ESPALHA_COLUNAS`,
+foi decidida depois desse diagnóstico, não ajustada até o número melhorar; o
+diagnóstico original continua reproduzível porque a P livre continua disponível.
+Os CSVs de força bruta e estatístico usam só a cifra atual.
 
 ## Decisões de método que afetam a leitura
 
@@ -59,4 +77,7 @@ encontrada não variam.
   pasta. É português real, mas prosa técnica, não aviso de turma.
 - **Força bruta.** Uma thread, varredura completa do espaço (pior caso), com
   um par texto claro/texto cifrado conhecido como oráculo. Cada candidata da
-  CifraSigea paga a geração da S-box e da permutação.
+  CifraSigea paga a geração da S-box e da permutação. As chaves por segundo
+  variam muito de uma execução para outra na mesma máquina (o AES, que não
+  muda, já variou perto de 2x); compare as duas cifras só dentro da mesma
+  execução, nunca entre execuções.

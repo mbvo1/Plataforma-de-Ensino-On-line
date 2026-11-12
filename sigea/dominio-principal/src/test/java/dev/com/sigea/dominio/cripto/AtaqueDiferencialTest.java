@@ -49,8 +49,8 @@ class AtaqueDiferencialTest {
         byte[] cifrar(byte[] chave, byte[] nonce, byte[] bloco, int rodadas);
     }
 
-    private static CifraDeBloco sigea(CamadaDifusao camada) {
-        return (chave, nonce, bloco, rodadas) -> new CifraSigea(chave, rodadas, camada).cifrarBlocoUnico(bloco, nonce);
+    private static CifraDeBloco sigea(CamadaDifusao camada, ModoPermutacao permutacao) {
+        return (chave, nonce, bloco, rodadas) -> new CifraSigea(chave, rodadas, camada, permutacao).cifrarBlocoUnico(bloco, nonce);
     }
 
     private static final CifraDeBloco AES_256 = (chave, nonce, bloco, rodadas) -> AesReferencia.cifrarBloco(chave, bloco, rodadas);
@@ -85,7 +85,7 @@ class AtaqueDiferencialTest {
     }
 
     @Test
-    @DisplayName("Avalanche de texto e de chave por rodada: CifraSigea (duas camadas) x AES-256")
+    @DisplayName("Avalanche de texto e de chave por rodada: CifraSigea (atual, Adendo 01, Fase 1) x AES-256")
     void avalanchePorRodada() {
         Evidencias.Csv csv = new Evidencias.Csv("avalanche.csv",
                 "cifra,rodadas,tipo,media_pct,desvio_pct,min_pct,max_pct,min_bits,max_bits,pares");
@@ -93,8 +93,13 @@ class AtaqueDiferencialTest {
                 "cifra,rodadas,tipo,bits_alterados,ocorrencias");
 
         Object[][] cifras = {
-                {"CIFRA_SIGEA_MDS", sigea(CamadaDifusao.MIXCOLUMNS_MDS), CifraSigea.RODADAS_PADRAO},
-                {"CIFRA_SIGEA_CADEIA_DUPLA", sigea(CamadaDifusao.CADEIA_DUPLA), CifraSigea.RODADAS_PADRAO},
+                // A cifra atual e as duas versoes anteriores, para o relatorio
+                // mostrar o efeito de cada correcao sobre os mesmos pares:
+                // Fase 1 (cadeia dupla, P livre) -> Adendo 01 (MixColumns,
+                // P livre) -> atual (MixColumns, P espalhando colunas).
+                {"CIFRA_SIGEA_MDS", sigea(CamadaDifusao.MIXCOLUMNS_MDS, ModoPermutacao.ESPALHA_COLUNAS), CifraSigea.RODADAS_PADRAO},
+                {"CIFRA_SIGEA_MDS_P_LIVRE", sigea(CamadaDifusao.MIXCOLUMNS_MDS, ModoPermutacao.LIVRE), CifraSigea.RODADAS_PADRAO},
+                {"CIFRA_SIGEA_CADEIA_DUPLA_P_LIVRE", sigea(CamadaDifusao.CADEIA_DUPLA, ModoPermutacao.LIVRE), CifraSigea.RODADAS_PADRAO},
                 {"AES_256", AES_256, AesReferencia.RODADAS_AES_256},
         };
         for (Object[] c : cifras) {
@@ -123,8 +128,8 @@ class AtaqueDiferencialTest {
         }
         csv.gravar();
         histograma.gravar();
-        // 3 cifras x 2 tipos x 10 rodadas, mais a linha de 14 rodadas do AES por tipo.
-        assertEquals(3 * 2 * RODADAS_MAX + 2, csv.linhasDeDados());
+        // 4 cifras x 2 tipos x 10 rodadas, mais a linha de 14 rodadas do AES por tipo.
+        assertEquals(4 * 2 * RODADAS_MAX + 2, csv.linhasDeDados());
     }
 
     /**

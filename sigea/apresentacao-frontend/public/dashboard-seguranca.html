@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Segurança</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages/seguranca.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js por CDN, versao fixa e com SRI: se o arquivo servido pelo CDN
+         mudar, o navegador recusa o script em vez de executa-lo na tela de admin. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
+            integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="dashboard-admin.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="gerenciar-usuarios.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Gerenciar Usuários</span>
+            </a>
+            <a href="gerenciar-disciplinas.html" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Gestão Acadêmica</span>
+            </a>
+            <a href="avisos-admin.html" class="menu-item">
+                <i class="fas fa-bullhorn"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="calendario-admin.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário Institucional</span>
+            </a>
+            <a href="dashboard-seguranca.html" class="menu-item active">
+                <i class="fas fa-shield-alt"></i>
+                <span class="menu-text">Segurança</span>
+            </a>
+            <a href="#" class="menu-item" id="sair">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Administrador</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <h1 class="welcome-title">Painel de Segurança</h1>
+            <p class="seg-legenda">
+                Painéis <strong>ao vivo</strong> leem o log de segurança agora. Painéis <strong>medidos</strong>
+                mostram os CSVs gerados pelos experimentos do Projeto 2, sem recalcular nada; o arquivo de
+                origem aparece em cada um.
+            </p>
+
+            <div class="seg-grid">
+                <section class="seg-painel seg-largo">
+                    <header>
+                        <h2><i class="fas fa-chart-line"></i> Eventos por hora</h2>
+                        <span class="seg-origem seg-vivo">ao vivo · log_seguranca</span>
+                    </header>
+                    <div class="seg-grafico"><canvas id="grafico-eventos"></canvas></div>
+                    <p class="seg-nota" id="nota-eventos"></p>
+                </section>
+
+                <section class="seg-painel">
+                    <header>
+                        <h2><i class="fas fa-link"></i> Cadeia de integridade</h2>
+                        <span class="seg-origem seg-vivo">ao vivo · verificar-integridade</span>
+                    </header>
+                    <div id="integridade" class="seg-integridade seg-carregando">Verificando...</div>
+                    <dl id="integridade-detalhes" class="seg-detalhes"></dl>
+                    <button type="button" class="seg-botao" id="verificar">
+                        <i class="fas fa-sync-alt"></i> Verificar agora
+                    </button>
+                    <p class="seg-nota">Cada verificação que encontra corrupção grava um evento INTEGRIDADE_VIOLADA.</p>
+                </section>
+
+                <section class="seg-painel">
+                    <header>
+                        <h2><i class="fas fa-bullseye"></i> Métricas do detector</h2>
+                        <span class="seg-origem seg-medido">medido · deteccao.csv</span>
+                    </header>
+                    <div class="seg-grafico seg-grafico-baixo"><canvas id="grafico-metricas"></canvas></div>
+                    <div class="table-container seg-rolagem-x">
+                        <table class="data-table seg-tabela" id="tabela-metricas">
+                            <thead>
+                                <tr><th>Modelo</th><th>Precisão</th><th>Recall</th><th>F1</th><th>ROC-AUC</th><th>Incidentes</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="seg-painel seg-largo">
+                    <header>
+                        <h2><i class="fas fa-exclamation-triangle"></i> Anomalias detectadas</h2>
+                        <span class="seg-origem seg-vivo">ao vivo · ANOMALIA_DETECTADA</span>
+                    </header>
+                    <div class="seg-filtros">
+                        <label for="filtro-modelo">Modelo</label>
+                        <select id="filtro-modelo"></select>
+                        <span id="anomalias-resumo" class="seg-nota"></span>
+                    </div>
+                    <div class="table-container seg-rolagem">
+                        <table class="data-table seg-tabela" id="tabela-anomalias">
+                            <thead>
+                                <tr><th>Score</th><th>Usuário</th><th>Janela (Recife)</th><th>Modelo</th><th>log_id</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="seg-painel">
+                    <header>
+                        <h2><i class="fas fa-random"></i> Avalanche por rodada</h2>
+                        <span class="seg-origem seg-medido">medido · avalanche.csv</span>
+                    </header>
+                    <div class="seg-grafico"><canvas id="grafico-avalanche"></canvas></div>
+                    <p class="seg-nota">Bits do texto cifrado alterados ao virar 1 bit do texto claro. Ideal: 50%.
+                        As versões antigas da CifraSigea começam ocultas; clique na legenda para exibir.</p>
+                </section>
+
+                <section class="seg-painel">
+                    <header>
+                        <h2><i class="fas fa-chart-bar"></i> Distribuição de bytes</h2>
+                        <span class="seg-origem seg-medido">medido · frequencia-bytes.csv</span>
+                    </header>
+                    <div class="seg-grafico"><canvas id="grafico-bytes"></canvas></div>
+                    <p class="seg-nota">Frequência de cada valor de byte (0 a 255) no mesmo corpus em português:
+                        texto claro concentrado em poucos valores, os dois textos cifrados quase uniformes.</p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard-seguranca.js"></script>
+</body>
+</html>

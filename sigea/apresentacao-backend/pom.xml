@@ -90,6 +90,18 @@
                 <directory>../apresentacao-frontend/public</directory>
                 <targetPath>static</targetPath>
             </resource>
+            <!-- Projeto 2, Fase 6: os paineis de cifra e detector do
+                 dashboard-seguranca mostram os CSVs medidos, sem recalcular.
+                 Fora de static: so saem pelo endpoint de admin. -->
+            <resource>
+                <directory>../evidencias/projeto-2</directory>
+                <targetPath>evidencias/projeto-2</targetPath>
+                <includes>
+                    <include>avalanche.csv</include>
+                    <include>frequencia-bytes.csv</include>
+                    <include>deteccao.csv</include>
+                </includes>
+            </resource>
         </resources>
         
         <plugins>

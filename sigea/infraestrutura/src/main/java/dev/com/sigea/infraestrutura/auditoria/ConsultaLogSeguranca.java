@@ -78,6 +78,42 @@ public class ConsultaLogSeguranca {
         });
     }
 
+    public record EventosNaHora(LocalDateTime hora, long total, long sucessos, long falhas, long alertas) {
+    }
+
+    /**
+     * Fase 6: agregado no banco, para o painel nao precisar baixar o log
+     * inteiro. Hora em UTC.
+     *
+     * Sem ANOMALIA_DETECTADA: o timestamp dela e o do envio em lote pelo
+     * script da Fase 5, nao o do comportamento detectado. Milhares de
+     * eventos na mesma hora apareciam como um pico falso que esmagava a
+     * escala do grafico. Elas tem painel proprio.
+     */
+    public List<EventosNaHora> eventosPorHora() {
+        return jdbc.query("SELECT DATE_TRUNC('HOUR', timestamp) AS hora, COUNT(*), "
+                        + "SUM(CASE WHEN resultado = 'SUCESSO' THEN 1 ELSE 0 END), "
+                        + "SUM(CASE WHEN resultado = 'FALHA' THEN 1 ELSE 0 END), "
+                        + "SUM(CASE WHEN resultado = 'ALERTA' THEN 1 ELSE 0 END) "
+                        + "FROM log_seguranca WHERE tipo_evento <> 'ANOMALIA_DETECTADA' GROUP BY hora ORDER BY hora",
+                (rs, n) -> new EventosNaHora(rs.getObject(1, LocalDateTime.class), rs.getLong(2), rs.getLong(3),
+                        rs.getLong(4), rs.getLong(5)));
+    }
+
+    public record EventoResumido(long logId, LocalDateTime timestamp, Long usuarioId, String detalhe) {
+    }
+
+    /** Todos os eventos de um tipo, em fluxo, sem as colunas de hash. */
+    public void eventosDoTipo(String tipoEvento, Consumer<EventoResumido> consumidor) {
+        jdbc.query("SELECT log_id, timestamp, usuario_id, detalhe FROM log_seguranca WHERE tipo_evento = ? ORDER BY log_id",
+                rs -> {
+                    long usuario = rs.getLong(3);
+                    Long usuarioId = rs.wasNull() ? null : usuario;
+                    consumidor.accept(new EventoResumido(rs.getLong(1), rs.getObject(2, LocalDateTime.class), usuarioId,
+                            rs.getString(4)));
+                }, tipoEvento);
+    }
+
     public long contarEventos() {
         Long n = jdbc.queryForObject("SELECT COUNT(*) FROM log_seguranca", Long.class);
         return n == null ? 0 : n;

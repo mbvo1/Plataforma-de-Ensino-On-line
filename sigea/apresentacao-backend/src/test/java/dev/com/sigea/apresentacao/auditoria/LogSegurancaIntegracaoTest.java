@@ -176,7 +176,8 @@ class LogSegurancaIntegracaoTest {
     void soAdministrador() throws Exception {
         String aluno = jwt.gerarToken("999", "aluno@sigea.com", "ALUNO");
         for (String url : List.of("/api/admin/auditoria/verificar-integridade", "/api/admin/logs/export",
-                "/api/admin/experimento/rotulos")) {
+                "/api/admin/experimento/rotulos", "/api/admin/dashboard-seguranca/eventos-por-hora",
+                "/api/admin/dashboard-seguranca/anomalias", "/api/admin/dashboard-seguranca/evidencias/avalanche.csv")) {
             int anonimo = mvc.perform(get(url)).andReturn().getResponse().getStatus();
             assertTrue(anonimo == 401 || anonimo == 403, url + " anonimo: " + anonimo);
             mvc.perform(get(url).header("Authorization", "Bearer " + aluno)).andExpect(status().isForbidden());
@@ -288,6 +289,65 @@ class LogSegurancaIntegracaoTest {
         assertEquals(0L, jdbc.queryForObject(
                 "SELECT COUNT(*) FROM log_seguranca WHERE CAST(detalhe AS VARCHAR) LIKE '%@%' OR recurso LIKE '%@%'", Long.class));
         assertEquals("OK", verificar().get("status").asText());
+    }
+
+    @Test
+    @DisplayName("Dashboard: eventos por hora somam o log inteiro menos ANOMALIA_DETECTADA, agregados no banco")
+    void dashboardEventosPorHora() throws Exception {
+        JsonNode pontos = json.readTree(baixar("/api/admin/dashboard-seguranca/eventos-por-hora"));
+        long soma = 0;
+        for (JsonNode p : pontos) {
+            assertEquals(p.get("total").asLong(),
+                    p.get("sucessos").asLong() + p.get("falhas").asLong() + p.get("alertas").asLong());
+            assertTrue(p.get("hora").asText().matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:00:00Z"), p.toString());
+            soma += p.get("total").asLong();
+        }
+        assertEquals(jdbc.queryForObject("SELECT COUNT(*) FROM log_seguranca WHERE tipo_evento <> 'ANOMALIA_DETECTADA'",
+                Long.class), soma, "ANOMALIA_DETECTADA fica fora: o timestamp e o do envio, nao o do comportamento");
+        assertTrue(pontos.size() > 300, "duas semanas de volume ocupam centenas de horas: " + pontos.size());
+    }
+
+    @Test
+    @DisplayName("Dashboard: anomalias de maior score por modelo, ordenadas, com usuario e janela")
+    void dashboardAnomalias() throws Exception {
+        StringBuilder corpo = new StringBuilder("[");
+        double[] scores = {0.10, 0.90, 0.50};
+        for (int i = 0; i < scores.length; i++) {
+            corpo.append(i > 0 ? "," : "").append("{\"usuarioId\":").append(100_200 + i)
+                    .append(",\"inicioJanela\":\"2026-10-09T1").append(i).append(":00:00\",\"fimJanela\":\"2026-10-09T1")
+                    .append(i).append(":05:00\",\"score\":").append(scores[i]).append(",\"modelo\":\"teste_dashboard\"}");
+        }
+        mvc.perform(post("/api/admin/anomalias").header("Authorization", "Bearer " + tokenAdmin)
+                .contentType(MediaType.APPLICATION_JSON).content(corpo.append("]").toString())).andExpect(status().isCreated());
+
+        JsonNode r = json.readTree(baixar("/api/admin/dashboard-seguranca/anomalias?porModelo=2"));
+        assertEquals(3, r.get("porModelo").get("teste_dashboard").asLong());
+        List<JsonNode> doModelo = new java.util.ArrayList<>();
+        r.get("maioresScores").forEach(a -> {
+            if ("teste_dashboard".equals(a.get("modelo").asText())) {
+                doModelo.add(a);
+            }
+        });
+        assertEquals(2, doModelo.size(), "so os 2 maiores");
+        assertEquals(0.90, doModelo.get(0).get("score").asDouble(), 1e-9);
+        assertEquals(0.50, doModelo.get(1).get("score").asDouble(), 1e-9);
+        assertEquals(100_201, doModelo.get(0).get("usuarioId").asLong());
+        assertEquals("2026-10-09T11:00:00", doModelo.get(0).get("janelaInicio").asText());
+    }
+
+    @Test
+    @DisplayName("Dashboard: evidencias so da lista fechada, e iguais ao CSV versionado")
+    void dashboardEvidencias() throws Exception {
+        for (String nome : List.of("avalanche.csv", "frequencia-bytes.csv", "deteccao.csv")) {
+            String servido = baixar("/api/admin/dashboard-seguranca/evidencias/" + nome);
+            String versionado = Files.readString(Paths.get("../evidencias/projeto-2", nome), StandardCharsets.UTF_8);
+            assertEquals(versionado.replace("\r\n", "\n"), servido.replace("\r\n", "\n"), nome);
+        }
+        for (String proibido : List.of("application.properties", "estego.csv", "..%2Fapplication.properties")) {
+            int status = mvc.perform(get("/api/admin/dashboard-seguranca/evidencias/" + proibido)
+                    .header("Authorization", "Bearer " + tokenAdmin)).andReturn().getResponse().getStatus();
+            assertTrue(status == 400 || status == 404, proibido + ": " + status);
+        }
     }
 
     @Test

@@ -105,6 +105,42 @@ versionada. Na prática, entre uma execução com 100.001 eventos e outra com
 100.002, só o ROC-AUC do IsolationForest mudou, de 0,9554 para 0,9555 (execuções
 de 12/11/2026). Os números citados no relatório são os de `deteccao.csv`.
 
+## Fase 6: dashboard
+
+`apresentacao-frontend/public/dashboard-seguranca.html` e `js/dashboard-seguranca.js`.
+A tela fica no menu "Segurança" das telas de admin. Os dados vêm de
+`DashboardSegurancaController` (`/api/admin/dashboard-seguranca/*`, só para
+ADMINISTRADOR) e do endpoint de verificação da Fase 4.
+
+| Painel | Origem |
+|---|---|
+| Eventos por hora | Ao vivo: `log_seguranca`, agregado no banco, sem `ANOMALIA_DETECTADA` |
+| Anomalias detectadas | Ao vivo: `ANOMALIA_DETECTADA`, as 50 de maior score de cada modelo |
+| Avalanche por rodada | Medido: `avalanche.csv` |
+| Distribuição de bytes | Medido: `frequencia-bytes.csv`, em % do total de cada texto |
+| Cadeia de integridade | Ao vivo: `verificar-integridade` |
+| Métricas do detector | Medido: `deteccao.csv` |
+
+- **Painéis medidos mostram os CSVs desta pasta como estão.** O Maven copia
+  `avalanche.csv`, `frequencia-bytes.csv` e `deteccao.csv` para o jar. O endpoint
+  só serve esses três nomes, e um teste confirma que o conteúdo servido é igual
+  ao arquivo versionado. Se um experimento for refeito, a tela muda no build
+  seguinte.
+- **`ANOMALIA_DETECTADA` fica fora de "eventos por hora".** O timestamp desses
+  eventos é o do envio em lote pelo script da Fase 5, não o do comportamento.
+  Eles apareciam como um pico falso de milhares de eventos numa hora só.
+- **Escape.** Nenhum dado do servidor passa por `innerHTML`: texto vai por
+  `textContent` e linhas de tabela por `createElement`. O Chart.js desenha em
+  canvas.
+- **Chart.js 4.4.1 via cdnjs, com SRI.** Se o arquivo do CDN mudar, o navegador
+  recusa o script. Se o CDN cair, os gráficos mostram um aviso e as tabelas
+  continuam funcionando.
+- **Verificação no navegador.** A tela foi aberta no Chrome headless contra o
+  app com o seeder e as anomalias enviadas. Os quatro gráficos e as duas
+  tabelas carregaram. O console só registrou o 403 de `/favicon.ico`, que
+  acontece em todas as telas do SIGEA (o favicon não está na lista de rotas
+  públicas).
+
 ## Variantes da CifraSigea nos CSVs
 
 A cifra mudou duas vezes; os CSVs comparam as três versões sobre os mesmos pares.

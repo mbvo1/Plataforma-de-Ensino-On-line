@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -70,13 +69,8 @@ class AtaqueEstatisticoTest {
     }
 
     private static Corpus carregarCorpus() throws IOException {
-        Path raiz = Paths.get(System.getProperty("corpus.raiz", "../..")).toAbsolutePath().normalize();
-        assertTrue(Files.isRegularFile(raiz.resolve("README.md")), "Raiz do repositorio nao encontrada em " + raiz);
-
-        // git ls-files e nao uma varredura do disco: arquivo ignorado ou nao
-        // versionado (relatorio gerado por ferramenta, rascunho local) mudaria
-        // o corpus de maquina para maquina, e o CSV deixaria de ser reproduzivel.
-        List<Path> arquivos = arquivosVersionados(raiz).stream()
+        Path raiz = RepositorioGit.raiz();
+        List<Path> arquivos = RepositorioGit.arquivosVersionados(raiz).stream()
                 .filter(r -> r.toLowerCase().endsWith(".md"))
                 .filter(r -> !foraDoCorpus(r))
                 .sorted()
@@ -104,19 +98,6 @@ class AtaqueEstatisticoTest {
 
     private static String relativo(Path raiz, Path p) {
         return raiz.relativize(p).toString().replace('\\', '/');
-    }
-
-    private static List<String> arquivosVersionados(Path raiz) throws IOException {
-        Process git = new ProcessBuilder("git", "ls-files", "-z").directory(raiz.toFile()).redirectErrorStream(true).start();
-        String saida = new String(git.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        try {
-            int codigo = git.waitFor();
-            assertEquals(0, codigo, "git ls-files falhou (git precisa estar no PATH): " + saida);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException(e);
-        }
-        return Arrays.stream(saida.split("\0")).filter(s -> !s.isEmpty()).collect(Collectors.toList());
     }
 
     private static boolean foraDoCorpus(String relativo) {

@@ -35,6 +35,9 @@ encontrada não variam.
 | `corpus-estatistico.csv` | `AtaqueEstatisticoTest` | Arquivos que compõem o corpus, tamanhos e SHA-256 do total |
 | `cauda-diagnostico.csv` | `DiagnosticoCaudaTest` | Cauda residual da MixColumns: S-box (H1) x colunas fechadas pela permutação (H2), P livre e P atual |
 | `cauda-pares-ruins.csv` | `DiagnosticoCaudaTest` | Cada par ruim, com a permutação, o confinamento e a uniformidade diferencial da sua chave |
+| `estego.csv` | `ExperimentoEsteganografiaTest` | Fase 3: por capa e ocupação, payload, capacidade usada, PSNR e qui-quadrado LSB (imagem inteira e trecho embutido) |
+| `estego-curva.csv` | `ExperimentoEsteganografiaTest` | Valor-p do qui-quadrado acumulado a cada 5% da imagem, na ordem do embutimento |
+| `estego-capas.csv` | `ExperimentoEsteganografiaTest` | PNGs versionados usados como capa, dimensões, SHA-256 e duplicatas descartadas |
 
 ## Variantes da CifraSigea nos CSVs
 
@@ -81,3 +84,15 @@ Os CSVs de força bruta e estatístico usam só a cifra atual.
   variam muito de uma execução para outra na mesma máquina (o AES, que não
   muda, já variou perto de 2x); compare as duas cifras só dentro da mesma
   execução, nunca entre execuções.
+- **Capas da esteganografia.** Todos os PNGs versionados, sem duplicatas.
+  São capturas de tela: o repositório não tem fotografias. Tela tem áreas de
+  cor chapada e histograma em picos, o caso mais fácil para o detector; o
+  resultado não vale como estimativa para fotos.
+- **Leitura do qui-quadrado LSB.** É a leitura inversa da Fase 2: valor-p
+  perto de 1 significa pares (2k, 2k+1) igualados, ou seja, embutimento
+  provável; perto de 0, imagem com aparência limpa. `nan` indica menos de dois
+  pares com contagem suficiente para o teste.
+- **Embutimento sequencial.** O payload ocupa o começo da imagem. Por isso o
+  CSV traz o valor-p na imagem inteira e só no trecho embutido: um analista
+  que olha a imagem inteira e outro que varre do começo veem coisas
+  diferentes, e `estego-curva.csv` mostra a transição.

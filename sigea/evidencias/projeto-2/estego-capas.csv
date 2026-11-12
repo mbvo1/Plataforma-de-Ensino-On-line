@@ -1,0 +1,47 @@
+arquivo,bytes_arquivo,largura,altura,sha256,uso
+sigea/docs/evidencias/v05/01-testes-curl-antes-do-fix.png,98046,960,1150,ffe7c8a33d54e817326f308951dcb5e7c7c867540414ae73a1303120b7d9d020,capa
+sigea/docs/evidencias/v05/02-payload-html-executado-no-browser.png,19761,1000,500,b45dbb5c698830b55470a868d5bf6efc2e49e6cb33560298b3176d9eaf3c2763,capa
+sigea/docs/evidencias/v05/03-fix-bloqueando-os-mesmos-ataques.png,63750,960,1000,7efe4ed47b165675507263d9f4cd49f2a7b0c69c9e9c4c8e9be061a7eea5904c,capa
+sigea/docs/evidencias/v05/04-codigo-corrigido.png,114497,980,1500,568f8aee3a3702daa4af962e3b741915cd6166e1708544fa2e565ccb5488ad3f,capa
+sigea/docs/evidencias/v05/05-app-rodando.png,14685,1200,800,e43f990cc704ff32a99afaca07376e15a48041cbee0e81d765eca43aee2bfc42,capa
+sigea/docs/evidencias/v06/01-ataques-antes-do-fix.png,94837,980,1250,b677ba0637a662107376954e1b53656437fc6f8bf9cd14e519cb6576e293b5ad,capa
+sigea/docs/evidencias/v06/02-fix-bloqueando-e-golden-path-ok.png,42104,980,650,07a9541a6368f53f8ee52fcdc0ea734681455968a31525d8be7b4373c9d05b62,capa
+sigea/docs/evidencias/v06/03-codigo-corrigido.png,113302,980,1450,2735b291a86f8222be410e3b107a26af822a01d78a040b26c0c10ebd3c18d4ab,capa
+sigea/docs/evidencias/v06/04-app-rodando.png,14685,1200,800,e43f990cc704ff32a99afaca07376e15a48041cbee0e81d765eca43aee2bfc42,duplicata_de_sigea/docs/evidencias/v05/05-app-rodando.png
+sigea/docs/evidencias/v07/01-cpf-em-claro-antes-do-fix.png,29767,1000,420,c1927de62871bf2dc683f8c45596d5b6c7499193067f9c31e16badc8b5c1f561,capa
+sigea/docs/evidencias/v07/02-cpf-cifrado-e-round-trip.png,53858,1020,700,3958c9fcf9823f2becde62ed06b49917548a5c72bf83aa2439ef5f2f0d86ceb4,capa
+sigea/docs/evidencias/v07/03-codigo-corrigido.png,140035,1000,1750,3695a80f47938818af3b63a11fc7925c79008a2160c220ffb87bd1f6405cae42,capa
+sigea/docs/evidencias/v07/04-app-rodando.png,14685,1200,800,e43f990cc704ff32a99afaca07376e15a48041cbee0e81d765eca43aee2bfc42,duplicata_de_sigea/docs/evidencias/v05/05-app-rodando.png
+sigea/evidencias/IA/Reteste ataque bloqueado.png,77375,961,462,6ebe4e55283256f7b7d98240e013a995f6ba16daeb44971d01310a4143f15998,capa
+sigea/evidencias/IA/Reteste nota final.png,208771,1918,927,1436f8677d3b651e42747b684f487aa2b46b9b8196cc56dc74aa785fe858dc90,capa
+sigea/evidencias/IA/Tentativa 1-fracasso.png,27806,1042,150,cd7d21819a441e0aa27bd48a6f48196412375eeada524db28afd7184b4567b57,capa
+sigea/evidencias/IA/Tentativa 2-sucesso.png,43068,1013,232,773c800c5d896894452de4cea691c9e19e3f883b53bbe669cc13dc8a8dca87c1,capa
+sigea/evidencias/IA/reteste confirmação professor.png,39086,956,418,6fa205905ab2e25cfeccff615cf0e38a6389841b56538004f4cea81131c879a7,capa
+sigea/evidencias/IA/reteste sem persistencia automatica.png,213386,1918,927,cb0340f3a3352c0517409a5aa013ebe8417c868cf43f1a840a07d2b6af3ad54d,capa
+sigea/evidencias/V-01/antes.png,104495,1918,873,213aa6b326c29bb4aa5882c4ed29179e249d742b008312311b31645be3a4cab3,capa
+sigea/evidencias/V-01/depois hash ilegivel.png,130405,1918,875,9caf61606b2cb4112f819f3c6a4bb3f8de8b4587eaf8c12debfba808e983ceed,capa
+sigea/evidencias/V-01/depois login funcionando.png,51911,1046,396,c4564a59928e2a7f6ab2d340b7420e248302a186a78cf271be7177ec07908b3d,capa
+sigea/evidencias/V-02/Depois-autorizado.png,78221,953,506,43cacc43fba33027b8e6bbaa0cece7546128a4bd2094621b412548bd90937cc3,capa
+sigea/evidencias/V-02/Depois-bloqueado.png,32038,960,257,9db4d7a172158b5807ecf3f9990aeff8aff4d1e767eefe613bf1aaa2b1b04d57,capa
+sigea/evidencias/V-02/Depois-login.png,46678,940,395,e8db634c349dd873d54d0e3ee9e2ce406c7d6cbbe491f308f2ee3f6234854adc,capa
+sigea/evidencias/V-02/antes.png,20280,963,170,e61a575c4008d6c6ca3f02cdcd9081189f6f68f3679d1acc88c7a1957e4d792b,capa
+sigea/evidencias/V-03/Depois bloqueado.png,74040,1026,518,99b46ecf16f22b7afd9c1d3b23b65f58c1a03ae44d0f124a929d5bc31c0ea6c2,capa
+sigea/evidencias/V-03/antes.png,47934,1046,327,9cf99117ed774c3c0d82d749131ced5a67bb1010e1af5e01b40018e0c23064a3,capa
+sigea/evidencias/V-03/depois autorizado.png,55907,1033,405,3c5c7fc3bf3a307c1ba3cb1fd7bbe9b6b686defe9c971d79c238238131386ded,capa
+sigea/evidencias/V-03/depois put bloqueado.png,33359,1032,221,2fdd2f83d8f97c044c4d3788d4b888842702e7b673ce73d4021c0db1d1679b4c,capa
+sigea/evidencias/V-04/antes.png,100520,1918,872,0c1ad37e6c377fed7b81170bb4cd566b467c32ae6093986849b5f1689cd9c4ef,capa
+sigea/evidencias/V-04/depois.png,162217,1918,1025,e8e2f02b97aaa14f764c563ef980762476ea53c8ce50b342e224edffda14cb62,capa
+sigea/evidencias/V-08/Antes.png,59606,1030,440,8d7021f875aa7cbbb081d54fb33e809192929f4b8f842f0823d3d16a68dd79f4,capa
+sigea/evidencias/V-08/Depois.png,47880,1037,325,d2b4f208416a7bbbfcddc1817edccf8cec1ff5930b6f35a7be97ac906ed79b78,capa
+sigea/evidencias/V-09/reteste-hash-argon2.png,211095,1918,927,2d59a13edfc7c55af681f97d45ba0adcddcd6e48a8c3d3c9c070ad1a33f62163,capa
+sigea/evidencias/V-10/antes-migration.png,27859,728,243,5c05112fd5dc64cbe8f4a233b8d2cb31a99e4326f892a987bd9d7f08fb21b7c1,capa
+sigea/evidencias/V-10/depois-senha-aleatoria.png,45862,1492,292,3cfe20652be504aff3ea4035084a4b7437b331b98c4bb925f538c4e4ff33aa58,capa
+sigea/evidencias/V-10/readme-antes.png,39403,1530,246,c4c0acbd5a4f5cc9f516f9595aaf86e2b393cb89fd5d89d8129246645c062f93,capa
+sigea/evidencias/V-11/antes.png,38995,1502,758,861af12cab0378371998b2f55379c7ef0053e8953638ee35636b1b78aff8ec28,capa
+sigea/evidencias/V-11/depois-adulteracao-detectada.png,32374,1500,203,079d0f0dc3d162dd1975610e070a799b1f569e64c85b9705716b9acca58ee3a8,capa
+sigea/evidencias/V-11/depois-logas-gravados.png,142313,1917,868,c53a8a998fb29f9e418a9d7c09b392334cf7ff502f1d769b2f457270ee7ee732,capa
+sigea/evidencias/V-12/antes.png,88125,1557,586,b5cc4fa7af61e164482645659dfea0d7fecc88c4fe3247ca86a5e44215c4df46,capa
+sigea/evidencias/V-12/depois.png,83511,1565,487,3f691cbb7951962c50fe6a4d2cf765ef1e8b5df86a550a86422794bf9bd792f0,capa
+sigea/evidencias/V-13/antes-alerta.png,153571,1918,922,97f37911da6f96f54fb5cc2f664d10d132e2aa0e752932532787544a2fc87f20,capa
+sigea/evidencias/V-13/antes-tabela-icone-quebrado.png,77165,1918,870,915479a14403f8b5d4c13120baad905b76431a1a6ec5cd1d61572907d2162d15,capa
+sigea/evidencias/V-13/depois.png,153104,1912,971,145ff1830a7c8f3216af7e1f17bce2703772fddd7ef6a5afb0f73120b9293dec,capa

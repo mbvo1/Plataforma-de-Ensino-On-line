@@ -59,6 +59,8 @@ public class AuditoriaSegurancaController {
     static final int MAXIMO_ANOMALIAS_POR_REQUISICAO = 10_000;
     private static final Pattern MODELO_VALIDO = Pattern.compile("[A-Za-z0-9_.-]{1,50}");
     private static final DateTimeFormatter FORMATO_UTC = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'");
+    // LocalDateTime.toString omite os segundos quando sao zero ("08:05"); formato fixo para quem le o log.
+    private static final DateTimeFormatter FORMATO_JANELA = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
 
     private final RegistradorLogSeguranca registrador;
     private final ConsultaLogSeguranca consulta;
@@ -177,11 +179,13 @@ public class AuditoriaSegurancaController {
             Map<String, Object> detalhe = new LinkedHashMap<>();
             detalhe.put("modelo", a.modelo());
             detalhe.put("score", a.score());
-            detalhe.put("janela_inicio", a.inicioJanela().toString());
-            detalhe.put("janela_fim", a.fimJanela().toString());
+            String inicio = FORMATO_JANELA.format(a.inicioJanela());
+            String fim = FORMATO_JANELA.format(a.fimJanela());
+            detalhe.put("janela_inicio", inicio);
+            detalhe.put("janela_fim", fim);
             detalhe.put("reportado_por", admin);
             eventos.add(new NovoEventoSeguranca(TipoEventoSeguranca.ANOMALIA_DETECTADA, a.usuarioId(),
-                    "janela:" + a.inicioJanela() + "/" + a.fimJanela(), requisicao.getRemoteAddr(),
+                    "janela:" + inicio + "/" + fim, requisicao.getRemoteAddr(),
                     ResultadoEvento.ALERTA, json.writeValueAsString(detalhe)));
         }
         List<Long> ids = registrador.registrarTodos(eventos);

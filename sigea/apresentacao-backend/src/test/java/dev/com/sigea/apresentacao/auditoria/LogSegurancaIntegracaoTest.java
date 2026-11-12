@@ -250,6 +250,7 @@ class LogSegurancaIntegracaoTest {
                 resposta.get("primeiroLogId").asLong());
         assertEquals(100123L, ((Number) gravado.get("USUARIO_ID")).longValue());
         assertEquals("ALERTA", gravado.get("RESULTADO"));
+        assertEquals("janela:2026-10-07T20:20:00/2026-10-07T20:25:00", gravado.get("RECURSO"));
         JsonNode detalhe = json.readTree(texto(gravado.get("DETALHE")));
         assertEquals("isolation_forest", detalhe.get("modelo").asText());
         assertEquals(idAdmin, detalhe.get("reportado_por").asLong());

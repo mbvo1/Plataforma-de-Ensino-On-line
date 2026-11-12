@@ -85,6 +85,25 @@ senha vazia), editar uma linha e chamar o endpoint de verificação. O perfil
 | `seeder-incidentes.csv` | `GeradorEventosExperimentaisTest` | Cada incidente injetado: cenário, usuário, início, fim, duração e número de eventos |
 | `seeder-volume.csv` | `LogSegurancaIntegracaoTest` (módulo `apresentacao-backend`) | Gravação real dos 100 mil eventos no H2 via Flyway: tempos e o hash final da cadeia |
 | `fase4-demonstracao-console.txt` | `demo-fase4-console.sh`, execução manual | Transcrição da edição de uma linha pelo console H2 do app real e da resposta do endpoint |
+| `deteccao.csv` | `analise-anomalias/detectar.py` | Fase 5: IsolationForest x z-score contra os rótulos. Precisão, recall, F1, matriz de confusão, ROC-AUC e precisão média; recall por cenário e por incidente |
+| `deteccao-features.csv` | `analise-anomalias/detectar.py` | Média de cada feature por grupo (janelas normais e cada cenário) e a anomalia do enunciado que a feature cobre |
+| `deteccao-zscore-feature-dominante.csv` | `analise-anomalias/detectar.py` | Feature que disparou o z-score, nos acertos e nos falsos positivos |
+| `deteccao-isolation-forest-arvores.csv` | `analise-anomalias/detectar.py` | Em quantas árvores cada feature variou no treino e recebeu corte |
+| `deteccao-entrada.csv` | `analise-anomalias/detectar.py` | Linhas e SHA-256 da exportação de eventos e dos rótulos usados |
+| `fase5-execucao.txt` | `detectar.py --sigea ... --enviar`, execução manual | Transcrição da execução contra o app real, incluindo o envio das anomalias |
+
+## Fase 5: detecção de anomalias
+
+O código está em `analise-anomalias/`, na raiz do repositório. O README de lá
+explica como rodar, as features e as decisões de método. Os CSVs `deteccao*`
+não saem do `mvn test`: são gerados pelo script Python. Eles dependem da entrada
+(cujo SHA-256 fica em `deteccao-entrada.csv`) e das versões fixadas em
+`requirements.txt`. Com a mesma entrada, a saída é idêntica byte a byte. Rodar
+contra o app gera uma entrada um pouco diferente a cada vez, porque o login do
+próprio script entra no log com a hora real. A exportação (27 MB) não está
+versionada. Na prática, entre uma execução com 100.001 eventos e outra com
+100.002, só o ROC-AUC do IsolationForest mudou, de 0,9554 para 0,9555 (execuções
+de 12/11/2026). Os números citados no relatório são os de `deteccao.csv`.
 
 ## Variantes da CifraSigea nos CSVs
 

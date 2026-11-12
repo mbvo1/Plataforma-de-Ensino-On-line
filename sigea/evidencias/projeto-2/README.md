@@ -1,8 +1,10 @@
 # Evidências do Projeto 2
 
-Todos os arquivos desta pasta são gerados por testes em
-`sigea/dominio-principal/src/test/java/dev/com/sigea/dominio/cripto/`. Nenhum é
-editado à mão. Este README não repete números de propósito: a fonte de
+Os CSVs desta pasta são gerados por testes em
+`sigea/dominio-principal/src/test/java/dev/com/sigea/dominio/` e em
+`sigea/apresentacao-backend/src/test/`. Nenhum é editado à mão. A única
+exceção é `fase4-demonstracao-console.txt`, a transcrição de uma demonstração
+manual, que está marcada como tal. Este README não repete números de propósito: a fonte de
 qualquer valor citado no relatório é o CSV, não este texto.
 
 ## Como regenerar
@@ -16,7 +18,45 @@ mvn test -pl dominio-principal -Pexperimentos   # força bruta de 8 a 24 bits (l
 Os testes rodados pelo `mvn test` usam semente fixa e saem idênticos a cada
 execução. A força bruta mede tempo de parede, então os segundos variam de
 máquina para máquina e entre execuções; o número de tentativas e a chave
-encontrada não variam.
+encontrada não variam. O mesmo vale para as colunas `ms_*` de
+`seeder-volume.csv`; nesse arquivo, contagens e `hash_final` não variam.
+
+## Fase 4: log encadeado
+
+| O que | Onde |
+|---|---|
+| Tabela `log_seguranca` | `infraestrutura/.../db/migration/V28__criar_log_seguranca.sql` |
+| Rótulos de verdade, à parte | `V29__criar_rotulo_evento_experimental.sql` |
+| Hash e verificação | `dominio-principal/.../auditoria/CadeiaHashLog.java`, `VerificadorCadeiaLog.java` |
+| Gravação (única porta de escrita) | `infraestrutura/.../auditoria/RegistradorLogSeguranca.java` |
+| Seeder | `infraestrutura/.../auditoria/SeedEventosExperimentais.java` (gera com `GeradorEventosExperimentais`, no domínio) |
+| Endpoints de admin | `apresentacao-backend/.../auditoria/AuditoriaSegurancaController.java` |
+
+Endpoints, todos com `@PreAuthorize("hasRole('ADMINISTRADOR')")`:
+
+- `GET /api/admin/auditoria/verificar-integridade`: devolve `OK` com `hashFinal`, ou
+  `CORROMPIDO` com `logIdCorrompido`, `motivo` e `ultimoLogIdIntegro`. Cada
+  verificação que encontra corrupção grava um `INTEGRIDADE_VIOLADA`.
+- `GET /api/admin/logs/export?desde=&ate=&formato=csv|json`: `desde` é inclusivo,
+  `ate` exclusivo, os dois em UTC e opcionais. A saída não traz rótulo.
+- `POST /api/admin/anomalias`: recebe uma lista de
+  `{usuarioId, inicioJanela, fimJanela, score, modelo}` e grava cada item como
+  `ANOMALIA_DETECTADA`. Aceita no máximo 10 mil itens. Se um item for inválido,
+  nada do lote é gravado.
+- `GET /api/admin/experimento/rotulos?formato=csv|json`: a verdade conhecida, só
+  para a avaliação da Fase 5.
+- `POST /api/admin/experimento/seed?quantidade=&semente=`: vem **desligado**.
+  Para ligar, use `sigea.experimento.seed.endpoint-habilitado=true`.
+
+Seeder no Railway: perfil `seed-eventos` (`SPRING_PROFILES_ACTIVE=seed-eventos`).
+Ele regrava os 100 mil eventos padrão a cada subida. O tamanho vai de 100 mil a
+500 mil e é ajustado por `sigea.experimento.seed.quantidade`.
+
+Demonstração manual do critério de aceite: suba o app com os perfis
+`seed-eventos,console-h2` e rode `demo-fase4-console.sh`. Outra opção é abrir
+`http://localhost:8080/h2-console` (URL `jdbc:h2:file:./sigea`, usuário `sa`,
+senha vazia), editar uma linha e chamar o endpoint de verificação. O perfil
+`console-h2` existe só para isso e nunca deve ir para o Railway.
 
 ## Arquivos
 
@@ -38,6 +78,13 @@ encontrada não variam.
 | `estego.csv` | `ExperimentoEsteganografiaTest` | Fase 3: por capa e ocupação, payload, capacidade usada, PSNR e qui-quadrado LSB (imagem inteira e trecho embutido) |
 | `estego-curva.csv` | `ExperimentoEsteganografiaTest` | Valor-p do qui-quadrado acumulado a cada 5% da imagem, na ordem do embutimento |
 | `estego-capas.csv` | `ExperimentoEsteganografiaTest` | PNGs versionados usados como capa, dimensões, SHA-256 e duplicatas descartadas |
+| `seeder-resumo.csv` | `GeradorEventosExperimentaisTest` | Fase 4: composição do volume padrão do seeder (100 mil eventos), usuários, incidentes, fração anômala |
+| `seeder-tipos.csv` | `GeradorEventosExperimentaisTest` | Eventos por tipo e resultado, normais x rotulados como anômalos |
+| `seeder-horas.csv` | `GeradorEventosExperimentaisTest` | Eventos por hora local (Recife), normais x anômalos |
+| `seeder-dias-semana.csv` | `GeradorEventosExperimentaisTest` | Eventos por dia da semana, normais x anômalos |
+| `seeder-incidentes.csv` | `GeradorEventosExperimentaisTest` | Cada incidente injetado: cenário, usuário, início, fim, duração e número de eventos |
+| `seeder-volume.csv` | `LogSegurancaIntegracaoTest` (módulo `apresentacao-backend`) | Gravação real dos 100 mil eventos no H2 via Flyway: tempos e o hash final da cadeia |
+| `fase4-demonstracao-console.txt` | `demo-fase4-console.sh`, execução manual | Transcrição da edição de uma linha pelo console H2 do app real e da resposta do endpoint |
 
 ## Variantes da CifraSigea nos CSVs
 
@@ -96,3 +143,45 @@ Os CSVs de força bruta e estatístico usam só a cifra atual.
   CSV traz o valor-p na imagem inteira e só no trecho embutido: um analista
   que olha a imagem inteira e outro que varre do começo veem coisas
   diferentes, e `estego-curva.csv` mostra a transição.
+- **Hash do log cobre todas as colunas (desvio do brief, decidido pelo
+  grupo).** A fórmula do brief deixava `ip` e `detalhe` fora do hash. Com ela,
+  editar essas colunas pelo console passaria sem detecção, o que contradiz o
+  critério de aceite. A demonstração manual editou justamente o `ip`. A
+  serialização é canônica: cada campo vai com o comprimento na frente, e nulo
+  fica diferente de vazio. Sem isso, dava para mover caracteres de um campo
+  para outro sem mudar o hash.
+- **Limites da cadeia, documentados e não corrigidos.** O SHA-256 não usa
+  chave. Quem escreve no banco pode refazer todos os hashes a partir da linha
+  alterada, e truncar o fim do log não quebra nenhum elo. Nos dois casos, só
+  a âncora externa (o `hashFinal`, guardado fora do banco) denuncia.
+  `CadeiaHashLogTest.limitesSemAncora` demonstra os dois. A correção seria usar
+  HMAC com a chave fora do banco ou publicar o `hashFinal` periodicamente.
+- **Linha apagada aponta a seguinte.** A linha apagada não existe mais para
+  ser apontada. O endpoint devolve o `log_id` da linha seguinte e mostra o
+  último íntegro, o que deixa o buraco visível.
+- **`timestamp` em UTC.** As horas locais de `seeder-horas.csv` são de Recife
+  (UTC-3, sem horário de verão). A Fase 5 precisa converter antes de calcular
+  `hora_do_dia`.
+- **Eventos com emissão real e eventos só do seeder.** Hoje o app emite de
+  verdade `LOGIN_SUCESSO` e `LOGIN_FALHA` (nas rotas `/api/auth/login` e
+  `/login-admin`, sem gravar o e-mail digitado), além de `ANOMALIA_DETECTADA` e
+  `INTEGRIDADE_VIOLADA`. A CifraSigea ainda não é usada em nenhum fluxo do app,
+  e não existe tela de esteganografia nem de ataques. Por isso `CIFRAGEM_*`,
+  `DECIFRAGEM_*`, `ESTEGO_*` e `ATAQUE_EXECUTADO` só aparecem no volume
+  sintético (decisão do grupo). Integrar a cifra a `AvisoEntity.conteudo`
+  continua pendente; nenhuma fase do brief atribui essa tarefa.
+- **IP dos logins reais.** O app grava `getRemoteAddr`, que no Railway é o IP
+  do proxy. `X-Forwarded-For` não é usado porque pode ser forjado enquanto os
+  proxies confiáveis não estiverem configurados.
+- **Volume sintético.** O período é fixo: duas semanas a partir de 05/10/2026.
+  Os usuários são sintéticos, com ids a partir de 100001, para não colidir com
+  pessoas reais. Os IPs saem só dos blocos de documentação da RFC 5737, e o
+  campo `detalhe` tem o mesmo formato em eventos normais e anômalos. Há falhas
+  benignas: 7% das sessões começam com senha errada, e 0,3% das leituras falham.
+  Sem elas, qualquer falha seria anomalia. `VIOLACAO_INTEGRIDADE` é separável
+  por construção, porque `INTEGRIDADE_VIOLADA` nunca ocorre em uso normal. Os
+  parâmetros foram fixados antes de qualquer detector rodar.
+- **Seeder apaga o log.** Ele recomeça do `log_id` 1, então a mesma semente
+  gera a mesma tabela, hash por hash: o `hash_final` de `seeder-volume.csv` se
+  repete. Isso também apaga eventos reais anteriores, e por isso o endpoint
+  vem desligado.

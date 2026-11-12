@@ -69,6 +69,14 @@
             <artifactId>pdfbox</artifactId>
             <version>3.0.3</version>
         </dependency>
+
+        <!-- Projeto 2, Fase 4: teste de integracao do log encadeado (Flyway +
+             H2 em memoria + endpoints com JWT real). Primeiro teste deste modulo. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

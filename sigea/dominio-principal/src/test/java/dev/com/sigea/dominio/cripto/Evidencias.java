@@ -15,15 +15,16 @@ import java.util.Locale;
  *
  * Regra do brief: nenhum numero vai para o relatorio sem sair de um CSV
  * gerado por execucao real. Por isso os testes de medicao escrevem aqui e
- * nunca so imprimem. Locale.ROOT em toda formatacao: na JVM em pt-BR,
+ * nunca so imprimem. Publica porque os testes da Fase 4 (pacote auditoria)
+ * gravam na mesma pasta. Locale.ROOT em toda formatacao: na JVM em pt-BR,
  * String.format escreveria "49,60" e a virgula decimal quebraria o CSV.
  */
-final class Evidencias {
+public final class Evidencias {
 
     private Evidencias() {
     }
 
-    static Path diretorio() {
+    public static Path diretorio() {
         // O surefire roda com o diretorio do modulo (dominio-principal) como cwd.
         Path dir = Paths.get(System.getProperty("evidencias.dir", "../evidencias/projeto-2"));
         try {
@@ -34,29 +35,29 @@ final class Evidencias {
         return dir;
     }
 
-    static String fmt(String formato, Object... args) {
+    public static String fmt(String formato, Object... args) {
         return String.format(Locale.ROOT, formato, args);
     }
 
     /** Acumula linhas de um CSV e grava de uma vez, com cabecalho. */
-    static final class Csv {
+    public static final class Csv {
         private final String nome;
         private final List<String> linhas = new ArrayList<>();
 
-        Csv(String nome, String cabecalho) {
+        public Csv(String nome, String cabecalho) {
             this.nome = nome;
             linhas.add(cabecalho);
         }
 
-        void linha(String formato, Object... args) {
+        public void linha(String formato, Object... args) {
             linhas.add(fmt(formato, args));
         }
 
-        int linhasDeDados() {
+        public int linhasDeDados() {
             return linhas.size() - 1;
         }
 
-        Path gravar() {
+        public Path gravar() {
             Path arquivo = diretorio().resolve(nome);
             try {
                 Files.write(arquivo, linhas, StandardCharsets.UTF_8);

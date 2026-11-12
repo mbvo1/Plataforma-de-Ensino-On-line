@@ -1,0 +1,17 @@
+metrica,valor
+quantidade,100000
+semente,1592598566
+periodo_inicio_local,2026-10-05
+periodo_dias,14
+usuarios_sinteticos,625
+usuarios_com_eventos,617
+turmas,20
+incidentes,50
+eventos_rotulados_anomalos,2899
+fracao_anomala_pct,2.8990
+eventos_forca_bruta_login,354
+eventos_falhas_decifragem,265
+eventos_violacao_integridade,23
+eventos_acesso_atipico,541
+eventos_geracao_automatizada,1716
+sucesso_pct,98.3640

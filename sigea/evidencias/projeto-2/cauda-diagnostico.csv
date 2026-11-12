@@ -1,0 +1,11 @@
+hipotese,grupo,pares,pares_abaixo_32_bits,pct_abaixo_32_bits,media_pct
+H2_permutacao,menor_conjunto_fechado_1_colunas,10,10,100.0000,12.1875
+H2_permutacao,menor_conjunto_fechado_2_colunas,3,1,33.3333,24.2188
+H2_permutacao,menor_conjunto_fechado_3_colunas,31,0,0.0000,36.2651
+H2_permutacao,menor_conjunto_fechado_4_colunas,19956,1,0.0050,49.9991
+H1_sbox,uniformidade_diferencial_8,1,0,0.0000,
+H1_sbox,uniformidade_diferencial_10,7954,5,0.0629,
+H1_sbox,uniformidade_diferencial_12,10751,6,0.0558,
+H1_sbox,uniformidade_diferencial_14,1213,1,0.0824,
+H1_sbox,uniformidade_diferencial_16,75,0,0.0000,
+H1_sbox,uniformidade_diferencial_18,6,0,0.0000,

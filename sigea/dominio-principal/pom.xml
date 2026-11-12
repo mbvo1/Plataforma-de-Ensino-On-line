@@ -68,4 +68,52 @@
     <version>1.78.1</version>
 </dependency>
     </dependencies>
+
+    <!-- Testes marcados @Tag("experimento") medem custo real (a forca bruta
+         de 24 bits leva minutos) e ficam fora do mvn test do dia a dia, que
+         tem de continuar rapido para ser rodado antes de todo commit.
+         Rodar as medicoes longas com: mvn test -pl dominio-principal -Pexperimentos -->
+    <properties>
+        <testes.grupos></testes.grupos>
+        <testes.excluidos>experimento</testes.excluidos>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <groups>${testes.grupos}</groups>
+                    <excludedGroups>${testes.excluidos}</excludedGroups>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>experimentos</id>
+            <properties>
+                <testes.grupos>experimento</testes.grupos>
+                <testes.excluidos></testes.excluidos>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- Com o filtro de tag, a suite Cucumber nao descobre nenhum
+                                 cenario e o junit-platform-suite trata suite vazia como erro.
+                                 Ela continua rodando no mvn test padrao. -->
+                            <excludes>
+                                <exclude>**/RunCucumberTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

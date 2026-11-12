@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -38,12 +37,6 @@ class DiagnosticoDifusaoTest {
     private static final int RODADAS = 10;
     private static final int LIMIAR_RUIM_BITS = 32;
 
-    static Path diretorioEvidencias() throws IOException {
-        Path dir = Paths.get(System.getProperty("evidencias.dir", "../evidencias/projeto-2"));
-        Files.createDirectories(dir);
-        return dir;
-    }
-
     @Test
     @DisplayName("Diagnostico da camada de difusao: 20.000 pares, 10 rodadas, bloco unico, por byte")
     void compararCamadas() throws IOException {
@@ -73,7 +66,7 @@ class DiagnosticoDifusaoTest {
 
             for (int c = 0; c < k; c++) {
                 CifraSigea cifra = new CifraSigea(chave, RODADAS, camadas[c]);
-                int d = distanciaHamming(cifra.cifrarBlocoUnico(bloco, nonce), cifra.cifrarBlocoUnico(vizinho, nonce));
+                int d = Estatistica.distanciaHamming(cifra.cifrarBlocoUnico(bloco, nonce), cifra.cifrarBlocoUnico(vizinho, nonce));
                 soma[c] += d;
                 somaQuadrados[c] += (long) d * d;
                 min[c] = Math.min(min[c], d);
@@ -102,7 +95,7 @@ class DiagnosticoDifusaoTest {
             System.out.println("[DiagnosticoDifusao] " + camadas[c] + " ruins por byte: " + java.util.Arrays.toString(ruinsPorByte[c]));
         }
 
-        Path dir = diretorioEvidencias();
+        Path dir = Evidencias.diretorio();
         Files.write(dir.resolve("difusao-comparacao.csv"), resumo, StandardCharsets.UTF_8);
         Files.write(dir.resolve("difusao-ruins-por-byte.csv"), porByte, StandardCharsets.UTF_8);
 
@@ -112,13 +105,5 @@ class DiagnosticoDifusaoTest {
         }
         assertEquals(PARES, java.util.Arrays.stream(paresPorByte).sum());
         assertTrue(Files.size(dir.resolve("difusao-comparacao.csv")) > 0);
-    }
-
-    static int distanciaHamming(byte[] a, byte[] b) {
-        int d = 0;
-        for (int i = 0; i < a.length; i++) {
-            d += Integer.bitCount((a[i] ^ b[i]) & 0xFF);
-        }
-        return d;
     }
 }

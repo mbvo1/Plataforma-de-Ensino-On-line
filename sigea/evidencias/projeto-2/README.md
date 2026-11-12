@@ -144,6 +144,13 @@ Os CSVs de força bruta e estatístico usam só a cifra atual.
   `Topicos`). Por decisão do grupo, o corpus é o conjunto dos arquivos `.md`
   versionados no repositório (`git ls-files`), sem blocos de código e sem esta
   pasta. É português real, mas prosa técnica, não aviso de turma.
+  Efeito colateral: versionar um `.md` novo muda o corpus. Também mudam as
+  linhas `10KB_letra_A`, porque chave e nonces saem de um fluxo aleatório que
+  o corpus consome antes. Foi o que aconteceu quando a Fase 5 versionou
+  `analise-anomalias/README.md` (681 para 696 mensagens). `corpus-estatistico.csv`
+  registra o SHA-256 do corpus de cada geração. As variações são de amostra
+  única: com 255 graus de liberdade, um valor-p abaixo de 0,05 aparece em 5%
+  das amostras de uma fonte uniforme. Um valor-p isolado não é sinal de viés.
 - **Força bruta.** Uma thread, varredura completa do espaço (pior caso), com
   um par texto claro/texto cifrado conhecido como oráculo. Cada candidata da
   CifraSigea paga a geração da S-box e da permutação. As chaves por segundo

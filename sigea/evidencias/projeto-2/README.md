@@ -96,6 +96,7 @@ senha vazia), editar uma linha e chamar o endpoint de verificação. O perfil
 | `deteccao-zscore-feature-dominante.csv` | `analise-anomalias/detectar.py` | Feature que disparou o z-score, nos acertos e nos falsos positivos |
 | `deteccao-isolation-forest-arvores.csv` | `analise-anomalias/detectar.py` | Em quantas árvores cada feature variou no treino e recebeu corte |
 | `deteccao-entrada.csv` | `analise-anomalias/detectar.py` | Linhas e SHA-256 da exportação de eventos e dos rótulos usados |
+| `deteccao-entrada-eventos.csv.gz`, `deteccao-entrada-rotulos.csv.gz` | Exportação da Fase 5 (`/api/admin/logs/export` e `/experimento/rotulos`), comprimida com `gzip -9 -n` | A entrada congelada que gerou os CSVs `deteccao*`; os SHA-256 descomprimidos são os de `deteccao-entrada.csv` |
 | `fase5-execucao.txt` | `detectar.py --sigea ... --enviar`, execução manual | Transcrição da execução contra o app real, incluindo o envio das anomalias |
 | `demo-apresentacao-saida.txt` | `demo-apresentacao.sh`, execução manual | Ensaio da apresentação de ponta a ponta, em banco novo: cifra no banco, adulterações, log, detecção e painel |
 
@@ -107,20 +108,28 @@ não saem do `mvn test`: são gerados pelo script Python. Eles dependem da entra
 (cujo SHA-256 fica em `deteccao-entrada.csv`) e das versões fixadas em
 `requirements.txt`. Com a mesma entrada, a saída é idêntica byte a byte. Rodar
 contra o app gera uma entrada um pouco diferente a cada vez, porque o login do
-próprio script entra no log com a hora real. A exportação (27 MB) não está
-versionada. Na prática, entre uma execução com 100.001 eventos e outra com
+próprio script entra no log com a hora real. A exportação que gerou os números do
+relatório está versionada, comprimida, em `deteccao-entrada-eventos.csv.gz` e
+`deteccao-entrada-rotulos.csv.gz`; descomprimidas, elas têm os SHA-256 de
+`deteccao-entrada.csv`, e o detector rodado sobre elas reproduz os CSVs `deteccao*`
+byte a byte. Na prática, entre uma execução com 100.001 eventos e outra com
 100.002, só o ROC-AUC do IsolationForest mudou, de 0,9554 para 0,9555 (execuções
 de 12/11/2026). Os números citados no relatório são os de `deteccao.csv`.
 
-O ensaio da apresentação (`demo-apresentacao-saida.txt`, 16/11/2026) rodou o
-detector com `--saida` numa pasta temporária, sobre 100.007 eventos: os 100 mil
-do seeder mais os eventos reais da própria demonstração (logins, cifragem e
-decifragem do aviso, verificações). Isso dá 22.466 janelas, uma a mais que em
-`deteccao.csv`. O z-score quase não mudou (1.566 janelas marcadas, contra 1.565).
-O IsolationForest marcou 1.986, contra 1.870, com o mesmo recall: a janela a mais
-muda as subamostras sorteadas para cada árvore. É uma medida da instabilidade do
-modelo diante de mudanças mínimas na entrada, não um ajuste. O ensaio repetido
-em outro banco novo deu os mesmos números.
+**Por que a demonstração usa a entrada congelada.** O script treina os modelos a
+cada execução. Rodado sobre o log ao vivo, ele treina sobre um conjunto que passa
+a incluir os eventos da própria demonstração (logins, cifragem e decifragem do
+aviso, verificações), com o horário real dela, e a fronteira de decisão do
+IsolationForest se desloca. Nos primeiros ensaios de 16/11/2026, com 100.007
+eventos e 22.466 janelas, ele marcou 1.986 janelas em duas execuções feitas na
+mesma hora e 1.936 numa terceira, uma hora depois; o z-score marcou 1.566 nas três.
+As duas primeiras só coincidiram porque rodaram na mesma hora. Por isso
+`demo-apresentacao.sh` passou a rodar o detector sobre a entrada congelada (com
+`--sigea` junto de `--eventos` e `--rotulos`, nada é exportado; o app só recebe as
+anomalias), com `--saida` numa pasta temporária fora do repositório. Assim a
+demonstração reproduz `deteccao.csv` byte a byte e envia ao painel as mesmas 1.870 +
+1.565 janelas. Duas execuções em bancos novos deram a mesma saída, fora tempo e
+texto cifrado (`demo-apresentacao-saida.txt`).
 
 ## Fase 6: dashboard
 
@@ -205,6 +214,14 @@ avisos e tópicos vai para o banco cifrado pela CifraSigea.
   real, a 1400 e a 390 px: JPG recusado, aviso escondido numa foto convertida
   para PNG, PNG baixado, extraído e decifrado para o texto original. Um `<script>`
   no conteúdo do aviso apareceu como texto.
+
+- **XSS das telas de avisos, corrigido.** As telas de avisos de admin, professor e
+  aluno, anteriores ao projeto, montavam os cards com `innerHTML` sem escape, e
+  qualquer usuário logado pode publicar aviso. Num teste com o código antigo, um aluno
+  publicou `<img src=x onerror=alert(1)>`, que executou nas três telas. Agora título,
+  conteúdo, escopo e data passam pelo `escapeHtml` já usado no projeto (mitigação da
+  V-13), e os mesmos payloads aparecem como texto, sem executar (relatório, seção 9,
+  achado 7).
 
 `ATAQUE_EXECUTADO` continua só no volume sintético: os ataques rodam como testes
 (`mvn test`), não no app.

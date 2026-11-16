@@ -77,8 +77,8 @@ def itens_para_envio(janelas: pd.DataFrame, d: modelos.Deteccao) -> list[dict]:
 def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--sigea", help="URL base do SIGEA, ex.: http://localhost:8080")
-    p.add_argument("--eventos", type=Path, help="CSV de /api/admin/logs/export (sem --sigea)")
-    p.add_argument("--rotulos", type=Path, help="CSV de /api/admin/experimento/rotulos (sem --sigea)")
+    p.add_argument("--eventos", type=Path, help="CSV de /api/admin/logs/export (com --sigea: nao exporta, so envia)")
+    p.add_argument("--rotulos", type=Path, help="CSV de /api/admin/experimento/rotulos (com --sigea: nao exporta, so envia)")
     p.add_argument("--enviar", action="store_true", help="devolve as janelas marcadas via POST /api/admin/anomalias")
     p.add_argument("--saida", type=Path, help=f"pasta dos CSVs de resultado (padrao: {EVIDENCIAS})")
     a = p.parse_args(argv)
@@ -87,7 +87,13 @@ def main(argv: list[str]) -> int:
         saida = a.saida
 
     cliente = None
-    if a.sigea:
+    if a.sigea and a.eventos and a.rotulos:
+        # Entrada congelada (a mesma do relatorio) e envio ao app: nada e
+        # exportado. Retreinar sobre o log ao vivo incluiria os eventos da
+        # propria demonstracao, com o horario dela, e deslocaria a fronteira
+        # do IsolationForest; com a entrada fixa, o resultado e o versionado.
+        cliente = ClienteSigea(a.sigea)
+    elif a.sigea:
         cliente = ClienteSigea(a.sigea)
         a.eventos = cliente.exportar_eventos(DADOS / "log-seguranca.csv")
         a.rotulos = cliente.exportar_rotulos(DADOS / "rotulos.csv")

@@ -86,12 +86,19 @@ h2 "UPDATE log_seguranca SET ip = '$IP' WHERE log_id = 54321" | grep -o 'Update 
 curl -s -H "$H" $B/api/admin/auditoria/verificar-integridade | cut -c1-80; echo
 
 echo
-echo "== 6. deteccao em Python contra o log ao vivo, devolvendo as anomalias ao SIGEA"
+echo "== 6. deteccao em Python sobre a entrada congelada do relatorio, devolvendo as anomalias ao SIGEA"
+# Entrada versionada (a mesma que gerou deteccao.csv), e nao o log ao vivo: retreinar
+# sobre o log ao vivo incluiria os eventos desta demonstracao e mudaria o resultado.
+EVID="$REPO/sigea/evidencias/projeto-2"
 SAIDA=$(mktemp -d)
 ( cd "$REPO/analise-anomalias" && SIGEA_ADMIN_EMAIL=$ADMIN_EMAIL SIGEA_ADMIN_SENHA=$ADMIN_SENHA \
-    .venv/Scripts/python detectar.py --sigea $B --enviar --saida "$SAIDA" ) | grep -v "^\[Evidencias\]"
-echo "-- metricas desta execucao (pasta temporaria; as versionadas nao foram tocadas)"
+    .venv/Scripts/python detectar.py --sigea $B --enviar --saida "$SAIDA" \
+    --eventos "$EVID/deteccao-entrada-eventos.csv.gz" --rotulos "$EVID/deteccao-entrada-rotulos.csv.gz" ) \
+  | grep -v "^\[Evidencias\]"
+echo "-- metricas desta execucao (pasta temporaria fora do repositorio)"
 cut -d, -f1-9 "$SAIDA/deteccao.csv" | head -3
+cmp -s "$SAIDA/deteccao.csv" "$EVID/deteccao.csv" && echo "deteccao.csv identico ao versionado" || echo "deteccao.csv DIFERENTE do versionado"
+rm -rf "$SAIDA"
 
 echo
 echo "== 7. painel de seguranca le as anomalias e a cadeia"

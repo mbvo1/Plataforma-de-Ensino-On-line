@@ -1,3 +1,12 @@
+// Mitigacao V-13 (XSS): converte caracteres HTML perigosos em texto
+// literal antes de inserir no innerHTML.
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
+}
+
 // View-only avisos loader for professors (based on admin avisos view)
 window.addEventListener('DOMContentLoaded', () => {
     const usuarioId = localStorage.getItem('usuarioId');
@@ -66,14 +75,14 @@ function exibirAvisos(avisos) {
                 <i class="fas fa-times"></i>
             </button>
             <div class="aviso-header">
-                <h3>${aviso.titulo || ''} ${badgeLido}</h3>
-                <div class="aviso-data">${aviso.dataExpiracao || ''}</div>
+                <h3>${escapeHtml(aviso.titulo)} ${badgeLido}</h3>
+                <div class="aviso-data">${escapeHtml(aviso.dataExpiracao)}</div>
             </div>
             <div class="aviso-body">
-                <p>${aviso.conteudo || ''}</p>
+                <p>${escapeHtml(aviso.conteudo)}</p>
             </div>
             <div class="aviso-footer">
-                <span class="aviso-destinatarios"><i class="fas fa-users"></i> ${aviso.escopo || 'Geral'}</span>
+                <span class="aviso-destinatarios"><i class="fas fa-users"></i> ${escapeHtml(aviso.escopo || 'Geral')}</span>
             </div>
         </div>
     `;

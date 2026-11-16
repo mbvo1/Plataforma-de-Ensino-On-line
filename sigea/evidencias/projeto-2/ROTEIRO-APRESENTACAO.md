@@ -12,8 +12,14 @@ Cada passo foi ensaiado do zero em banco novo; o resultado esperado está em
    mkdir -p ~/demo-sigea && cd ~/demo-sigea && rm -f sigea.mv.db
    JWT_SECRET=<32+ caracteres> GEMINI_API_KEY=x CPF_ENCRYPTION_KEY=<qualquer> \
      java -jar <repo>/sigea/apresentacao-backend/target/sigea-apresentacao-backend-1.0.0-SNAPSHOT.jar \
-     --spring.profiles.active=seed-eventos,console-h2 > app.log 2>&1 &
+     --spring.profiles.active=seed-eventos --spring.h2.console.enabled=true > app.log 2>&1 &
    ```
+
+   O console H2 continua desligado no `application.properties` (a correção da V-04 do
+   Projeto 1). A flag `--spring.h2.console.enabled=true` liga o console só nesta execução
+   local. Comando testado em 16/11/2026: o `app.log` mostrou `H2 console available at
+   '/h2-console'`, o console abriu e conectou no Chrome, e as edições pelo console do
+   passo 2 e do passo 3 funcionaram.
 
    O app está pronto quando `app.log` mostrar `Seeder: 100000 eventos` e `Started`
    (perto de 30 s).
@@ -30,7 +36,8 @@ Cada passo foi ensaiado do zero em banco novo; o resultado esperado está em
 
 4. Deixe um terminal aberto em `analise-anomalias/`, com a `.venv` instalada.
 
-5. **Não use o perfil `console-h2` no Railway.** Ele existe só para a demonstração local.
+5. **Nunca passe `--spring.h2.console.enabled=true` no Railway.** O console executa SQL
+   arbitrário no banco; a flag existe só para a demonstração local.
 
 ## Roteiro (cerca de 15 minutos)
 
@@ -150,7 +157,7 @@ SIGEA_ADMIN_EMAIL=admin@sigea.com SIGEA_ADMIN_SENHA=admin123 \
 |---|---|
 | App não sobe | Confira as três variáveis de ambiente. Mostre `demo-apresentacao-saida.txt`, que é o mesmo roteiro já executado |
 | Gráficos não aparecem | O Chart.js vem de CDN. Sem internet, os gráficos mostram um aviso e as tabelas continuam funcionando |
-| Console H2 não abre | Confira o perfil `console-h2` e a URL `jdbc:h2:file:./sigea`. Alternativa: rode `bash evidencias/projeto-2/demo-apresentacao.sh <repo>` noutro terminal |
+| Console H2 não abre | Confira se o app subiu com `--spring.h2.console.enabled=true` (o `app.log` mostra `H2 console available`) e a URL `jdbc:h2:file:./sigea`. Alternativa: rode `bash evidencias/projeto-2/demo-apresentacao.sh <repo>` noutro terminal |
 | Python falha | Mostre `fase5-execucao.txt` e o painel de métricas, que lê o `deteccao.csv` versionado |
 | Aviso adulterado não decifra mais | É o esperado depois do passo 2. Publique outro para o passo 4 |
 

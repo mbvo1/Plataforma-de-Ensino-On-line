@@ -6,7 +6,8 @@
 # Uso, numa pasta de trabalho vazia (o banco ./sigea.mv.db nasce nela):
 #   JWT_SECRET=<32+ bytes> GEMINI_API_KEY=x CPF_ENCRYPTION_KEY=<qualquer> \
 #     java -jar <repo>/sigea/apresentacao-backend/target/sigea-apresentacao-backend-1.0.0-SNAPSHOT.jar \
-#     --server.port=18080 --spring.profiles.active=seed-eventos,console-h2 > app.log 2>&1 &
+#     --server.port=18080 --spring.profiles.active=seed-eventos --spring.h2.console.enabled=true > app.log 2>&1 &
+# (a flag liga o console H2 so nesta execucao local; no application.properties ele fica desligado)
 #   bash <repo>/sigea/evidencias/projeto-2/demo-apresentacao.sh <repo>
 #
 # Usa o admin padrao do seed do banco (admin@sigea.com). O token JWT so

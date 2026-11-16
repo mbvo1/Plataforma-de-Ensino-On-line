@@ -165,7 +165,7 @@ Todos saem dos CSVs desta pasta.
 | Pares abaixo de 32 bits: cadeia dupla do brief / versão atual | 92 de 20.000 / 0 | `difusao-comparacao.csv` |
 | Força bruta de 24 bits: CifraSigea / AES | 472,5 s / 46,4 s | `forca-bruta.csv` |
 | 2^256 a 10^12 chaves/s | 3,67 × 10^57 anos | `forca-bruta-extrapolacao.csv` |
-| Entropia: português / CifraSigea / AES | 5,02 / 7,9988 / 7,9986 bits por byte | `estatistico.csv` |
+| Entropia: português / CifraSigea / AES | 5,02 / 7,9987 / 7,9986 bits por byte | `estatistico.csv` |
 | Blocos repetidos em 10 KB de "A": ECB / CBC | 639 de 640 / 0 | `estatistico.csv` |
 | PSNR com a imagem cheia (pior capa) | 51,13 dB | `estego.csv` |
 | Eventos / incidentes / eventos rotulados | 100.000 / 50 / 2.899 | `seeder-resumo.csv` |

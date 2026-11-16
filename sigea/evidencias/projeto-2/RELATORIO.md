@@ -189,30 +189,31 @@ quantos dos 128 bits do bloco cifrado mudaram.
 ### 4.3 Estatístico (`estatistico.csv`, `frequencia-bytes.csv`)
 
 O texto de teste reúne 21 arquivos `.md` em português versionados no repositório,
-126.898 bytes ao todo. Cada parágrafo é cifrado como uma mensagem separada, com nonce
-próprio: 702 mensagens (`corpus-estatistico.csv`).
+125.186 bytes ao todo. Cada parágrafo é cifrado como uma mensagem separada, com nonce
+próprio: 696 mensagens (`corpus-estatistico.csv`).
 
 | Fonte | Bytes | Qui-quadrado (255 g.l.) | Valor-p | Entropia (bits/byte) | Índice de coincidência | Blocos de 16 repetidos |
 |---|---|---|---|---|---|---|
-| Texto claro | 126.898 | 1.492.894,6 | 0 | 5,02 | 0,0499 | 366 de 7.931 |
-| CifraSigea (CBC) | 132.704 | 222,5 | 0,930 | 7,9988 | 0,00391 | 0 |
-| AES-256-GCM | 138.130 | 269,4 | 0,256 | 7,9986 | 0,00391 | 0 |
+| Texto claro | 125.186 | 1.472.148,4 | 0 | 5,02 | 0,0498 | 366 de 7.824 |
+| CifraSigea (CBC) | 130.928 | 230,4 | 0,864 | 7,9987 | 0,00391 | 0 |
+| AES-256-GCM | 136.322 | 259,9 | 0,403 | 7,9986 | 0,00391 | 0 |
 
 O índice de coincidência dos dois textos cifrados fica em 1/256 ≈ 0,00391, o valor de
-bytes uniformes. O do português é 0,0499.
+bytes uniformes. O do português é 0,0498.
 
 **10 KB da letra "A":**
 - Em CBC e em GCM, nenhum bloco de 16 bytes se repetiu (0 de 641).
 - No ECB emulado, com a mesma cifra, 639 de 640 blocos se repetiram e a entropia caiu
-  para 3,875 bits por byte, nas duas cifras.
+  para 4,0 bits por byte, nas duas cifras.
 
 É a demonstração de por que o modo de operação importa tanto quanto a cifra.
 
 **Um valor-p não é veredito.** Na linha "10 KB de A" da CifraSigea em CBC, o valor-p foi
-0,046 numa geração e 0,480 na seguinte. A cifra era a mesma; mudaram a chave e os nonces
-sorteados, porque o gerador aleatório do teste é consumido antes pelo texto de teste, que
-ganhou arquivos. Para uma fonte uniforme, um valor-p abaixo de 0,05 aparece em 5% das
-amostras. As duas gerações estão no histórico do git.
+0,046 com o texto de teste em 696 mensagens, 0,480 quando ele passou a 702 e de novo 0,046
+quando voltou a 696. A cifra era a mesma. O gerador aleatório do teste é consumido antes
+pelo texto de teste, então o número de mensagens decide a chave e os nonces sorteados para
+essa linha. Para uma fonte uniforme, um valor-p abaixo de 0,05 aparece em 5% das amostras.
+As três gerações estão no histórico do git.
 
 ## 5. Esteganografia (`estego.csv`)
 

@@ -5,10 +5,17 @@ import dev.com.sigea.apresentacao.autenticacao.dto.AuthResponse;
 import dev.com.sigea.apresentacao.autenticacao.dto.LoginRequest;
 import dev.com.sigea.apresentacao.autenticacao.dto.RegistroRequest;
 import dev.com.sigea.apresentacao.seguranca.JwtUtil;
+import dev.com.sigea.dominio.auditoria.NovoEventoSeguranca;
+import dev.com.sigea.dominio.auditoria.ResultadoEvento;
+import dev.com.sigea.dominio.auditoria.TipoEventoSeguranca;
 import dev.com.sigea.dominio.usuario.AutenticacaoService;
 import dev.com.sigea.dominio.usuario.Perfil;
 import dev.com.sigea.dominio.usuario.Usuario;
 import dev.com.sigea.dominio.usuario.UsuarioRepository;
+import dev.com.sigea.infraestrutura.auditoria.RegistradorLogSeguranca;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,24 +28,32 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AutenticacaoController {
 
-    private final AutenticacaoService autenticacaoService;
-    private final JwtUtil jwtUtil;
+    private static final Logger LOG = LoggerFactory.getLogger(AutenticacaoController.class);
 
-    public AutenticacaoController(UsuarioRepository usuarioRepository, JwtUtil jwtUtil) {
+    private final AutenticacaoService autenticacaoService;
+    private final UsuarioRepository usuarioRepository;
+    private final JwtUtil jwtUtil;
+    private final RegistradorLogSeguranca registradorLog;
+
+    public AutenticacaoController(UsuarioRepository usuarioRepository, JwtUtil jwtUtil,
+                                  RegistradorLogSeguranca registradorLog) {
         this.autenticacaoService = new AutenticacaoService(usuarioRepository);
+        this.usuarioRepository = usuarioRepository;
         this.jwtUtil = jwtUtil;
+        this.registradorLog = registradorLog;
     }
 
     /**
      * POST /api/auth/login - Autentica um aluno
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest http) {
         try {
             Usuario usuario = autenticacaoService.autenticar(
                 request.getEmail(),
                 request.getSenha()
             );
+            registrarLogin(true, idDe(usuario), "/api/auth/login", http, null);
 
             String token = jwtUtil.gerarToken(
                 usuario.getId().valor().toString(),
@@ -57,9 +72,11 @@ public class AutenticacaoController {
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
+            registrarLogin(false, idPorEmail(request.getEmail()), "/api/auth/login", http, "credenciais_invalidas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(e.getMessage()));
         } catch (IllegalStateException e) {
+            registrarLogin(false, idPorEmail(request.getEmail()), "/api/auth/login", http, "usuario_inativo");
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getMessage()));
         }
@@ -112,7 +129,7 @@ public class AutenticacaoController {
      * POST /api/auth/login-admin - Autentica um administrador com email, CPF e senha
      */
     @PostMapping("/login-admin")
-    public ResponseEntity<?> loginAdmin(@RequestBody AdminLoginRequest request) {
+    public ResponseEntity<?> loginAdmin(@RequestBody AdminLoginRequest request, HttpServletRequest http) {
         try {
             Usuario usuario = autenticacaoService.autenticar(
                 request.getEmail(),
@@ -120,10 +137,14 @@ public class AutenticacaoController {
             );
 
             if (usuario.getPerfil() != Perfil.ADMINISTRADOR) {
+                // Senha certa, porta errada: conta como falha, e a mais
+                // interessante para a Fase 5 (aluno tentando a tela de admin).
+                registrarLogin(false, idDe(usuario), "/api/auth/login-admin", http, "perfil_nao_administrador");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new ErrorResponse("Acesso negado. Apenas administradores podem fazer login aqui."));
             }
 
+            registrarLogin(true, idDe(usuario), "/api/auth/login-admin", http, null);
             String token = jwtUtil.gerarToken(
                 usuario.getId().valor().toString(),
                 usuario.getEmail(),
@@ -141,11 +162,60 @@ public class AutenticacaoController {
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
+            registrarLogin(false, idPorEmail(request.getEmail()), "/api/auth/login-admin", http, "credenciais_invalidas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse("Credenciais inválidas. Verifique email, CPF e senha."));
         } catch (IllegalStateException e) {
+            registrarLogin(false, idPorEmail(request.getEmail()), "/api/auth/login-admin", http, "usuario_inativo");
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    /**
+     * Fase 4: LOGIN_SUCESSO / LOGIN_FALHA no log de seguranca.
+     *
+     * O e-mail digitado nao vai para o log, nem em falha: o log e exportado
+     * para analise, e um e-mail digitado errado costuma ser o e-mail certo
+     * de outra conta ou a senha no campo errado. Quando o e-mail existe, o
+     * usuario_id basta para a Fase 5 contar falhas por usuario.
+     *
+     * Falha ao gravar o log nao derruba o login (fail-open): um banco de log
+     * com problema nao deve trancar todo mundo para fora. O erro vai para o
+     * log da aplicacao.
+     *
+     * IP: getRemoteAddr. Atras do proxy do Railway e o IP do proxy;
+     * X-Forwarded-For seria o do cliente, mas e forjavel sem configurar
+     * quais proxies sao confiaveis - fica como pendencia, nao improvisado.
+     */
+    private void registrarLogin(boolean sucesso, Long usuarioId, String recurso, HttpServletRequest http, String motivo) {
+        try {
+            registradorLog.registrar(new NovoEventoSeguranca(
+                sucesso ? TipoEventoSeguranca.LOGIN_SUCESSO : TipoEventoSeguranca.LOGIN_FALHA,
+                usuarioId, recurso, http.getRemoteAddr(),
+                sucesso ? ResultadoEvento.SUCESSO : ResultadoEvento.FALHA,
+                motivo == null ? null : "{\"motivo\":\"" + motivo + "\"}"));
+        } catch (RuntimeException e) {
+            LOG.error("Falha ao registrar evento de login no log de seguranca", e);
+        }
+    }
+
+    private Long idPorEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        try {
+            return usuarioRepository.buscarPorEmail(email).map(AutenticacaoController::idDe).orElse(null);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    private static Long idDe(Usuario usuario) {
+        try {
+            return Long.valueOf(usuario.getId().valor());
+        } catch (RuntimeException e) {
+            return null;
         }
     }
 

@@ -21,7 +21,9 @@ public class TopicoEntity {
     @Column(name = "titulo", nullable = false)
     private String titulo;
     
+    // Projeto 2: cifrado em repouso com a CifraSigea (ver CifraConteudo).
     @Column(name = "conteudo", columnDefinition = "TEXT")
+    @Convert(converter = ConteudoCifradoTopicoConverter.class)
     private String conteudo;
     
     @Column(name = "arquivo_path")

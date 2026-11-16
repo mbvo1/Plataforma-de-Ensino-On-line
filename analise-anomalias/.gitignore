@@ -1,0 +1,4 @@
+.venv/
+__pycache__/
+# Exportacoes baixadas do SIGEA: 27 MB, regeneraveis pelo seeder e com IP/usuario.
+dados/

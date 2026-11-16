@@ -1,0 +1,21 @@
+# Saida integral de demo-fase4-console.sh, execucao de 2026-11-12, contra o jar
+# do commit da Fase 4 com os perfis seed-eventos e console-h2, banco H2 em arquivo
+# recem-criado. Unico arquivo desta pasta que nao e gerado por teste: e a
+# transcricao da demonstracao manual do criterio de aceite. O tempo de gravacao
+# do seeder e de parede e varia; 100001 registros = 100 mil do seeder + o login
+# do proprio script.
+== log do seeder
+Seeder: 100000 eventos, 2899 rotulados em 50 incidentes; geracao 199 ms, gravacao 6473 ms
+== 1. verificacao antes da edicao
+{"status":"OK","registrosVerificados":100001,"logIdCorrompido":null,"motivo":null,"ultimoLogIdIntegro":100001,"hashEsperado":null,"hashEncontrado":null,"hashFinal":"9b6702e3977d830cd94de8737a041cedfef0c1117667a04c3e3facfc1f52898d"}
+== 2. edicao a mao pelo console H2 (login.do + query.do)
+sessao do console obtida: sim
+SQL: UPDATE log_seguranca SET ip = '10.66.66.66' WHERE log_id = 54321
+Update count: 1
+== 3. verificacao depois da edicao
+{"status":"CORROMPIDO","registrosVerificados":54321,"logIdCorrompido":54321,"motivo":"HASH_DIVERGENTE","ultimoLogIdIntegro":54320,"hashEsperado":"4db718d584c4b22be7e8effcb2a0a6bb889f7c61285fdfa5c5c46902bd5e966a","hashEncontrado":"ec6d72d1af7ef8a92ff1047b007bfe31d9d18dbccf9cf22df85b78480302161a","hashFinal":null}
+== 4. exportacao CSV completa (linhas incluindo cabecalho, bytes)
+100003
+27036778
+== 5. evento INTEGRIDADE_VIOLADA registrado pela verificacao
+100002,INTEGRIDADE_VIOLADA,log_seguranca/54321,ALERTA

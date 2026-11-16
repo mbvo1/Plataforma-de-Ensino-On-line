@@ -1,0 +1,18 @@
+# Saida integral de analise-anomalias/detectar.py --sigea http://localhost:18080 --enviar,
+# execucao de 2026-11-12 contra o jar da Fase 4 com o perfil seed-eventos, banco H2 em
+# arquivo recem-criado (100 mil eventos do seeder + 2 logins do administrador feitos
+# pelos scripts). Transcricao, nao gerada por teste; os numeros sao os de deteccao.csv,
+# cuja entrada esta amarrada por SHA-256 em deteccao-entrada.csv. Caminhos locais
+# encurtados para <repo>. deteccao-isolation-forest-arvores.csv foi acrescentado
+# depois, numa nova execucao offline (--eventos/--rotulos) sobre a MESMA entrada;
+# os outros quatro CSVs sairam identicos byte a byte nessa nova execucao.
+100002 eventos (0 ANOMALIA_DETECTADA ignorados), 22465 janelas, 85 anomalas
+[Evidencias] <repo>\sigea\evidencias\projeto-2\deteccao.csv (24 linhas)
+[Evidencias] <repo>\sigea\evidencias\projeto-2\deteccao-features.csv (11 linhas)
+[Evidencias] <repo>\sigea\evidencias\projeto-2\deteccao-zscore-feature-dominante.csv (10 linhas)
+[Evidencias] <repo>\sigea\evidencias\projeto-2\deteccao-entrada.csv (2 linhas)
+isolation_forest  marcadas=  1870 precisao=0.0412 recall=0.9059 f1=0.0788 roc_auc=0.9555
+zscore            marcadas=  1565 precisao=0.0530 recall=0.9765 f1=0.1006 roc_auc=0.9912
+enviado isolation_forest: 1870 ANOMALIA_DETECTADA em 1 requisicao(oes)
+enviado zscore: 1565 ANOMALIA_DETECTADA em 1 requisicao(oes)
+integridade depois do envio: OK

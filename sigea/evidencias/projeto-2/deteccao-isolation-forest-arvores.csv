@@ -1,0 +1,11 @@
+feature,arvores,arvores_em_que_a_feature_variou_no_treino,arvores_com_corte_na_feature
+n_tentativas_login,100,100,100
+n_falhas_login,100,100,66
+taxa_falha,100,100,67
+n_falhas_decifragem,100,96,77
+n_violacoes_integridade,100,10,6
+n_recursos_distintos,100,100,98
+raridade_hora,100,100,100
+n_eventos,100,100,100
+intervalo_medio_entre_eventos,100,100,100
+desvio_intervalo,100,100,100

@@ -1,0 +1,177 @@
+/* Projeto 2, Fase 6: dashboard-seguranca.html. Usa as variaveis e os
+   componentes do main.css (cards, data-table); so o que e proprio da tela. */
+
+.seg-legenda {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 6px 0 20px;
+    max-width: 900px;
+}
+
+.seg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.seg-painel {
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    min-width: 0;
+}
+
+.seg-largo {
+    grid-column: 1 / -1;
+}
+
+.seg-painel header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.seg-painel h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.seg-painel h2 i {
+    color: var(--primary-color);
+    margin-right: 6px;
+}
+
+.seg-origem {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.seg-vivo {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+
+.seg-medido {
+    background: #e8eaf6;
+    color: #3949ab;
+}
+
+.seg-grafico {
+    position: relative;
+    height: 300px;
+}
+
+.seg-grafico-baixo {
+    height: 200px;
+}
+
+.seg-nota {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.seg-integridade {
+    font-size: 26px;
+    font-weight: 700;
+    padding: 18px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.seg-carregando {
+    background: var(--bg-light);
+    color: var(--text-secondary);
+}
+
+.seg-ok {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+
+.seg-corrompido {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+}
+
+.seg-detalhes {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px 14px;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+.seg-detalhes dt {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.seg-detalhes dd {
+    font-family: Consolas, "Courier New", monospace;
+    overflow-wrap: anywhere;
+}
+
+.seg-botao {
+    background: var(--primary-gradient);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 16px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.seg-botao:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.seg-tabela {
+    margin-top: 14px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.seg-tabela td.seg-num {
+    font-family: Consolas, "Courier New", monospace;
+    text-align: right;
+}
+
+.seg-rolagem {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.seg-rolagem-x {
+    overflow-x: auto;
+}
+
+.seg-filtros {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.seg-filtros select {
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+@media (max-width: 968px) {
+    .seg-grid {
+        grid-template-columns: 1fr;
+    }
+}

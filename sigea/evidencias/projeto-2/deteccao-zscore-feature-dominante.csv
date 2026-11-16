@@ -1,0 +1,11 @@
+feature,falsos_positivos,verdadeiros_positivos
+n_tentativas_login,0,0
+n_falhas_login,0,12
+taxa_falha,637,1
+n_falhas_decifragem,3,17
+n_violacoes_integridade,0,12
+n_recursos_distintos,52,14
+raridade_hora,419,8
+n_eventos,1,19
+intervalo_medio_entre_eventos,0,0
+desvio_intervalo,370,0

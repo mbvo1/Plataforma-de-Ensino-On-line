@@ -1,0 +1,5 @@
+cifra,modo,cenario,bits_comparados,media_pct,desvio_pct,min_bits,max_bits,pares
+CIFRA_SIGEA_MDS,CBC,bit_no_primeiro_de_10_blocos,1408,50.0339,1.3489,624,766,2000
+CIFRA_SIGEA_MDS,CBC,bit_no_ultimo_de_10_blocos,1408,9.0880,0.5725,100,154,2000
+AES_256,GCM,corpo_bit_no_primeiro_bloco,1280,0.0781,0.0000,1,1,2000
+AES_256,GCM,tag_bit_no_primeiro_bloco,128,50.0328,4.4514,45,83,2000

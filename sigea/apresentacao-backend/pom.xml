@@ -69,6 +69,14 @@
             <artifactId>pdfbox</artifactId>
             <version>3.0.3</version>
         </dependency>
+
+        <!-- Projeto 2, Fase 4: teste de integracao do log encadeado (Flyway +
+             H2 em memoria + endpoints com JWT real). Primeiro teste deste modulo. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -81,6 +89,18 @@
             <resource>
                 <directory>../apresentacao-frontend/public</directory>
                 <targetPath>static</targetPath>
+            </resource>
+            <!-- Projeto 2, Fase 6: os paineis de cifra e detector do
+                 dashboard-seguranca mostram os CSVs medidos, sem recalcular.
+                 Fora de static: so saem pelo endpoint de admin. -->
+            <resource>
+                <directory>../evidencias/projeto-2</directory>
+                <targetPath>evidencias/projeto-2</targetPath>
+                <includes>
+                    <include>avalanche.csv</include>
+                    <include>frequencia-bytes.csv</include>
+                    <include>deteccao.csv</include>
+                </includes>
             </resource>
         </resources>
         

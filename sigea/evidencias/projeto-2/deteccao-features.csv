@@ -1,0 +1,12 @@
+feature,categoria_pdf,media_normal,media_ACESSO_ATIPICO,media_FALHAS_DECIFRAGEM,media_FORCA_BRUTA_LOGIN,media_GERACAO_AUTOMATIZADA,media_VIOLACAO_INTEGRIDADE
+n_tentativas_login,Numero incomum de tentativas de autenticacao,0.4656,0.4762,0.6471,27.2308,0.4545,0.0000
+n_falhas_login,Numero incomum de tentativas de autenticacao,0.0326,0.0000,0.0000,27.1538,0.0000,0.0000
+taxa_falha,Numero incomum de tentativas de autenticacao,0.0153,0.0000,0.0000,0.9982,0.0000,0.0000
+n_falhas_decifragem,Frequencia elevada de falhas de descriptografia,0.0097,0.0000,15.0000,0.0000,0.0000,0.0000
+n_violacoes_integridade,Alteracoes inesperadas em arquivos,0.0000,0.0000,0.0000,0.0000,0.0000,1.9167
+n_recursos_distintos,Padroes atipicos de acesso,4.1223,25.5714,13.7647,1.0000,31.0000,1.9167
+raridade_hora,Padroes atipicos de acesso,2.8601,5.9370,2.7517,3.4727,2.7567,4.3651
+n_eventos,Comportamentos incomuns na geracao de eventos,4.3385,25.7619,16.0000,27.2308,78.0000,1.9167
+intervalo_medio_entre_eventos,Comportamentos incomuns na geracao de eventos,73.8211,6.6923,8.3145,2.8305,2.1031,137.6931
+desvio_intervalo,Comportamentos incomuns na geracao de eventos,26.1830,5.5129,6.8819,2.2957,0.0286,19.6650
+janelas,,22380,21,17,13,22,12

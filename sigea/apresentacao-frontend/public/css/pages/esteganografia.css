@@ -1,0 +1,107 @@
+/* Projeto 2: esteganografia.html. Reusa o seguranca.css (paineis, botoes,
+   detalhes); aqui so o formulario e a comparacao das duas imagens. */
+
+.est-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.est-form > label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.est-origem {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.est-origem legend {
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 0 6px;
+}
+
+.est-origem select,
+.est-origem textarea {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font: inherit;
+}
+
+.est-origem textarea:disabled,
+.est-origem select:disabled {
+    background: var(--bg-light);
+}
+
+.est-form .seg-botao {
+    align-self: flex-start;
+}
+
+.est-erro {
+    color: var(--danger-dark);
+    font-weight: 600;
+}
+
+.est-claro {
+    background: var(--success-light);
+    color: var(--success-dark);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 15px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.est-imagens {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.est-imagens figure {
+    margin: 0;
+    text-align: center;
+}
+
+.est-imagens img {
+    max-width: 100%;
+    max-height: 320px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.est-imagens figcaption {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.est-baixar {
+    text-decoration: none;
+}
+
+@media (max-width: 600px) {
+    .est-imagens {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* O atributo hidden perde para o display das classes (.seg-detalhes e grid). */
+[hidden] {
+    display: none !important;
+}
+
+#resultado-extrair {
+    margin-top: 14px;
+}

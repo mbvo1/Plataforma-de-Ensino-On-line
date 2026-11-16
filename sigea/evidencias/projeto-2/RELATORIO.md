@@ -321,13 +321,20 @@ usaram configuração padrão, sem ajuste contra os rótulos:
   - `desvio_intervalo`: 370.
 
   O limiar não foi mexido para melhorar esses números.
-- **O IsolationForest é instável diante de mudanças mínimas na entrada.** No ensaio
-  (`demo-apresentacao-saida.txt`), os eventos reais da própria demonstração somaram uma
-  janela, e ele marcou 1.986 janelas em vez de 1.870, com o mesmo recall. O z-score foi
-  de 1.565 para 1.566.
+- **Retreinar sobre o log ao vivo muda o resultado, e por isso a demonstração usa a
+  entrada congelada.** O script treina os modelos a cada execução. Rodado sobre o log ao
+  vivo, ele treina sobre um conjunto que passa a incluir os eventos da própria
+  demonstração (logins, cifragens, verificações), com o horário real dela, e a fronteira
+  de decisão do IsolationForest se desloca. Em ensaios de 16/11/2026, com 100.007
+  eventos, ele marcou 1.986 janelas numa execução e 1.936 noutra, feita uma hora depois,
+  contra 1.870 aqui; o z-score marcou 1.566 nas duas. Os números deste relatório vêm da
+  entrada congelada, versionada em `deteccao-entrada-eventos.csv.gz` e
+  `deteccao-entrada-rotulos.csv.gz`; descomprimidas, elas têm os SHA-256 registrados em
+  `deteccao-entrada.csv`. A demonstração roda sobre essa entrada e reproduz
+  `deteccao.csv` byte a byte (`demo-apresentacao-saida.txt`, passo 6).
 
 O script devolve as janelas marcadas ao SIGEA por `POST /api/admin/anomalias`; elas
-viram `ANOMALIA_DETECTADA` no log e aparecem no painel.
+viram `ANOMALIA_DETECTADA` no log e aparecem no painel (3.435 no ensaio: 1.870 + 1.565).
 
 ## 8. Painel de segurança e telas
 
@@ -346,9 +353,8 @@ Os painéis medidos leem os CSVs como estão; um teste confere que o conteúdo s
 igual ao arquivo versionado.
 
 No painel e na tela de esteganografia, nenhum dado do servidor passa por `innerHTML`, e o
-Chart.js é carregado com SRI. No ensaio, um `<script>` gravado no conteúdo de um aviso
-apareceu como texto na tela de esteganografia. Na tela de avisos, que já existia, ele vira
-HTML (seção 13).
+Chart.js é carregado com SRI. As telas de avisos, que já existiam, tinham um XSS
+armazenado, encontrado e corrigido durante este projeto (seção 9, achado 7).
 
 ## 9. Fraquezas encontradas (Parte 4)
 
@@ -356,7 +362,7 @@ Documentadas, e não corrigidas, quando corrigir apagaria o achado:
 
 1. **CBC sem autenticação: maleabilidade demonstrada no app.** Trocamos um caractere no
    1º bloco do texto cifrado de um aviso pelo console H2. O aviso abriu com o 1º bloco
-   embaralhado e um bit trocado no 2º ("Calculo I" virou "Calculo M"), **sem nenhum
+   embaralhado e bits trocados no 2º ("Calculo I" virou "Calculo e" no ensaio), **sem nenhum
    erro e sem `DECIFRAGEM_FALHA`** (`demo-apresentacao-saida.txt`, passo 3; teste
    `adulteracaoNoMeioPassaCalada`). Só a adulteração que quebra o formato ou o padding é
    detectada (passo 4). No CPF, o AES-GCM recusaria as duas pela tag.
@@ -377,6 +383,24 @@ Documentadas, e não corrigidas, quando corrigir apagaria o achado:
 6. **Velocidade da CifraSigea.** Na medição de 24 bits, ela foi cerca de 10 vezes mais
    lenta que o AES por chave testada (seção 4.1), um custo de desempenho sem ganho de
    segurança.
+7. **XSS armazenado nas telas de avisos: encontrado durante o Projeto 2 e corrigido.**
+   Ao ligar a CifraSigea ao conteúdo dos avisos, notamos que as telas de avisos de admin,
+   professor e aluno (`avisos-admin.js`, `avisos-professor.js`, `avisos-aluno.js`) montavam
+   cada card com `innerHTML` sem escapar título, conteúdo, escopo e data.
+   - **O que era explorável:** `POST /api/avisos` aceita qualquer usuário autenticado,
+     inclusive um aluno que acabou de se cadastrar. No teste com o código antigo, um aluno
+     publicou avisos com `<img src=x onerror=alert(1)>` no conteúdo e
+     `<img src=x onerror=alert(2)>` no título, e o código executou nas três telas, no
+     navegador de quem abria a página, administrador incluído. O `<script>alert(1)</script>`
+     também virava HTML, mas não executava, porque o navegador não roda script inserido
+     por `innerHTML`.
+   - **O que mudou:** as três telas passam título, conteúdo, escopo e data pelo mesmo
+     `escapeHtml` que o projeto já usa nas outras telas (a mitigação da V-13 do Projeto 1).
+     O backend não mudou. Com o código novo, os mesmos avisos aparecem como texto nas
+     três telas, sem nenhuma chamada a `alert` e sem elemento `<img>` injetado.
+   - **O que não muda:** cifrar o conteúdo em repouso não protege contra isso, porque o
+     texto é decifrado antes de chegar à tela. A permissão de qualquer usuário publicar
+     aviso continua igual; é uma questão de autorização, fora do escopo deste brief.
 
 ## 10. Desvios do brief e decisões
 
@@ -417,7 +441,8 @@ mvn test -pl dominio-principal -Pexperimentos   # força bruta de 8 a 24 bits (m
 
 cd ../analise-anomalias
 python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
-.venv/Scripts/python detectar.py --sigea http://localhost:8080 --enviar
+# os números do relatório, sobre a entrada congelada (saída fora do repositório)
+.venv/Scripts/python detectar.py --saida /tmp/deteccao   --eventos ../sigea/evidencias/projeto-2/deteccao-entrada-eventos.csv.gz   --rotulos ../sigea/evidencias/projeto-2/deteccao-entrada-rotulos.csv.gz
 ```
 
 O ensaio completo da apresentação está em `demo-apresentacao.sh`, com a transcrição em
@@ -431,10 +456,5 @@ mede tempo de parede, que varia com a máquina.
 - As capas da esteganografia são capturas de tela, não fotografias.
 - Os resultados estatísticos são de amostra única por configuração; a seção 4.3 mostra
   quanto um valor-p pode variar.
-- **XSS armazenado anterior ao projeto, na tela de avisos.** `avisos-admin.js` monta o
-  card com `innerHTML` sem escapar título e conteúdo, e `POST /api/avisos` aceita
-  qualquer usuário autenticado. Cifrar o conteúdo em repouso não muda isso: ele é
-  decifrado antes de chegar à tela. Fica fora do escopo deste brief, que só pede para não
-  aumentar essa dívida nas telas novas, e é do mesmo tipo da V-13 do Projeto 1.
 - Pendências que dependem da professora: se o reaproveitamento do SIGEA vale para este
   projeto, e se "grandes volumes" com banco relacional e seeder atende ao enunciado.

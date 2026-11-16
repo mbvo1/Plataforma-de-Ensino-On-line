@@ -1,9 +1,9 @@
-# Transcricao de demo-apresentacao.sh contra o app real (jar), banco novo, perfis seed-eventos,console-h2.
-# Execucao de 16/11/2026. Saida copiada sem edicao, exceto um caractere de controle do passo 3 trocado por "?"
-# (a versao atual do script ja faz essa troca). Os caracteres estranhos do passo 3 sao o bloco embaralhado.
+# Transcricao de demo-apresentacao.sh contra o app real (jar), banco novo, --spring.profiles.active=seed-eventos --spring.h2.console.enabled=true.
+# Execucao de 16/11/2026, copiada sem edicao. Os caracteres estranhos do passo 3 sao o bloco embaralhado. O passo 6 roda
+# sobre a entrada congelada do relatorio; uma segunda execucao em outro banco novo deu a mesma saida, fora tempo e texto cifrado.
 
 == 0. app no ar com o volume experimental
-Seeder: 100000 eventos, 2899 rotulados em 50 incidentes; geracao 307 ms, gravacao 6880 ms
+Seeder: 100000 eventos, 2899 rotulados em 50 incidentes; geracao 230 ms, gravacao 8682 ms
 
 == 1. integridade da cadeia com o volume do seeder
 {"status":"OK","registrosVerificados":100001,"logIdCorrompido":null,"motivo":null,"ultimoLogIdIntegro":100001,"hashEsper
@@ -12,13 +12,13 @@ Seeder: 100000 eventos, 2899 rotulados em 50 incidentes; geracao 307 ms, gravaca
 == 2. aviso novo: o banco guarda v1:Base64 da CifraSigea, a tela mostra o texto
 aviso_id: 1
 SQL: SELECT conteudo FROM avisos WHERE aviso_id = 1
-v1:jtW095+Oa+i5iX+aDZLpA+oumQEUjt+B76Wffw759eRn23XH9s830ktY/F4iu5LnvhV
+v1:Svv9bfgmxVBAPqobm99pLF5tySoNcvWt0K+pLLvS2F/POm0yYfQ74kr6SzY5i53FYvO
 tela de avisos: A prova de Calculo I foi remarcada para sexta-feira, 14h, sala 302. Tragam documento com foto.
 
 == 3. fraqueza do CBC sem autenticacao: trocar 1 caractere no 1o bloco cifrado
 SQL: UPDATE avisos SET conteudo = CONCAT(LEFT(conteudo, 23), CASE WHEN SUBSTRING(conteudo, 24, 1) = 'A' THEN 'B' ELSE 'A' END, SUBSTRING(conteudo, 25)) WHERE aviso_id = 1
 Update count: 1
-tela de avisos: s���f��?��*CH��/lo M foi remarcada para sexta-feira, 14h, sala 302. Tragam documento com foto.
+tela de avisos: Ϲ#����?;?|�.�:lo e foi remarcada para sexta-feira, 14h, sala 302. Tragam documento com foto.
 DECIFRAGEM_FALHA de avisos.conteudo, antes/depois: 0/0  (nada acusou: o padding no fim ficou intacto)
 
 == 4. adulteracao que quebra o formato: cortar o texto cifrado
@@ -37,20 +37,21 @@ Update count: 1
 {"status":"OK","registrosVerificados":100006,"logIdCorrompido":null,"motivo":nul
 
 
-== 6. deteccao em Python contra o log ao vivo, devolvendo as anomalias ao SIGEA
-100007 eventos (0 ANOMALIA_DETECTADA ignorados), 22466 janelas, 85 anomalas
-isolation_forest  marcadas=  1986 precisao=0.0388 recall=0.9059 f1=0.0744 roc_auc=0.9599
-zscore            marcadas=  1566 precisao=0.0530 recall=0.9765 f1=0.1005 roc_auc=0.9911
-enviado isolation_forest: 1986 ANOMALIA_DETECTADA em 1 requisicao(oes)
-enviado zscore: 1566 ANOMALIA_DETECTADA em 1 requisicao(oes)
+== 6. deteccao em Python sobre a entrada congelada do relatorio, devolvendo as anomalias ao SIGEA
+100002 eventos (0 ANOMALIA_DETECTADA ignorados), 22465 janelas, 85 anomalas
+isolation_forest  marcadas=  1870 precisao=0.0412 recall=0.9059 f1=0.0788 roc_auc=0.9555
+zscore            marcadas=  1565 precisao=0.0530 recall=0.9765 f1=0.1006 roc_auc=0.9912
+enviado isolation_forest: 1870 ANOMALIA_DETECTADA em 1 requisicao(oes)
+enviado zscore: 1565 ANOMALIA_DETECTADA em 1 requisicao(oes)
 integridade depois do envio: OK
--- metricas desta execucao (pasta temporaria; as versionadas nao foram tocadas)
+-- metricas desta execucao (pasta temporaria fora do repositorio)
 modelo,escopo,unidade,total,positivos_reais,vp,fp,fn,vn
-isolation_forest,todas,janela,22466,85,77,1909,8,20472
+isolation_forest,todas,janela,22465,85,77,1793,8,20587
 isolation_forest,ACESSO_ATIPICO,janela,21,21,21,,0,
+deteccao.csv identico ao versionado
 
 == 7. painel de seguranca le as anomalias e a cadeia
-{"total":3552,"porModelo":{"isolation_forest":1986,"zscore":1566},"maioresScores":[{"logId":101356,"registradaEm":"2026-11-16T17:13:04Z","usuarioId":100445,"modelo":"isolation_forest","score":0.785651
+{"total":3435,"porModelo":{"isolation_forest":1870,"zscore":1565},"maioresScores":[{"logId":101278,"registradaEm":"2026-11-16T18:31:59Z","usuarioId":100445,"modelo":"isolation_forest","score":0.785495
 
-{"status":"OK","registrosVerificados":103559,"logIdCorrompido":null,"motivo":nul
+{"status":"OK","registrosVerificados":103442,"logIdCorrompido":null,"motivo":nul
 

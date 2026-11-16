@@ -131,25 +131,33 @@ UPDATE avisos SET conteudo = CONCAT(LEFT(conteudo, 23),
 
 ### 6. IA (3 min)
 
-No terminal:
+No terminal, em `analise-anomalias/`:
 
 ```bash
+E=../sigea/evidencias/projeto-2
 SIGEA_ADMIN_EMAIL=admin@sigea.com SIGEA_ADMIN_SENHA=admin123 \
-  .venv/Scripts/python detectar.py --sigea http://localhost:8080 --enviar --saida /tmp/deteccao-demo
+  .venv/Scripts/python detectar.py --sigea http://localhost:8080 --enviar --saida /tmp/deteccao-demo \
+  --eventos $E/deteccao-entrada-eventos.csv.gz --rotulos $E/deteccao-entrada-rotulos.csv.gz
 ```
 
-- **Use sempre `--saida`.** Sem ela, o script grava por cima dos CSVs versionados.
-- Volte ao painel: a tabela de anomalias se enche, e o painel de métricas mostra os dois
-  modelos.
+- **Entrada congelada:** o script roda sobre a mesma exportação que gerou os números do
+  relatório, versionada no repositório. Com `--sigea` junto de `--eventos` e `--rotulos`,
+  ele não exporta o log ao vivo; só envia as anomalias ao app.
+- **Resultado esperado:** IsolationForest com 1.870 janelas marcadas e z-score com 1.565,
+  os números do relatório (testado em dois bancos novos, com saída idêntica).
+- **`--saida` aponta para fora do repositório:** os CSVs versionados não são tocados.
+- Volte ao painel: a tabela de anomalias se enche com 3.435 anomalias, e o painel de
+  métricas mostra os dois modelos.
 - **O que dizer:**
   - "medimos contra a verdade conhecida que o seeder grava à parte, e não só olhando
     scores";
   - "o z-score, o modelo mais simples, ganhou em tudo";
   - "o IsolationForest perdeu metade das violações de integridade, porque essa feature é
     zero em quase toda a amostra de cada árvore".
-- **Os números ao vivo diferem um pouco dos do relatório.** Os eventos da própria demo
-  somam uma janela; o z-score muda 1 janela marcada, e o IsolationForest muda cerca de
-  100. Isso mostra a instabilidade dele, e está no relatório.
+- **Por que não rodar sobre o log ao vivo:** o script treina os modelos a cada execução.
+  Sobre o log ao vivo, o conjunto passaria a incluir os eventos da própria demo, com o
+  horário dela, e a fronteira de decisão do IsolationForest se deslocaria. Nos ensaios,
+  isso deu 1.986 e 1.936 janelas marcadas, contra 1.870.
 
 ## Se algo falhar
 
@@ -180,6 +188,11 @@ Todos saem dos CSVs desta pasta.
 | IsolationForest: recall / incidentes / precisão média | 0,9059 / 45 de 50 / 0,4165 | `deteccao.csv` |
 
 ## Perguntas prováveis
+
+- **"Por que o número muda se rodar de novo?"** Porque o modelo é retreinado a cada
+  execução, e o log ao vivo inclui os eventos da própria demonstração, o que desloca a
+  fronteira de decisão; sobre a entrada congelada do relatório, o resultado é sempre o
+  mesmo.
 
 - **"Por que criar uma cifra própria se o AES existe?"** É o objeto de estudo do
   enunciado. Em produção usaríamos AES-GCM, e o SIGEA já usa no CPF. A comparação mostra

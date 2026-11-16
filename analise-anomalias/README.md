@@ -17,6 +17,9 @@ export SIGEA_ADMIN_EMAIL=admin@sigea.com
 export SIGEA_ADMIN_SENHA=...          # ou deixe vazio e digite no prompt
 .venv/Scripts/python detectar.py --sigea http://localhost:8080 --enviar
 
+# Na demonstração ao vivo: resultados numa pasta à parte, sem tocar nas evidências
+.venv/Scripts/python detectar.py --sigea http://localhost:8080 --enviar --saida /tmp/deteccao-demo
+
 # Ou sobre exportações já baixadas, sem o app e sem enviar nada
 .venv/Scripts/python detectar.py --eventos dados/log-seguranca.csv --rotulos dados/rotulos.csv
 
@@ -27,7 +30,10 @@ export SIGEA_ADMIN_SENHA=...          # ou deixe vazio e digite no prompt
 As credenciais nunca vão como argumento de linha de comando, porque ficariam no
 histórico do shell. As exportações baixadas ficam em `dados/`, fora do git.
 
-Os resultados são gravados em `sigea/evidencias/projeto-2/`:
+Os resultados são gravados em `sigea/evidencias/projeto-2/` (ou na pasta de
+`--saida`). Use `--saida` sempre que o log tiver eventos além do volume do
+seeder: as janelas mudam, e gravar por cima trocaria os números versionados
+pelos de uma execução que ninguém versionou.
 
 | Arquivo | Conteúdo |
 |---|---|

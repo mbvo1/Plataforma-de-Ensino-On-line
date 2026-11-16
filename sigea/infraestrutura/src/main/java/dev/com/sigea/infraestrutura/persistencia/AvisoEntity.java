@@ -14,7 +14,9 @@ public class AvisoEntity {
     @Column(name = "titulo", nullable = false, length = 255)
     private String titulo;
     
+    // Projeto 2: cifrado em repouso com a CifraSigea (ver CifraConteudo).
     @Column(name = "conteudo", columnDefinition = "TEXT", nullable = false)
+    @Convert(converter = ConteudoCifradoAvisoConverter.class)
     private String conteudo;
     
     @Column(name = "autor_id", nullable = false)

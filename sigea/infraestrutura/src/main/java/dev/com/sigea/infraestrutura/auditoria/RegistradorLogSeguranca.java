@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
@@ -62,6 +63,12 @@ public class RegistradorLogSeguranca {
     RegistradorLogSeguranca(DataSource dataSource, PlatformTransactionManager transacoes, Clock relogio) {
         this.jdbc = new JdbcTemplate(dataSource);
         this.transacao = new TransactionTemplate(transacoes);
+        // Transacao propria, nunca a de quem chamou: a cabeca da cadeia tem de
+        // estar COMMITADA antes de a trava ser solta. Se o evento entrasse na
+        // transacao de fora (por exemplo, a do Hibernate gravando um aviso
+        // cifrado), a trava sairia com a linha ainda invisivel para os outros,
+        // e o proximo a gravar leria a cabeca antiga e repetiria o log_id.
+        this.transacao.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         this.relogio = relogio;
     }
 

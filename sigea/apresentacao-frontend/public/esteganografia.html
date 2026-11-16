@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEA - Esteganografia</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages/seguranca.css">
+    <link rel="stylesheet" href="css/pages/esteganografia.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="dashboard-admin.html" class="menu-item">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Painel</span>
+            </a>
+            <a href="gerenciar-usuarios.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Gerenciar Usuários</span>
+            </a>
+            <a href="gerenciar-disciplinas.html" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Gestão Acadêmica</span>
+            </a>
+            <a href="avisos-admin.html" class="menu-item">
+                <i class="fas fa-bullhorn"></i>
+                <span class="menu-text">Avisos</span>
+            </a>
+            <a href="calendario-admin.html" class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Calendário Institucional</span>
+            </a>
+            <a href="dashboard-seguranca.html" class="menu-item">
+                <i class="fas fa-shield-alt"></i>
+                <span class="menu-text">Segurança</span>
+            </a>
+            <a href="esteganografia.html" class="menu-item active">
+                <i class="fas fa-user-secret"></i>
+                <span class="menu-text">Esteganografia</span>
+            </a>
+            <a href="#" class="menu-item" id="sair">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Sair</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <i class="fas fa-envelope header-icon"></i>
+                <span class="header-title">SIGEA</span>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-name">Administrador</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <h1 class="welcome-title">Esteganografia em PNG</h1>
+            <p class="seg-legenda">
+                O texto de um aviso é cifrado com a <strong>CifraSigea</strong> e só depois escondido nos bits menos
+                significativos dos canais R, G e B de um PNG. A imagem esconde que a mensagem existe; a cifra protege
+                o conteúdo. Só PNG é aceito: JPG tem compressão com perda e destrói os bits escondidos.
+            </p>
+
+            <div class="seg-grid">
+                <section class="seg-painel">
+                    <header>
+                        <h2><i class="fas fa-eye-slash"></i> Esconder</h2>
+                        <span class="seg-origem seg-vivo">ao vivo · ESTEGO_EMBUTIR</span>
+                    </header>
+                    <form id="form-embutir" class="est-form">
+                        <label for="imagem-capa">Imagem de capa (PNG)</label>
+                        <input type="file" id="imagem-capa" accept="image/png" required>
+
+                        <fieldset class="est-origem">
+                            <legend>O que esconder</legend>
+                            <label><input type="radio" name="origem" value="aviso" checked> Um aviso do SIGEA (texto cifrado do banco)</label>
+                            <select id="aviso"></select>
+                            <label><input type="radio" name="origem" value="texto"> Um texto digitado (cifrado agora)</label>
+                            <textarea id="texto" rows="3" maxlength="10000" disabled
+                                      placeholder="Mensagem a cifrar e esconder"></textarea>
+                        </fieldset>
+
+                        <button type="submit" class="seg-botao" id="botao-embutir">
+                            <i class="fas fa-lock"></i> Cifrar e esconder
+                        </button>
+                    </form>
+                    <p class="seg-nota est-erro" id="erro-embutir" hidden></p>
+                </section>
+
+                <section class="seg-painel">
+                    <header>
+                        <h2><i class="fas fa-search"></i> Extrair</h2>
+                        <span class="seg-origem seg-vivo">ao vivo · ESTEGO_EXTRAIR</span>
+                    </header>
+                    <form id="form-extrair" class="est-form">
+                        <label for="imagem-estego">Imagem com mensagem (PNG)</label>
+                        <input type="file" id="imagem-estego" accept="image/png" required>
+                        <button type="submit" class="seg-botao" id="botao-extrair">
+                            <i class="fas fa-unlock"></i> Extrair e decifrar
+                        </button>
+                    </form>
+                    <p class="seg-nota est-erro" id="erro-extrair" hidden></p>
+                    <dl class="seg-detalhes" id="resultado-extrair" hidden>
+                        <dt>Bytes extraídos</dt><dd id="ext-bytes"></dd>
+                        <dt>Texto cifrado</dt><dd id="ext-cifrado"></dd>
+                    </dl>
+                    <div class="est-claro" id="ext-claro" hidden></div>
+                </section>
+
+                <section class="seg-painel seg-largo" id="resultado-embutir" hidden>
+                    <header>
+                        <h2><i class="fas fa-image"></i> Resultado</h2>
+                        <a class="seg-botao est-baixar" id="baixar" download="sigea-estego.png">
+                            <i class="fas fa-download"></i> Baixar PNG
+                        </a>
+                    </header>
+                    <div class="est-imagens">
+                        <figure>
+                            <img id="previa-original" alt="Imagem original">
+                            <figcaption>Original</figcaption>
+                        </figure>
+                        <figure>
+                            <img id="previa-estego" alt="Imagem com a mensagem escondida">
+                            <figcaption>Com a mensagem escondida</figcaption>
+                        </figure>
+                    </div>
+                    <dl class="seg-detalhes">
+                        <dt>PSNR</dt><dd id="m-psnr"></dd>
+                        <dt>Capacidade usada</dt><dd id="m-capacidade"></dd>
+                        <dt>Qui-quadrado, original</dt><dd id="m-chi-original"></dd>
+                        <dt>Qui-quadrado, com mensagem</dt><dd id="m-chi-estego"></dd>
+                        <dt>Texto cifrado escondido</dt><dd id="m-cifrado"></dd>
+                    </dl>
+                    <p class="seg-nota">
+                        PSNR acima de 40 dB: diferença invisível a olho nu. O qui-quadrado de Westfeld e Pfitzmann olha a
+                        região onde a mensagem foi gravada; valor-p perto de 1 indica pares de valores igualados, a marca
+                        do LSB. Ou seja, a mudança é invisível ao olho, mas detectável pela estatística.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/esteganografia.js"></script>
+</body>
+</html>

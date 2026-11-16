@@ -1,10 +1,13 @@
 # Evidências do Projeto 2
 
+- **Relatório:** [`RELATORIO.md`](RELATORIO.md)
+- **Roteiro da apresentação:** [`ROTEIRO-APRESENTACAO.md`](ROTEIRO-APRESENTACAO.md)
+
 Os CSVs desta pasta são gerados por testes em
 `sigea/dominio-principal/src/test/java/dev/com/sigea/dominio/` e em
 `sigea/apresentacao-backend/src/test/`. Nenhum é editado à mão. A única
-exceção é `fase4-demonstracao-console.txt`, a transcrição de uma demonstração
-manual, que está marcada como tal. Este README não repete números de propósito: a fonte de
+exceção são as transcrições de execuções manuais (`fase4-demonstracao-console.txt`,
+`fase5-execucao.txt` e `demo-apresentacao-saida.txt`), marcadas como tal. Este README não repete números de propósito: a fonte de
 qualquer valor citado no relatório é o CSV, não este texto.
 
 ## Como regenerar
@@ -52,6 +55,9 @@ Seeder no Railway: perfil `seed-eventos` (`SPRING_PROFILES_ACTIVE=seed-eventos`)
 Ele regrava os 100 mil eventos padrão a cada subida. O tamanho vai de 100 mil a
 500 mil e é ajustado por `sigea.experimento.seed.quantidade`.
 
+Ensaio completo da apresentação: `demo-apresentacao.sh` (instruções no
+cabeçalho do script; transcrição em `demo-apresentacao-saida.txt`).
+
 Demonstração manual do critério de aceite: suba o app com os perfis
 `seed-eventos,console-h2` e rode `demo-fase4-console.sh`. Outra opção é abrir
 `http://localhost:8080/h2-console` (URL `jdbc:h2:file:./sigea`, usuário `sa`,
@@ -91,6 +97,7 @@ senha vazia), editar uma linha e chamar o endpoint de verificação. O perfil
 | `deteccao-isolation-forest-arvores.csv` | `analise-anomalias/detectar.py` | Em quantas árvores cada feature variou no treino e recebeu corte |
 | `deteccao-entrada.csv` | `analise-anomalias/detectar.py` | Linhas e SHA-256 da exportação de eventos e dos rótulos usados |
 | `fase5-execucao.txt` | `detectar.py --sigea ... --enviar`, execução manual | Transcrição da execução contra o app real, incluindo o envio das anomalias |
+| `demo-apresentacao-saida.txt` | `demo-apresentacao.sh`, execução manual | Ensaio da apresentação de ponta a ponta, em banco novo: cifra no banco, adulterações, log, detecção e painel |
 
 ## Fase 5: detecção de anomalias
 
@@ -104,6 +111,16 @@ próprio script entra no log com a hora real. A exportação (27 MB) não está
 versionada. Na prática, entre uma execução com 100.001 eventos e outra com
 100.002, só o ROC-AUC do IsolationForest mudou, de 0,9554 para 0,9555 (execuções
 de 12/11/2026). Os números citados no relatório são os de `deteccao.csv`.
+
+O ensaio da apresentação (`demo-apresentacao-saida.txt`, 16/11/2026) rodou o
+detector com `--saida` numa pasta temporária, sobre 100.007 eventos: os 100 mil
+do seeder mais os eventos reais da própria demonstração (logins, cifragem e
+decifragem do aviso, verificações). Isso dá 22.466 janelas, uma a mais que em
+`deteccao.csv`. O z-score quase não mudou (1.566 janelas marcadas, contra 1.565).
+O IsolationForest marcou 1.986, contra 1.870, com o mesmo recall: a janela a mais
+muda as subamostras sorteadas para cada árvore. É uma medida da instabilidade do
+modelo diante de mudanças mínimas na entrada, não um ajuste. O ensaio repetido
+em outro banco novo deu os mesmos números.
 
 ## Fase 6: dashboard
 
@@ -140,6 +157,57 @@ ADMINISTRADOR) e do endpoint de verificação da Fase 4.
   tabelas carregaram. O console só registrou o 403 de `/favicon.ico`, que
   acontece em todas as telas do SIGEA (o favicon não está na lista de rotas
   públicas).
+
+## CifraSigea no app e tela de esteganografia
+
+A decisão do brief "tipo de dado cifrado: texto" agora vale no app: o conteúdo de
+avisos e tópicos vai para o banco cifrado pela CifraSigea.
+
+| O que | Onde |
+|---|---|
+| Cifra do conteúdo e registro no log | `infraestrutura/.../persistencia/CifraConteudo.java` |
+| Converters JPA | `ConteudoCifradoAvisoConverter`, `ConteudoCifradoTopicoConverter` (`@Convert` em `AvisoEntity.conteudo` e `TopicoEntity.conteudo`) |
+| Cifragem do legado em claro | `RecifragemConteudoLegado` (roda na subida, idempotente) |
+| Endpoints de esteganografia | `apresentacao-backend/.../auditoria/EsteganografiaController.java` (`/api/admin/esteganografia/*`, só ADMINISTRADOR) |
+| Tela | `apresentacao-frontend/public/esteganografia.html`, menu "Esteganografia" das telas de admin |
+| Testes | `CifraConteudoEsteganografiaIntegracaoTest` |
+
+- **Chave.** Derivada de `CPF_ENCRYPTION_KEY` por separação de domínio, no mesmo
+  padrão do `CpfCryptoConverter`. Não há variável de ambiente nova para cadastrar
+  no Railway. O preço: quem tiver essa variável abre CPF e conteúdo.
+- **Formato.** `v1:` + Base64(nonce || texto cifrado), com nonce novo a cada
+  gravação. Linha sem o prefixo é legado em claro: continua legível e é cifrada
+  na próxima subida.
+- **Falha de decifragem.** O aviso aparece como `[conteudo indisponivel: falha na
+  decifragem]` e o log ganha um `DECIFRAGEM_FALHA`. Lançar exceção derrubaria a
+  listagem inteira por causa de uma linha.
+- **Fraqueza do CBC, agora visível no app.** Trocar um caractere no primeiro
+  bloco cifrado, pelo console H2, decifra para um texto alterado **sem erro**: o
+  primeiro bloco vira lixo e o segundo muda num bit. Só a adulteração que quebra
+  o formato ou o padding é detectada. O teste
+  `adulteracaoNoMeioPassaCalada` e o passo 3 do ensaio mostram isso. No CPF, o
+  GCM recusaria as duas.
+- **Eventos.** Cada cifragem grava `CIFRAGEM_OK`, cada leitura `DECIFRAGEM_OK` ou
+  `DECIFRAGEM_FALHA`, com o recurso (`avisos.conteudo`, `topicos.conteudo`) e sem
+  `usuario_id`: o converter roda dentro do Hibernate, sem acesso ao usuário da
+  requisição. Ler uma lista de avisos grava um evento por aviso.
+- **Transação própria no log.** `RegistradorLogSeguranca` passou a abrir sempre
+  uma transação nova. Antes, um evento gravado de dentro da transação do
+  Hibernate só ficaria visível no commit dela, depois de a trava ser solta, e o
+  próximo evento leria a cabeça antiga da cadeia.
+- **Esteganografia.** O que vai para a imagem é a coluna `avisos.conteudo` como
+  está no banco, já cifrada; também dá para digitar um texto, que é cifrado na
+  hora. A allowlist é própria (assinatura PNG; JPG recusado com erro explícito),
+  nada é gravado em disco e o limite de upload é o do app, 5 MB. A tela mostra
+  PSNR, capacidade usada e o qui-quadrado do trecho embutido, antes e depois.
+  Cada operação grava `ESTEGO_EMBUTIR` ou `ESTEGO_EXTRAIR` com o id do admin.
+- **Verificação no navegador.** A tela foi usada no Chrome headless, com login
+  real, a 1400 e a 390 px: JPG recusado, aviso escondido numa foto convertida
+  para PNG, PNG baixado, extraído e decifrado para o texto original. Um `<script>`
+  no conteúdo do aviso apareceu como texto.
+
+`ATAQUE_EXECUTADO` continua só no volume sintético: os ataques rodam como testes
+(`mvn test`), não no app.
 
 ## Variantes da CifraSigea nos CSVs
 
@@ -224,14 +292,12 @@ Os CSVs de força bruta e estatístico usam só a cifra atual.
 - **`timestamp` em UTC.** As horas locais de `seeder-horas.csv` são de Recife
   (UTC-3, sem horário de verão). A Fase 5 precisa converter antes de calcular
   `hora_do_dia`.
-- **Eventos com emissão real e eventos só do seeder.** Hoje o app emite de
-  verdade `LOGIN_SUCESSO` e `LOGIN_FALHA` (nas rotas `/api/auth/login` e
-  `/login-admin`, sem gravar o e-mail digitado), além de `ANOMALIA_DETECTADA` e
-  `INTEGRIDADE_VIOLADA`. A CifraSigea ainda não é usada em nenhum fluxo do app,
-  e não existe tela de esteganografia nem de ataques. Por isso `CIFRAGEM_*`,
-  `DECIFRAGEM_*`, `ESTEGO_*` e `ATAQUE_EXECUTADO` só aparecem no volume
-  sintético (decisão do grupo). Integrar a cifra a `AvisoEntity.conteudo`
-  continua pendente; nenhuma fase do brief atribui essa tarefa.
+- **Eventos com emissão real e eventos só do seeder.** O app emite de verdade
+  `LOGIN_SUCESSO` e `LOGIN_FALHA` (nas rotas `/api/auth/login` e `/login-admin`,
+  sem gravar o e-mail digitado), `CIFRAGEM_*` e `DECIFRAGEM_*` (conteúdo de
+  avisos e tópicos), `ESTEGO_*` (tela de esteganografia), `ANOMALIA_DETECTADA` e
+  `INTEGRIDADE_VIOLADA`. Só `ATAQUE_EXECUTADO` existe apenas no volume
+  sintético, porque os ataques rodam como testes, não no app.
 - **IP dos logins reais.** O app grava `getRemoteAddr`, que no Railway é o IP
   do proxy. `X-Forwarded-For` não é usado porque pode ser forjado enquanto os
   proxies confiáveis não estiverem configurados.

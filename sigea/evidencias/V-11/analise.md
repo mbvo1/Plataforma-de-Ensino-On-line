@@ -66,3 +66,35 @@ ser auditada ou comprovada depois do fato
   (depois-adulteracao-detectada.png)
 - Resultado: Ausência de auditoria → Log implementado → Adulteração
   detectada com precisão (confirmado)
+
+## Nota de rastreabilidade (Projeto 2, 16/11/2026)
+
+O texto acima é o que foi entregue no Projeto 1 e fica como estava. O
+código descrito em "Depois da correção" existe, mas não chegou à `main`: o
+PR #13 (commit `080dc00`, merge `cb9ab26`) levou só esta análise e os prints.
+A migration `V26__criar_log_seguranca.sql`, `LogSegurancaEntity`,
+`LogSegurancaJpaRepository` e `LogSegurancaService` foram commitados depois
+do merge, no `3acac2f` (16/09/2026), e estão só na branch
+`fix/V-11-log-seguranca`. Por isso a `main` pula de V25 para V27.
+
+Esse código não deve mais ser mesclado: a V26 ficaria abaixo da V27 já
+aplicada, e o Flyway recusa migration fora de ordem na validação. A tabela
+dela (`LogSeguranca`) também não é a do Projeto 2 (`log_seguranca`).
+
+O log encadeado do Projeto 2 (Fase 4, branch `feat/projeto-2`) foi feito do
+zero, com outra forma:
+
+- Tabela `log_seguranca`, migration `V28__criar_log_seguranca.sql`; não há
+  coluna `acao`, e sim `tipo_evento`, `recurso`, `resultado` e `detalhe`.
+- Gravação por `RegistradorLogSeguranca` (JDBC); o hash cobre todas as
+  colunas e é verificado por `VerificadorCadeiaLog`.
+- O endpoint `GET /api/admin/auditoria/verificar-integridade` tem o mesmo
+  caminho descrito acima.
+- Eventos emitidos de verdade: login (sucesso e falha), cifragem e
+  decifragem do conteúdo de avisos e tópicos, esteganografia, anomalias
+  detectadas e violação de integridade. Registro de usuário, criação de
+  professor e reset de senha **não** geram evento.
+
+O reteste equivalente (editar uma linha pelo console H2 e o endpoint apontar
+aquele `log_id`) está em `evidencias/projeto-2/fase4-demonstracao-console.txt`
+e no teste `LogSegurancaIntegracaoTest`.

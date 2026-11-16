@@ -42,9 +42,16 @@ def sha256(caminho: Path) -> str:
     return h.hexdigest()
 
 
+# Trocado por --saida. Na demonstracao ao vivo o log tem eventos reais a mais
+# (logins, cifragens, esteganografia), as janelas mudam, e gravar por cima
+# das evidencias trocaria os numeros do relatorio pelos de uma execucao
+# que ninguem versionou.
+saida = EVIDENCIAS
+
+
 def gravar_csv(nome: str, cabecalho: list[str], linhas: list[list]) -> None:
-    EVIDENCIAS.mkdir(parents=True, exist_ok=True)
-    destino = EVIDENCIAS / nome
+    saida.mkdir(parents=True, exist_ok=True)
+    destino = saida / nome
     with open(destino, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(cabecalho)
@@ -73,7 +80,11 @@ def main(argv: list[str]) -> int:
     p.add_argument("--eventos", type=Path, help="CSV de /api/admin/logs/export (sem --sigea)")
     p.add_argument("--rotulos", type=Path, help="CSV de /api/admin/experimento/rotulos (sem --sigea)")
     p.add_argument("--enviar", action="store_true", help="devolve as janelas marcadas via POST /api/admin/anomalias")
+    p.add_argument("--saida", type=Path, help=f"pasta dos CSVs de resultado (padrao: {EVIDENCIAS})")
     a = p.parse_args(argv)
+    if a.saida:
+        global saida
+        saida = a.saida
 
     cliente = None
     if a.sigea:

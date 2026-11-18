@@ -2,8 +2,7 @@
 
 Cibersegurança Aplicada a Dados e IA, CESAR School, Prof.ª Renatta Nigro.
 
-Integrantes:Marcelo Bresani, Felipe Bandeira, Rodrigo Nunes, Rodrigo Leal, Paulo Portella, João Victor Nunes 
-
+Integrantes: Marcelo Bresani, Felipe Bandeira, Rodrigo Nunes, Rodrigo Leal, Paulo Portella e João Victor Nunes
 
 Branch: `feat/projeto-2`. Todos os números deste relatório saem dos CSVs desta pasta,
 gerados por execução real; o arquivo de origem aparece ao lado de cada um. Quando um
@@ -357,9 +356,10 @@ No painel e na tela de esteganografia, nenhum dado do servidor passa por `innerH
 Chart.js é carregado com SRI. As telas de avisos, que já existiam, tinham um XSS
 armazenado, encontrado e corrigido durante este projeto (seção 9, achado 7).
 
-## 9. Fraquezas encontradas (Parte 4)
+## 9. Fraquezas encontradas
 
-Documentadas, e não corrigidas, quando corrigir apagaria o achado:
+Documentadas, e não corrigidas, quando corrigir apagaria o achado (a exceção é o item 7,
+que foi corrigido):
 
 1. **CBC sem autenticação: maleabilidade demonstrada no app.** Trocamos um caractere no
    1º bloco do texto cifrado de um aviso pelo console H2. O aviso abriu com o 1º bloco
@@ -387,7 +387,7 @@ Documentadas, e não corrigidas, quando corrigir apagaria o achado:
 7. **XSS armazenado nas telas de avisos: encontrado durante o Projeto 2 e corrigido.**
    Ao ligar a CifraSigea ao conteúdo dos avisos, notamos que as telas de avisos de admin,
    professor e aluno (`avisos-admin.js`, `avisos-professor.js`, `avisos-aluno.js`) montavam
-   cada card com `innerHTML` sem escapar título, conteúdo, escopo e data.
+   cada card com `innerHTML` sem escapar título, conteúdo e escopo (e a data, nas telas de professor e aluno).
    - **O que era explorável:** `POST /api/avisos` aceita qualquer usuário autenticado,
      inclusive um aluno que acabou de se cadastrar. No teste com o código antigo, um aluno
      publicou avisos com `<img src=x onerror=alert(1)>` no conteúdo e
@@ -395,7 +395,7 @@ Documentadas, e não corrigidas, quando corrigir apagaria o achado:
      navegador de quem abria a página, administrador incluído. O `<script>alert(1)</script>`
      também virava HTML, mas não executava, porque o navegador não roda script inserido
      por `innerHTML`.
-   - **O que mudou:** as três telas passam título, conteúdo, escopo e data pelo mesmo
+   - **O que mudou:** as três telas passam título, conteúdo e escopo (e a data, nas de professor e aluno) pelo mesmo
      `escapeHtml` que o projeto já usa nas outras telas (a mitigação da V-13 do Projeto 1).
      O backend não mudou. Com o código novo, os mesmos avisos aparecem como texto nas
      três telas, sem nenhuma chamada a `alert` e sem elemento `<img>` injetado.
@@ -450,7 +450,70 @@ O ensaio completo da apresentação está em `demo-apresentacao.sh`, com a trans
 `demo-apresentacao-saida.txt`. Os testes de `mvn test` usam semente fixa. A força bruta
 mede tempo de parede, que varia com a máquina.
 
-## 13. Limitações
+## 13. Parte 4 — as quatro perguntas do enunciado
+
+### 13.1 O sistema apresenta efeito avalanche?
+
+Sim. Com as 10 rodadas padrão, virar 1 bit do texto claro altera **50,01%** dos 128 bits
+do bloco cifrado, e o mínimo observado em 5.000 pares foi de 44 bits — sem cauda. A
+saturação acontece já na 2ª rodada, uma antes do AES (seção 4.2).
+
+A resposta não era essa no começo, e isso importa mais que o número. A primeira camada de
+difusão que projetamos dava média de 49,60%, aparentemente correta, mas escondia pares em
+que um bit virado mudava **1 único bit** depois de 10 rodadas, concentrados num byte
+específico. Foram duas correções, as duas a partir de diagnóstico da causa e não de ajuste
+de parâmetro, até chegar a zero pares defeituosos em 20.000 (seção 3.2). A média sozinha
+não responde esta pergunta: é preciso olhar o mínimo e a distribuição.
+
+### 13.2 Existem padrões na saída?
+
+Não, no modo de operação correto. O texto cifrado pela CifraSigea tem qui-quadrado de
+230,4 sobre 255 graus de liberdade (valor-p 0,864), entropia de 7,9987 bits por byte,
+índice de coincidência de 0,00391 — exatamente 1/256, o valor de bytes uniformes — e
+nenhum bloco de 16 bytes repetido em 8.183. O AES-256-GCM dá números equivalentes, e o
+texto claro em português dá 5,02 bits de entropia e índice de 0,0498 (seção 4.3).
+
+A ressalva é o modo de operação. Cifrando 10 KB da letra "A" em ECB emulado, com a mesma
+cifra, 639 de 640 blocos se repetiram e a entropia caiu para 4,0 bits por byte. A ausência
+de padrão é propriedade do conjunto cifra + modo, não da cifra isolada.
+
+### 13.3 Qual ataque foi mais eficaz?
+
+Nenhum dos três quebrou a cifra, mas eles não foram igualmente informativos.
+
+A **força bruta** é inviável por margem astronômica: a curva medida de 8 a 24 bits tem
+inclinação 0,98 em log₂ (R² = 0,998), e extrapolada para 2^256 dá 3,67 × 10^57 anos a
+10^12 chaves por segundo. O **ataque estatístico** não encontrou estrutura: a distribuição
+do texto cifrado é indistinguível de uniforme pelos quatro testes aplicados.
+
+O **ataque diferencial foi o mais eficaz**, e por larga margem — não porque tenha
+recuperado chave ou texto, mas porque foi o único que revelou defeito real no algoritmo, e
+o fez duas vezes. Ele é também o único dos três cujo resultado mudou o código: as duas
+versões anteriores da camada de difusão foram descartadas por causa dele.
+
+### 13.4 O sistema é seguro? Justifique
+
+**Não para uso real.** A justificativa está em cinco fraquezas medidas, todas na seção 9:
+
+1. **CBC sem autenticação**, com maleabilidade demonstrada no app rodando: trocar um
+   caractere do texto cifrado corrompe o conteúdo exibido sem gerar erro algum. O
+   AES-256-GCM que o SIGEA usa no CPF recusaria a mesma adulteração pela tag.
+2. **Padding oracle**, consequência do mesmo desenho: o sistema distingue falha de padding
+   de outros erros.
+3. **Chave do conteúdo derivada do segredo do CPF**: quem obtém um, abre os dois.
+4. **Hash do log sem chave**: quem escreve no banco recalcula a cadeia inteira a partir da
+   linha alterada, e truncar o fim não quebra elo nenhum.
+5. **LSB sequencial e por substituição**, detectável por qui-quadrado a partir de 10% de
+   ocupação.
+
+Soma-se a isso o desempenho: na medição de 24 bits a CifraSigea testou chaves cerca de 10
+vezes mais devagar que o AES, custo sem contrapartida de segurança.
+
+Uma cifra projetada por estudantes em algumas semanas não deveria competir com um padrão
+revisado por décadas, e seria suspeito se competisse. O que o projeto sustenta não é que a
+CifraSigea seja segura, e sim que sabemos medir e nomear por que ela não é.
+
+## 14. Limitações
 
 - Os usuários e eventos do volume são sintéticos. O detector foi medido contra os
   cenários que nós mesmos injetamos, e um atacante real não segue esses cenários.
@@ -459,3 +522,35 @@ mede tempo de parede, que varia com a máquina.
   quanto um valor-p pode variar.
 - Pendências que dependem da professora: se o reaproveitamento do SIGEA vale para este
   projeto, e se "grandes volumes" com banco relacional e seeder atende ao enunciado.
+
+## 15. Conclusão
+
+O projeto entregou uma cifra simétrica própria rodando dentro de uma aplicação real, não
+num laboratório separado: o conteúdo de avisos e tópicos do SIGEA vai para o banco cifrado
+pela CifraSigea, as operações geram eventos num log encadeado por hash, e um painel
+restrito a administrador mostra o estado da cadeia, as anomalias detectadas e os
+resultados das medições. As seis camadas do enunciado têm código e evidência, e a seção 11
+amarra cada requisito a um arquivo.
+
+Sobre a pergunta central — se o sistema é seguro — a resposta medida é não, e as cinco
+razões estão na seção 13.4. Isso era o desfecho provável desde o início, e tratá-lo como
+resultado em vez de fracasso foi uma decisão de método: deixamos no código as três versões
+da camada de difusão, mantivemos as fraquezas em vez de corrigi-las quando corrigir
+apagaria o achado, e reportamos que o modelo mais simples de detecção venceu o mais
+sofisticado em todas as métricas.
+
+Três resultados nos parecem os mais relevantes. O primeiro é que **a média engana**: a
+camada de difusão inicial tinha efeito avalanche médio de 49,60% e, ao mesmo tempo, pares
+em que um bit virado mudava um único bit de saída; só o mínimo e a distribuição por byte
+revelaram o defeito. O segundo é que **o modo de operação pesa tanto quanto o algoritmo**:
+a mesma cifra que não repete bloco algum em CBC repetiu 639 de 640 em ECB emulado. O
+terceiro é que **sofisticação não garante desempenho**: o IsolationForest perdeu para um
+limiar de três desvios padrão em precisão, recall e ROC-AUC, e a causa é identificável —
+a feature que marca violação de integridade é zero em quase toda amostra de treino de cada
+árvore.
+
+O que mudaríamos primeiro, com mais tempo: autenticação no modo de operação, por GCM ou
+encrypt-then-MAC, que elimina de uma vez a maleabilidade e o padding oracle; HMAC com
+chave fora do banco para a cadeia de log, ou publicação periódica do hash final; e
+embutimento em posições sorteadas por chave na esteganografia, com LSB matching no lugar
+da substituição.

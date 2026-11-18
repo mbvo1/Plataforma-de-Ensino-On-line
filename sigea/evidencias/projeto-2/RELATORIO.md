@@ -2,7 +2,8 @@
 
 Cibersegurança Aplicada a Dados e IA, CESAR School, Prof.ª Renatta Nigro.
 
-Integrantes: _preencher_
+Integrantes:Marcelo Bresani, Felipe Bandeira, Rodrigo Nunes, Rodrigo Leal, Paulo Portella, João Victor Nunes 
+
 
 Branch: `feat/projeto-2`. Todos os números deste relatório saem dos CSVs desta pasta,
 gerados por execução real; o arquivo de origem aparece ao lado de cada um. Quando um
